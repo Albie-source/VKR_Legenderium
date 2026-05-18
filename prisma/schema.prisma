@@ -1,0 +1,226 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+enum UserRole {
+  USER
+  ADMIN
+}
+
+enum PublishStatus {
+  DRAFT
+  PUBLISHED
+  ARCHIVED
+}
+
+model User {
+  id           Int      @id @default(autoincrement())
+  name         String
+  email        String   @unique
+  passwordHash String
+  role         UserRole @default(USER)
+  createdAt    DateTime @default(now())
+
+  materials     Material[]
+  favorites     Favorite[]
+  taskAttempts  TaskAttempt[]
+  goalProgress  GoalProgress[]
+
+  @@map("users")
+}
+
+model Region {
+  id          Int      @id @default(autoincrement())
+  name        String   @unique
+  description String?
+
+  materials   Material[]
+
+  @@map("regions")
+}
+
+model People {
+  id          Int      @id @default(autoincrement())
+  name        String   @unique
+  description String?
+
+  materials   Material[]
+
+  @@map("peoples")
+}
+
+model Genre {
+  id          Int      @id @default(autoincrement())
+  name        String   @unique
+  description String?
+
+  materials   Material[]
+  goals       Goal[]
+
+  @@map("genres")
+}
+
+model Topic {
+  id          Int      @id @default(autoincrement())
+  name        String   @unique
+  description String?
+
+  materials   MaterialTopic[]
+  goals       Goal[]
+
+  @@map("topics")
+}
+
+model Source {
+  id     Int     @id @default(autoincrement())
+  title  String
+  author String?
+  year   Int?
+  type   String?
+  url    String?
+
+  materials Material[]
+
+  @@map("sources")
+}
+
+model Material {
+  id               Int           @id @default(autoincrement())
+  title            String
+  shortDescription String?
+  fullText         String?
+
+  latitude         Float?
+  longitude        Float?
+
+  imageUrl         String?
+  audioUrl         String?
+  videoUrl         String?
+
+  status           PublishStatus @default(DRAFT)
+
+  regionId         Int
+  peopleId         Int
+  genreId          Int
+  sourceId         Int
+  createdById      Int
+
+  region           Region        @relation(fields: [regionId], references: [id])
+  people           People        @relation(fields: [peopleId], references: [id])
+  genre            Genre         @relation(fields: [genreId], references: [id])
+  source           Source        @relation(fields: [sourceId], references: [id])
+  createdBy        User          @relation(fields: [createdById], references: [id])
+
+  topics           MaterialTopic[]
+  favorites        Favorite[]
+  tasks            InteractiveTask[]
+
+  createdAt        DateTime      @default(now())
+  updatedAt        DateTime      @updatedAt
+
+  @@map("materials")
+}
+
+model MaterialTopic {
+  materialId Int
+  topicId    Int
+
+  material   Material @relation(fields: [materialId], references: [id], onDelete: Cascade)
+  topic      Topic    @relation(fields: [topicId], references: [id], onDelete: Cascade)
+
+  @@id([materialId, topicId])
+  @@map("material_topics")
+}
+
+model Favorite {
+  id         Int      @id @default(autoincrement())
+  userId     Int
+  materialId Int
+  createdAt  DateTime @default(now())
+
+  user       User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  material   Material @relation(fields: [materialId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, materialId])
+  @@map("favorites")
+}
+
+model InteractiveTask {
+  id          Int      @id @default(autoincrement())
+  materialId  Int
+
+  title       String
+  description String?
+  type        String
+  config      Json
+  difficulty  String?
+
+  material    Material      @relation(fields: [materialId], references: [id], onDelete: Cascade)
+  attempts    TaskAttempt[]
+
+  createdAt   DateTime      @default(now())
+  updatedAt   DateTime      @updatedAt
+
+  @@map("interactive_tasks")
+}
+
+model TaskAttempt {
+  id          Int      @id @default(autoincrement())
+  userId      Int
+  taskId      Int
+
+  isCompleted Boolean
+  score       Int      @default(0)
+  completedAt DateTime @default(now())
+
+  user        User            @relation(fields: [userId], references: [id], onDelete: Cascade)
+  task        InteractiveTask @relation(fields: [taskId], references: [id], onDelete: Cascade)
+
+  @@map("task_attempts")
+}
+
+model Goal {
+  id                     Int      @id @default(autoincrement())
+  title                  String
+  description             String?
+  requiredMaterialsCount  Int
+
+  cardTitle               String
+  cardImageUrl            String?
+
+  isActive                Boolean @default(true)
+
+  genreId                 Int
+  topicId                 Int
+
+  genre                   Genre   @relation(fields: [genreId], references: [id])
+  topic                   Topic   @relation(fields: [topicId], references: [id])
+
+  progress                GoalProgress[]
+
+  createdAt               DateTime @default(now())
+  updatedAt               DateTime @updatedAt
+
+  @@map("goals")
+}
+
+model GoalProgress {
+  id              Int      @id @default(autoincrement())
+  userId          Int
+  goalId          Int
+
+  currentProgress Int      @default(0)
+  isCompleted     Boolean  @default(false)
+  rewardReceived  Boolean  @default(false)
+  completedAt     DateTime?
+
+  user            User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  goal            Goal     @relation(fields: [goalId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, goalId])
+  @@map("goal_progress")
+}
