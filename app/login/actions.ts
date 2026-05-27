@@ -7,8 +7,9 @@ import { prisma } from "@/lib/prisma";
 import { AUTH_COOKIE_NAME } from "@/lib/auth";
 
 export async function loginAction(formData: FormData) {
-  const email = String(formData.get("email") ?? "").trim();
+  const email = String(formData.get("email") ?? "").trim().toLowerCase();
   const password = String(formData.get("password") ?? "").trim();
+  const next = String(formData.get("next") ?? "").trim();
 
   const user = await prisma.user.findUnique({
     where: {
@@ -17,17 +18,17 @@ export async function loginAction(formData: FormData) {
   });
 
   if (!user) {
-    redirect("/login?error=1");
+    redirect(makeLoginErrorUrl(next));
   }
 
   const isPasswordValid = await bcrypt.compare(password, user.passwordHash);
 
-  // Временная поддержка старого admin123 из seed, если пароль ещё был обычной строкой.
-  // После первого успешного входа пароль автоматически перезапишется хешем.
+  // Временная поддержка старых паролей из seed, если они были записаны обычной строкой.
+  // После первого успешного входа пароль автоматически перезапишется bcrypt-хэшем.
   const isLegacyPasswordValid = user.passwordHash === password;
 
   if (!isPasswordValid && !isLegacyPasswordValid) {
-    redirect("/login?error=1");
+    redirect(makeLoginErrorUrl(next));
   }
 
   if (isLegacyPasswordValid) {
@@ -56,6 +57,10 @@ export async function loginAction(formData: FormData) {
     redirect("/admin");
   }
 
+  if (isSafeInternalPath(next)) {
+    redirect(next);
+  }
+
   redirect("/profile");
 }
 
@@ -65,4 +70,20 @@ export async function logoutAction() {
   cookieStore.delete(AUTH_COOKIE_NAME);
 
   redirect("/login");
+}
+
+function makeLoginErrorUrl(next: string) {
+  const params = new URLSearchParams();
+
+  params.set("error", "1");
+
+  if (isSafeInternalPath(next)) {
+    params.set("next", next);
+  }
+
+  return `/login?${params.toString()}`;
+}
+
+function isSafeInternalPath(value: string) {
+  return value.startsWith("/") && !value.startsWith("//");
 }

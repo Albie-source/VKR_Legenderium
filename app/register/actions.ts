@@ -6,7 +6,7 @@ import { prisma } from "@/lib/prisma";
 
 export async function registerAction(formData: FormData) {
   const name = String(formData.get("name") ?? "").trim();
-  const email = String(formData.get("email") ?? "").trim();
+  const email = String(formData.get("email") ?? "").trim().toLowerCase();
   const password = String(formData.get("password") ?? "").trim();
 
   if (!name || !email || password.length < 6) {

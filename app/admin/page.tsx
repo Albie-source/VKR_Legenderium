@@ -16,6 +16,8 @@ export default async function AdminPage() {
     goalsCount,
     regionsCount,
     peoplesCount,
+    genresCount,
+    topicsCount,
   ] = await Promise.all([
     prisma.material.findMany({
       include: {
@@ -48,195 +50,151 @@ export default async function AdminPage() {
     }),
 
     prisma.interactiveTask.count(),
-
     prisma.goal.count(),
-
     prisma.region.count(),
-
     prisma.people.count(),
+    prisma.genre.count(),
+    prisma.topic.count(),
   ]);
 
+  const totalMaterials =
+    publishedMaterialsCount + draftMaterialsCount + archivedMaterialsCount;
+
   return (
-    <main className="min-h-screen bg-stone-50 px-6 py-10 text-stone-900">
-      <section className="mx-auto max-w-7xl">
-        <div className="mb-8 flex flex-wrap items-start justify-between gap-4">
-          <div>
-            <p className="mb-2 text-sm font-semibold uppercase tracking-[0.25em] text-amber-700">
-              Админ-панель
-            </p>
+    <main className="overflow-hidden bg-[#f4ecdf] pb-20">
+      <section className="border-b border-white/10 bg-[radial-gradient(circle_at_18%_12%,rgba(58,166,160,0.16),transparent_28%),radial-gradient(circle_at_82%_8%,rgba(216,163,66,0.12),transparent_24%),linear-gradient(180deg,#07181c_0%,#0b2428_100%)]">
+        <div className="mx-auto max-w-7xl px-6 py-12">
+          <div className="relative overflow-hidden rounded-[2.5rem] border border-white/10 bg-[#0b1f22] p-8 shadow-2xl shadow-black/25 md:p-10">
+            <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_12%_18%,rgba(58,166,160,0.16),transparent_28%),radial-gradient(circle_at_82%_20%,rgba(216,163,66,0.14),transparent_24%),radial-gradient(circle_at_70%_88%,rgba(47,143,99,0.10),transparent_28%)]" />
 
-            <h1 className="mb-3 text-4xl font-bold">
-              Панель управления платформой
-            </h1>
+            <div className="relative flex flex-wrap items-start justify-between gap-8">
+              <div className="max-w-3xl">
+                <p className="mb-4 inline-flex rounded-full border border-[#d8a342]/35 bg-[#d8a342]/10 px-4 py-2 text-xs font-black uppercase tracking-[0.28em] text-[#f0bd5b]">
+                  Административная панель
+                </p>
 
-            <p className="text-stone-700">
-              Вы вошли как:{" "}
-              <span className="font-medium text-stone-900">{admin.email}</span>
-            </p>
-          </div>
+                <h1 className="mb-4 text-5xl font-extrabold leading-tight tracking-tight text-[#fff8e8] md:text-6xl">
+                  Управление платформой
+                </h1>
 
-          <div className="flex flex-wrap gap-3">
-            <Link
-              href="/library"
-              className="rounded-xl border border-stone-300 px-5 py-3 font-medium text-stone-700 transition hover:bg-stone-100"
-            >
-              В библиотеку
-            </Link>
+                <p className="max-w-2xl text-lg leading-8 text-[#d6c8b6]">
+                  Управление фольклорными материалами, интерактивными заданиями,
+                  целями обучения и справочниками.
+                </p>
 
-            <form action={logoutAction}>
-              <button
-                type="submit"
-                className="rounded-xl border border-stone-300 px-5 py-3 font-medium text-stone-700 transition hover:bg-stone-100"
-              >
-                Выйти
-              </button>
-            </form>
+                <p className="mt-4 text-sm text-[#cbbba7]">
+                  Администратор:{" "}
+                  <span className="font-extrabold text-[#fff8e8]">
+                    {admin.email}
+                  </span>
+                </p>
+              </div>
+
+              <form action={logoutAction}>
+                <button
+                  type="submit"
+                  className="rounded-2xl bg-[#d8a342] px-5 py-3 text-sm font-extrabold !text-[#06151a] shadow-md transition hover:-translate-y-0.5 hover:bg-[#f0bd5b]"
+                >
+                  Выйти
+                </button>
+              </form>
+            </div>
           </div>
         </div>
+      </section>
 
-        <section className="mb-8 grid gap-4 md:grid-cols-2 lg:grid-cols-4">
+      <section className="mx-auto max-w-7xl px-6 pt-10">
+        <div className="mb-8 grid gap-4 md:grid-cols-2 xl:grid-cols-4">
+          <StatCard
+            title="Материалов"
+            value={totalMaterials}
+            text="Всего в базе данных"
+          />
+
           <StatCard
             title="Опубликовано"
             value={publishedMaterialsCount}
-            description="Материалы, доступные пользователям"
+            text="Доступны пользователям"
           />
 
           <StatCard
-            title="Черновики"
-            value={draftMaterialsCount}
-            description="Материалы, пока скрытые от пользователей"
-          />
-
-          <StatCard
-            title="В архиве"
-            value={archivedMaterialsCount}
-            description="Материалы, исключённые из публичного просмотра"
-          />
-
-          <StatCard
-            title="Задания"
+            title="Заданий"
             value={tasksCount}
-            description="Интерактивные задания платформы"
+            text="Интерактивные задания"
           />
-        </section>
 
-        <section className="mb-8 grid gap-5 md:grid-cols-2 lg:grid-cols-4">
+          <StatCard title="Целей" value={goalsCount} text="Маршруты изучения" />
+        </div>
+
+        <div className="mb-8 grid gap-5 md:grid-cols-2 xl:grid-cols-4">
           <AdminSectionCard
             title="Материалы"
-            text="Добавление и редактирование фольклорных материалов."
-            href="/admin/materials/new"
-            linkText="Добавить материал"
+            text="Добавление, редактирование и архивация фольклорных материалов."
+            href="/admin/materials"
+            actionHref="/admin/materials/new"
+            actionText="Добавить"
             accent
           />
 
           <AdminSectionCard
             title="Задания"
-            text="Создание и управление интерактивными заданиями."
+            text="Создание и настройка интерактивных заданий к материалам."
             href="/admin/tasks"
-            linkText="Управление заданиями"
+            actionHref="/admin/tasks/new"
+            actionText="Создать"
           />
 
           <AdminSectionCard
             title="Цели"
-            text="Настройка тематических целей и карточек-наград."
+            text="Маршруты изучения, прогресс и коллекционные карточки."
             href="/admin/goals"
-            linkText="Управление целями"
+            actionHref="/admin/goals"
+            actionText="Открыть"
           />
 
           <AdminSectionCard
             title="Справочники"
-            text="Регионы, народы, жанры, тематики и источники."
+            text={`Регионы: ${regionsCount}, народы: ${peoplesCount}, жанры: ${genresCount}, тематики: ${topicsCount}.`}
             href="/admin/dictionaries"
-            linkText="Открыть справочники"
+            actionHref="/admin/dictionaries"
+            actionText="Управлять"
           />
-        </section>
+        </div>
 
-        <section className="mb-8 grid gap-4 md:grid-cols-2">
-          <div className="rounded-3xl border border-stone-200 bg-white p-6 shadow-sm">
-            <h2 className="mb-3 text-2xl font-semibold">
-              Состав справочников
-            </h2>
-
-            <div className="grid gap-3 sm:grid-cols-2">
-              <SmallInfo title="Регионов" value={regionsCount} />
-              <SmallInfo title="Народов" value={peoplesCount} />
-              <SmallInfo title="Целей" value={goalsCount} />
-              <SmallInfo title="Всего материалов" value={materials.length} />
-            </div>
-          </div>
-
-          <div className="rounded-3xl border border-amber-200 bg-amber-50 p-6 shadow-sm">
-            <h2 className="mb-3 text-2xl font-semibold">
-              Быстрые действия
-            </h2>
-
-            <div className="flex flex-wrap gap-3">
-              <Link
-                href="/admin/materials/new"
-                className="rounded-xl bg-amber-700 px-4 py-2 text-sm font-medium text-white transition hover:bg-amber-800"
-              >
-                Новый материал
-              </Link>
-
-              <Link
-                href="/admin/tasks/new"
-                className="rounded-xl border border-amber-300 bg-white px-4 py-2 text-sm font-medium text-amber-800 transition hover:bg-amber-100"
-              >
-                Новое задание
-              </Link>
-
-              <Link
-                href="/admin/goals"
-                className="rounded-xl border border-amber-300 bg-white px-4 py-2 text-sm font-medium text-amber-800 transition hover:bg-amber-100"
-              >
-                Новая цель
-              </Link>
-
-              <Link
-                href="/admin/dictionaries"
-                className="rounded-xl border border-amber-300 bg-white px-4 py-2 text-sm font-medium text-amber-800 transition hover:bg-amber-100"
-              >
-                Добавить справочник
-              </Link>
-            </div>
-          </div>
-        </section>
-
-        <div className="overflow-hidden rounded-3xl border border-stone-200 bg-white shadow-sm">
-          <div className="flex flex-wrap items-center justify-between gap-4 border-b border-stone-200 p-5">
+        <section className="overflow-hidden rounded-[2rem] border border-[#e4d4bf] bg-white shadow-md">
+          <div className="flex flex-wrap items-center justify-between gap-4 border-b border-[#eadbc7] p-6">
             <div>
-              <h2 className="text-2xl font-semibold">
-                Фольклорные материалы
+              <h2 className="text-2xl font-extrabold text-stone-950">
+                Материалы
               </h2>
 
-              <p className="mt-1 text-sm text-stone-600">
-                Последние добавленные материалы и действия администратора.
+              <p className="mt-2 text-sm leading-6 text-stone-600">
+                Все материалы платформы. Таблица прокручивается внутри блока и
+                не растягивает страницу.
               </p>
             </div>
 
             <Link
               href="/admin/materials/new"
-              className="rounded-xl bg-amber-700 px-4 py-2 text-sm font-medium text-white transition hover:bg-amber-800"
+              className="rounded-2xl bg-[#d8a342] px-5 py-3 text-sm font-extrabold !text-[#06151a] shadow-md transition hover:-translate-y-0.5 hover:bg-[#f0bd5b]"
             >
               Добавить материал
             </Link>
           </div>
 
           {materials.length === 0 ? (
-            <div className="p-8 text-stone-600">
-              Материалы пока не добавлены.
-            </div>
+            <div className="p-8 text-stone-600">Материалы пока не добавлены.</div>
           ) : (
-            <div className="overflow-x-auto">
-              <table className="w-full min-w-[950px] border-collapse text-left">
-                <thead className="bg-stone-100 text-sm text-stone-700">
+            <div className="legendarium-admin-materials-scroll max-h-[760px] overflow-auto">
+              <table className="w-full min-w-[980px] border-collapse text-left">
+                <thead className="sticky top-0 z-10 bg-[#fbf7f1] text-sm text-stone-700 shadow-sm">
                   <tr>
-                    <th className="px-5 py-4">Название</th>
-                    <th className="px-5 py-4">Регион</th>
-                    <th className="px-5 py-4">Народ</th>
-                    <th className="px-5 py-4">Жанр</th>
-                    <th className="px-5 py-4">Статус</th>
-                    <th className="px-5 py-4">Действия</th>
+                    <th className="px-5 py-4 font-extrabold">Материал</th>
+                    <th className="px-5 py-4 font-extrabold">Регион</th>
+                    <th className="px-5 py-4 font-extrabold">Народ</th>
+                    <th className="px-5 py-4 font-extrabold">Жанр</th>
+                    <th className="px-5 py-4 font-extrabold">Статус</th>
+                    <th className="px-5 py-4 font-extrabold">Действия</th>
                   </tr>
                 </thead>
 
@@ -244,26 +202,48 @@ export default async function AdminPage() {
                   {materials.map((material) => (
                     <tr
                       key={material.id}
-                      className="border-t border-stone-200 align-top"
+                      className="border-t border-[#eadbc7] align-top transition hover:bg-[#fbf7f1]"
                     >
                       <td className="px-5 py-4">
-                        <p className="font-semibold">{material.title}</p>
+                        <div className="grid gap-3 sm:grid-cols-[72px_1fr]">
+                          <div className="h-16 w-20 overflow-hidden rounded-xl bg-[#eadfce]">
+                            {material.imageUrl ? (
+                              <img
+                                src={material.imageUrl}
+                                alt={material.title}
+                                className="h-full w-full object-cover object-[center_42%]"
+                              />
+                            ) : (
+                              <div className="flex h-full items-center justify-center text-xs text-stone-500">
+                                Нет фото
+                              </div>
+                            )}
+                          </div>
 
-                        <p className="mt-1 line-clamp-2 text-sm text-stone-600">
-                          {material.shortDescription}
-                        </p>
+                          <div>
+                            <p className="font-extrabold text-stone-950">
+                              {material.title}
+                            </p>
+
+                            <p className="mt-1 line-clamp-2 text-sm leading-6 text-stone-600">
+                              {material.shortDescription}
+                            </p>
+                          </div>
+                        </div>
                       </td>
 
-                      <td className="px-5 py-4 text-sm">
+                      <td className="px-5 py-4 text-sm font-medium text-stone-700">
                         {material.region.name}
                       </td>
 
-                      <td className="px-5 py-4 text-sm">
+                      <td className="px-5 py-4 text-sm font-medium text-stone-700">
                         {material.people.name}
                       </td>
 
-                      <td className="px-5 py-4 text-sm">
-                        {material.genre.name}
+                      <td className="px-5 py-4">
+                        <span className="rounded-full border border-[#d8a342]/25 bg-[#fff4d8] px-3 py-1 text-xs font-extrabold text-[#8a5418]">
+                          {material.genre.name}
+                        </span>
                       </td>
 
                       <td className="px-5 py-4">
@@ -271,19 +251,19 @@ export default async function AdminPage() {
                       </td>
 
                       <td className="px-5 py-4">
-                        <div className="flex flex-wrap gap-2">
+                        <div className="flex flex-col gap-2">
                           <Link
                             href={`/materials/${material.id}`}
-                            className="rounded-xl border border-stone-300 px-3 py-2 text-sm font-medium text-stone-700 transition hover:bg-stone-100"
+                            className="rounded-xl border border-[#d8a342]/45 bg-[#fff8e8] px-3 py-2 text-center text-xs font-extrabold !text-[#8a5418] transition hover:bg-[#fff1cf]"
                           >
                             Открыть
                           </Link>
 
                           <Link
                             href={`/admin/materials/${material.id}/edit`}
-                            className="rounded-xl border border-amber-300 px-3 py-2 text-sm font-medium text-amber-800 transition hover:bg-amber-50"
+                            className="rounded-xl border border-[#d8a342]/45 bg-white px-3 py-2 text-center text-xs font-extrabold !text-[#8a5418] transition hover:bg-[#fff8e8]"
                           >
-                            Редактировать
+                            Изменить
                           </Link>
 
                           {material.status !== "ARCHIVED" && (
@@ -296,7 +276,7 @@ export default async function AdminPage() {
 
                               <button
                                 type="submit"
-                                className="rounded-xl border border-red-200 px-3 py-2 text-sm font-medium text-red-700 transition hover:bg-red-50"
+                                className="w-full rounded-xl border border-red-200 bg-red-50 px-3 py-2 text-xs font-extrabold text-red-700 transition hover:bg-red-100"
                               >
                                 В архив
                               </button>
@@ -310,7 +290,7 @@ export default async function AdminPage() {
               </table>
             </div>
           )}
-        </div>
+        </section>
       </section>
     </main>
   );
@@ -319,17 +299,17 @@ export default async function AdminPage() {
 function StatCard({
   title,
   value,
-  description,
+  text,
 }: {
   title: string;
   value: number;
-  description: string;
+  text: string;
 }) {
   return (
-    <div className="rounded-3xl border border-stone-200 bg-white p-5 shadow-sm">
-      <p className="mb-2 text-sm text-stone-500">{title}</p>
-      <p className="mb-2 text-3xl font-bold text-stone-900">{value}</p>
-      <p className="text-sm leading-6 text-stone-600">{description}</p>
+    <div className="rounded-[2rem] border border-[#e4d4bf] bg-white p-6 shadow-md">
+      <p className="mb-2 text-sm font-bold text-stone-500">{title}</p>
+      <p className="text-4xl font-extrabold text-stone-950">{value}</p>
+      <p className="mt-3 text-sm leading-6 text-stone-600">{text}</p>
     </div>
   );
 }
@@ -338,68 +318,72 @@ function AdminSectionCard({
   title,
   text,
   href,
-  linkText,
+  actionHref,
+  actionText,
   accent = false,
 }: {
   title: string;
   text: string;
   href: string;
-  linkText: string;
+  actionHref: string;
+  actionText: string;
   accent?: boolean;
 }) {
   return (
-    <article
+    <section
       className={[
-        "flex min-h-[220px] flex-col rounded-3xl border p-5 shadow-sm transition hover:-translate-y-1 hover:shadow-md",
+        "flex min-h-[220px] flex-col rounded-[2rem] border p-6 shadow-md transition hover:-translate-y-1 hover:shadow-xl",
         accent
-          ? "border-amber-200 bg-amber-50"
-          : "border-stone-200 bg-white",
+          ? "border-[#d8a342]/35 bg-[#fff4d8]"
+          : "border-[#e4d4bf] bg-white",
       ].join(" ")}
     >
-      <h2 className="mb-3 text-2xl font-semibold">{title}</h2>
+      <h2 className="mb-3 text-2xl font-extrabold text-stone-950">{title}</h2>
 
-      <p className="mb-5 leading-7 text-stone-700">{text}</p>
+      <p className="mb-5 flex-1 leading-7 text-stone-600">{text}</p>
 
-      <Link
-        href={href}
-        className={[
-          "mt-auto inline-flex font-medium underline-offset-4 hover:underline",
-          accent ? "text-amber-800" : "text-stone-800",
-        ].join(" ")}
-      >
-        {linkText}
-      </Link>
-    </article>
-  );
-}
+      <div className="flex flex-wrap gap-2">
+        <Link
+          href={href}
+          className="rounded-2xl border border-[#d8a342]/45 bg-white px-4 py-2 text-sm font-extrabold !text-[#8a5418] transition hover:bg-[#fff8e8]"
+        >
+          Открыть
+        </Link>
 
-function SmallInfo({ title, value }: { title: string; value: number }) {
-  return (
-    <div className="rounded-2xl bg-stone-50 p-4">
-      <p className="mb-1 text-sm text-stone-500">{title}</p>
-      <p className="text-2xl font-bold">{value}</p>
-    </div>
+        {actionHref !== href && (
+          <Link
+            href={actionHref}
+            className="rounded-2xl bg-[#d8a342] px-4 py-2 text-sm font-extrabold !text-[#06151a] shadow-md transition hover:bg-[#f0bd5b]"
+          >
+            {actionText}
+          </Link>
+        )}
+      </div>
+    </section>
   );
 }
 
 function StatusBadge({ status }: { status: string }) {
-  const classes =
-    status === "PUBLISHED"
-      ? "bg-green-100 text-green-800"
-      : status === "DRAFT"
-        ? "bg-amber-100 text-amber-800"
-        : "bg-stone-100 text-stone-600";
+  const labels: Record<string, string> = {
+    PUBLISHED: "Опубликован",
+    DRAFT: "Черновик",
+    ARCHIVED: "Архив",
+  };
 
-  const label =
-    status === "PUBLISHED"
-      ? "Опубликован"
-      : status === "DRAFT"
-        ? "Черновик"
-        : "Архив";
+  const classNames: Record<string, string> = {
+    PUBLISHED: "border-emerald-200 bg-emerald-50 text-emerald-800",
+    DRAFT: "border-amber-200 bg-amber-50 text-amber-800",
+    ARCHIVED: "border-stone-200 bg-stone-100 text-stone-600",
+  };
 
   return (
-    <span className={`rounded-full px-3 py-1 text-xs ${classes}`}>
-      {label}
+    <span
+      className={[
+        "inline-flex rounded-full border px-3 py-1 text-xs font-extrabold",
+        classNames[status] ?? "border-stone-200 bg-stone-100 text-stone-600",
+      ].join(" ")}
+    >
+      {labels[status] ?? status}
     </span>
   );
 }

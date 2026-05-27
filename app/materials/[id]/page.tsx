@@ -61,50 +61,58 @@ export default async function MaterialPage({ params }: MaterialPageProps) {
   const isFavorite = Boolean(favorite);
 
   return (
-    <main className="min-h-screen bg-stone-50 text-stone-900">
-      <section className="relative overflow-hidden border-b border-stone-200 bg-white">
-        <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_left,rgba(180,83,9,0.16),transparent_32%),radial-gradient(circle_at_bottom_right,rgba(120,113,108,0.14),transparent_34%)]" />
+    <main className="overflow-hidden bg-[linear-gradient(180deg,#07181c_0%,#0b2428_28%,#f4ecdf_28%,#f4ecdf_100%)] pb-20">
+      <section className="mx-auto max-w-7xl px-6 pt-10">
+        <Link
+          href="/library"
+          className="mb-6 inline-flex rounded-2xl border border-white/10 bg-white/8 px-4 py-2 text-sm font-bold text-[#fff8e8] shadow-sm backdrop-blur transition hover:bg-white/14"
+        >
+          ← Вернуться в библиотеку
+        </Link>
 
-        <div className="relative mx-auto max-w-7xl px-6 py-12">
-          <Link
-            href="/library"
-            className="mb-8 inline-flex rounded-xl border border-stone-300 bg-white/80 px-4 py-2 text-sm font-medium text-stone-700 shadow-sm transition hover:bg-stone-100"
-          >
-            ← Вернуться в библиотеку
-          </Link>
+        <div className="relative overflow-hidden rounded-[2.5rem] border border-white/10 bg-[#0b1f22] shadow-2xl shadow-black/25">
+          <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_12%_18%,rgba(58,166,160,0.16),transparent_28%),radial-gradient(circle_at_82%_20%,rgba(216,163,66,0.14),transparent_24%),radial-gradient(circle_at_70%_88%,rgba(47,143,99,0.10),transparent_28%)]" />
 
-          <div className="grid gap-10 lg:grid-cols-[1.05fr_0.95fr] lg:items-center">
+          <div className="relative grid gap-8 p-8 md:p-10 lg:grid-cols-[1.05fr_0.95fr] lg:items-center">
             <div>
               <div className="mb-5 flex flex-wrap gap-2 text-xs">
-                <span className="rounded-full bg-amber-100 px-3 py-1 font-medium text-amber-800">
+                <span className="rounded-full border border-[#d8a342]/35 bg-[#d8a342]/12 px-3 py-1 font-black uppercase tracking-[0.12em] text-[#f0bd5b]">
                   {material.genre.name}
                 </span>
 
-                <span className="rounded-full bg-stone-100 px-3 py-1 text-stone-700">
+                <span className="rounded-full border border-[#3aa6a0]/35 bg-[#3aa6a0]/12 px-3 py-1 font-bold text-[#9ee8e2]">
                   {material.region.name}
                 </span>
 
-                <span className="rounded-full bg-stone-100 px-3 py-1 text-stone-700">
+                <span className="rounded-full border border-white/10 bg-white/10 px-3 py-1 font-bold text-[#fff8e8]">
                   {material.people.name}
                 </span>
               </div>
 
-              <h1 className="mb-5 text-5xl font-bold leading-tight">
-                {material.title}
-              </h1>
+              <div className="mb-5 flex items-start gap-4">
+                <h1 className="max-w-4xl text-5xl font-extrabold leading-tight tracking-tight text-[#fff8e8] md:text-6xl">
+                  {material.title}
+                </h1>
+
+                <FavoriteIconButton
+                  materialId={material.id}
+                  isFavorite={isFavorite}
+                  isLoggedIn={Boolean(user)}
+                />
+              </div>
 
               {material.shortDescription && (
-                <p className="max-w-3xl text-lg leading-8 text-stone-700">
+                <p className="max-w-3xl text-lg leading-8 text-[#d6c8b6]">
                   {material.shortDescription}
                 </p>
               )}
 
               {material.topics.length > 0 && (
-                <div className="mt-6 flex flex-wrap gap-2">
+                <div className="mt-7 flex flex-wrap gap-2">
                   {material.topics.map(({ topic }) => (
                     <span
                       key={topic.id}
-                      className="rounded-full border border-amber-200 bg-white/80 px-3 py-1 text-sm text-amber-800 shadow-sm"
+                      className="rounded-full border border-white/10 bg-white/8 px-3 py-1 text-sm font-semibold text-[#fff8e8]"
                     >
                       {topic.name}
                     </span>
@@ -113,15 +121,15 @@ export default async function MaterialPage({ params }: MaterialPageProps) {
               )}
             </div>
 
-            <div className="overflow-hidden rounded-[2rem] border border-stone-200 bg-white shadow-xl">
+            <div className="overflow-hidden rounded-[2rem] border border-white/10 bg-[#06151a] shadow-2xl shadow-black/25">
               {material.imageUrl ? (
                 <img
                   src={material.imageUrl}
                   alt={material.title}
-                  className="h-[360px] w-full object-cover"
+                  className="h-[380px] w-full object-cover"
                 />
               ) : (
-                <div className="flex h-[360px] items-center justify-center bg-gradient-to-br from-amber-100 via-stone-100 to-stone-200 text-stone-500">
+                <div className="flex h-[380px] items-center justify-center bg-[radial-gradient(circle_at_35%_25%,rgba(216,163,66,0.18),transparent_28%),linear-gradient(135deg,#10272b,#06151a)] px-6 text-center text-sm font-semibold text-[#cbbba7]">
                   Изображение не добавлено
                 </div>
               )}
@@ -130,48 +138,44 @@ export default async function MaterialPage({ params }: MaterialPageProps) {
         </div>
       </section>
 
-      <section className="mx-auto grid max-w-7xl gap-8 px-6 py-10 lg:grid-cols-[1fr_340px]">
+      <section className="mx-auto grid max-w-7xl gap-8 px-6 pt-10 lg:grid-cols-[1fr_340px]">
         <div className="space-y-8">
-          <section className="rounded-[2rem] border border-stone-200 bg-white p-7 shadow-sm">
-            <div className="mb-6 flex items-center justify-between gap-4">
-              <div>
-                <p className="mb-2 text-sm font-semibold uppercase tracking-[0.25em] text-amber-700">
-                  Текст
-                </p>
+          <section className="rounded-[2rem] border border-[#e4d4bf] bg-white p-7 shadow-md md:p-8">
+            <div className="mb-7">
+              <p className="mb-2 text-sm font-black uppercase tracking-[0.25em] text-[#b46b1f]">
+                Текст
+              </p>
 
-                <h2 className="text-3xl font-bold">
-                  Содержание материала
-                </h2>
-              </div>
+              <h2 className="text-3xl font-extrabold text-stone-950">
+                Содержание материала
+              </h2>
             </div>
 
             {material.fullText ? (
-              <div className="prose prose-stone max-w-none">
-                <p className="whitespace-pre-line text-lg leading-9 text-stone-800">
-                  {material.fullText}
-                </p>
-              </div>
+              <p className="whitespace-pre-line text-lg leading-9 text-stone-800">
+                {material.fullText}
+              </p>
             ) : (
-              <p className="rounded-2xl bg-stone-50 p-5 text-stone-600">
+              <p className="rounded-2xl border border-[#eadbc7] bg-[#fbf7f1] p-5 text-stone-700">
                 Полный текст пока не добавлен.
               </p>
             )}
           </section>
 
           {(material.audioUrl || material.videoUrl) && (
-            <section className="rounded-[2rem] border border-stone-200 bg-white p-7 shadow-sm">
-              <p className="mb-2 text-sm font-semibold uppercase tracking-[0.25em] text-amber-700">
+            <section className="rounded-[2rem] border border-[#e4d4bf] bg-white p-7 shadow-md md:p-8">
+              <p className="mb-2 text-sm font-black uppercase tracking-[0.25em] text-[#b46b1f]">
                 Медиа
               </p>
 
-              <h2 className="mb-6 text-3xl font-bold">
+              <h2 className="mb-6 text-3xl font-extrabold text-stone-950">
                 Мультимедийные материалы
               </h2>
 
               <div className="space-y-6">
                 {material.audioUrl && (
-                  <div className="rounded-2xl bg-stone-50 p-5">
-                    <p className="mb-3 text-sm font-medium text-stone-700">
+                  <div className="rounded-2xl border border-[#eadbc7] bg-[#fbf7f1] p-5">
+                    <p className="mb-3 text-sm font-bold text-stone-800">
                       Аудиозапись
                     </p>
 
@@ -183,8 +187,8 @@ export default async function MaterialPage({ params }: MaterialPageProps) {
                 )}
 
                 {material.videoUrl && (
-                  <div className="rounded-2xl bg-stone-50 p-5">
-                    <p className="mb-3 text-sm font-medium text-stone-700">
+                  <div className="rounded-2xl border border-[#eadbc7] bg-[#fbf7f1] p-5">
+                    <p className="mb-3 text-sm font-bold text-stone-800">
                       Видеоматериал
                     </p>
 
@@ -198,12 +202,12 @@ export default async function MaterialPage({ params }: MaterialPageProps) {
             </section>
           )}
 
-          <section className="rounded-[2rem] border border-stone-200 bg-white p-7 shadow-sm">
-            <p className="mb-2 text-sm font-semibold uppercase tracking-[0.25em] text-amber-700">
+          <section className="rounded-[2rem] border border-[#e4d4bf] bg-white p-7 shadow-md md:p-8">
+            <p className="mb-2 text-sm font-black uppercase tracking-[0.25em] text-[#b46b1f]">
               Источник
             </p>
 
-            <h2 className="mb-6 text-3xl font-bold">
+            <h2 className="mb-6 text-3xl font-extrabold text-stone-950">
               Сведения о происхождении материала
             </h2>
 
@@ -231,7 +235,7 @@ export default async function MaterialPage({ params }: MaterialPageProps) {
                 href={material.source.url}
                 target="_blank"
                 rel="noreferrer"
-                className="mt-5 inline-flex rounded-xl border border-amber-300 px-4 py-2 text-sm font-medium text-amber-800 transition hover:bg-amber-50"
+                className="mt-5 inline-flex rounded-2xl border border-[#d8a342]/45 bg-[#fff8e8] px-4 py-2 text-sm font-bold text-[#8a5418] transition hover:bg-[#fff1cf]"
               >
                 Открыть источник
               </Link>
@@ -240,84 +244,29 @@ export default async function MaterialPage({ params }: MaterialPageProps) {
         </div>
 
         <aside className="space-y-6 lg:sticky lg:top-28 lg:self-start">
-          <section className="rounded-[2rem] border border-amber-200 bg-amber-50 p-6 shadow-sm">
-            <p className="mb-2 text-sm font-semibold uppercase tracking-[0.2em] text-amber-800">
-              Избранное
+          <section className="rounded-[2rem] border border-[#e4d4bf] bg-[#fbf7f1] p-6 shadow-md">
+            <p className="mb-2 text-sm font-black uppercase tracking-[0.2em] text-[#b46b1f]">
+              О материале
             </p>
 
-            <h2 className="mb-3 text-2xl font-semibold">
-              {isFavorite ? "Материал сохранён" : "Сохранить материал"}
-            </h2>
-
-            <p className="mb-5 leading-7 text-stone-700">
-              {isFavorite
-                ? "Этот материал добавлен в ваш список избранного."
-                : "Добавьте материал в избранное, чтобы быстро вернуться к нему позже."}
-            </p>
-
-            {user ? (
-              isFavorite ? (
-                <form action={removeFromFavoritesAction}>
-                  <input type="hidden" name="materialId" value={material.id} />
-
-                  <button
-                    type="submit"
-                    className="w-full rounded-xl border border-amber-300 bg-white px-5 py-3 font-medium text-amber-800 transition hover:bg-amber-100"
-                  >
-                    Удалить из избранного
-                  </button>
-                </form>
-              ) : (
-                <form action={addToFavoritesAction}>
-                  <input type="hidden" name="materialId" value={material.id} />
-
-                  <button
-                    type="submit"
-                    className="w-full rounded-xl bg-amber-700 px-5 py-3 font-medium text-white transition hover:bg-amber-800"
-                  >
-                    Добавить в избранное
-                  </button>
-                </form>
-              )
-            ) : (
-              <form action={requireLoginForFavoriteAction}>
-                <input type="hidden" name="materialId" value={material.id} />
-
-                <button
-                  type="submit"
-                  className="w-full rounded-xl bg-amber-700 px-5 py-3 font-medium text-white transition hover:bg-amber-800"
-                >
-                  Войти, чтобы сохранить
-                </button>
-              </form>
-            )}
-          </section>
-          <section className="rounded-[2rem] border border-stone-200 bg-white p-6 shadow-sm">
-            <h2 className="mb-5 text-2xl font-semibold">
-              Краткая карточка
+            <h2 className="mb-5 text-2xl font-extrabold text-stone-950">
+              Основные сведения
             </h2>
 
             <div className="space-y-3">
-              <InfoCard title="Регион" value={material.region.name} />
-              <InfoCard title="Народ" value={material.people.name} />
-              <InfoCard title="Жанр" value={material.genre.name} />
-
-              {material.latitude && material.longitude && (
-                <InfoCard
-                  title="Координаты"
-                  value={`${material.latitude}, ${material.longitude}`}
-                />
-              )}
+              <CompactInfo title="Регион" value={material.region.name} />
+              <CompactInfo title="Народ" value={material.people.name} />
+              <CompactInfo title="Жанр" value={material.genre.name} />
             </div>
           </section>
 
           {material.tasks.length > 0 ? (
-            <section className="rounded-[2rem] border border-amber-200 bg-amber-50 p-6 shadow-sm">
-              <p className="mb-2 text-sm font-semibold uppercase tracking-[0.2em] text-amber-800">
+            <section className="rounded-[2rem] border border-[#d8a342]/35 bg-[#fff4d8] p-6 shadow-md">
+              <p className="mb-2 text-sm font-black uppercase tracking-[0.2em] text-[#b46b1f]">
                 Задание
               </p>
 
-              <h2 className="mb-3 text-2xl font-semibold">
+              <h2 className="mb-3 text-2xl font-extrabold text-stone-950">
                 Проверь понимание материала
               </h2>
 
@@ -328,71 +277,90 @@ export default async function MaterialPage({ params }: MaterialPageProps) {
 
               <Link
                 href={`/quests/${material.tasks[0].id}`}
-                className="inline-flex w-full justify-center rounded-xl bg-amber-700 px-5 py-3 font-medium text-white transition hover:bg-amber-800"
+                className="inline-flex w-full justify-center rounded-2xl bg-[#d8a342] px-5 py-3 font-extrabold text-[#06151a] shadow-md transition hover:-translate-y-0.5 hover:bg-[#f0bd5b]"
               >
                 Перейти к заданию
               </Link>
             </section>
           ) : (
-            <section className="rounded-[2rem] border border-stone-200 bg-white p-6 shadow-sm">
-              <h2 className="mb-3 text-2xl font-semibold">
+            <section className="rounded-[2rem] border border-[#e4d4bf] bg-white p-6 shadow-md">
+              <h2 className="mb-3 text-2xl font-extrabold text-stone-950">
                 Задание не добавлено
               </h2>
 
-              <p className="leading-7 text-stone-600">
+              <p className="leading-7 text-stone-700">
                 Для этого материала пока нет интерактивного задания.
               </p>
             </section>
           )}
-
-          <section className="rounded-[2rem] border border-stone-200 bg-white p-6 shadow-sm">
-            <h2 className="mb-4 text-2xl font-semibold">
-              Навигация
-            </h2>
-
-            <div className="space-y-3">
-              <Link
-                href="/library"
-                className="block rounded-xl border border-stone-300 px-4 py-3 text-sm font-medium text-stone-700 transition hover:bg-stone-100"
-              >
-                Все материалы
-              </Link>
-
-              <Link
-                href={`/library?region=${material.regionId}`}
-                className="block rounded-xl border border-stone-300 px-4 py-3 text-sm font-medium text-stone-700 transition hover:bg-stone-100"
-              >
-                Материалы этого региона
-              </Link>
-
-              <Link
-                href={`/library?genre=${material.genreId}`}
-                className="block rounded-xl border border-stone-300 px-4 py-3 text-sm font-medium text-stone-700 transition hover:bg-stone-100"
-              >
-                Материалы этого жанра
-              </Link>
-            </div>
-          </section>
         </aside>
       </section>
     </main>
   );
 }
 
-function InfoCard({ title, value }: { title: string; value: string }) {
+function FavoriteIconButton({
+  materialId,
+  isFavorite,
+  isLoggedIn,
+}: {
+  materialId: number;
+  isFavorite: boolean;
+  isLoggedIn: boolean;
+}) {
+  const action = !isLoggedIn
+    ? requireLoginForFavoriteAction
+    : isFavorite
+      ? removeFromFavoritesAction
+      : addToFavoritesAction;
+
   return (
-    <div className="rounded-2xl bg-stone-50 p-4">
-      <p className="mb-1 text-sm text-stone-500">{title}</p>
-      <p className="font-semibold text-stone-900">{value}</p>
+    <form action={action} className="shrink-0">
+      <input type="hidden" name="materialId" value={materialId} />
+
+      <button
+        type="submit"
+        title={
+          !isLoggedIn
+            ? "Войти, чтобы добавить в избранное"
+            : isFavorite
+              ? "Удалить из избранного"
+              : "Добавить в избранное"
+        }
+        aria-label={
+          !isLoggedIn
+            ? "Войти, чтобы добавить в избранное"
+            : isFavorite
+              ? "Удалить из избранного"
+              : "Добавить в избранное"
+        }
+        className={[
+          "flex h-14 w-14 items-center justify-center rounded-2xl border text-2xl shadow-lg transition hover:-translate-y-0.5",
+          isFavorite
+            ? "border-[#d8a342]/50 bg-[#d8a342] text-[#06151a] shadow-[#d8a342]/25"
+            : "border-white/15 bg-white/10 text-[#fff8e8] shadow-black/20 backdrop-blur hover:bg-white/16",
+        ].join(" ")}
+      >
+        {isFavorite ? "♥" : "♡"}
+      </button>
+    </form>
+  );
+}
+
+function CompactInfo({ title, value }: { title: string; value: string }) {
+  return (
+    <div className="rounded-2xl border border-[#eadbc7] bg-white p-4">
+      <p className="mb-1 text-sm font-semibold text-stone-500">{title}</p>
+      <p className="font-extrabold text-stone-950">{value}</p>
     </div>
   );
 }
 
 function SourceInfo({ title, value }: { title: string; value: string }) {
   return (
-    <div className="rounded-2xl bg-stone-50 p-4">
-      <p className="mb-1 text-sm text-stone-500">{title}</p>
-      <p className="font-medium text-stone-900">{value}</p>
+    <div className="rounded-2xl border border-[#eadbc7] bg-[#fbf7f1] p-4">
+      <p className="mb-1 text-sm font-semibold text-stone-500">{title}</p>
+      <p className="font-bold text-stone-950">{value}</p>
     </div>
   );
 }

@@ -23,6 +23,8 @@ export async function archiveMaterialAction(formData: FormData) {
   });
 
   revalidatePath("/admin");
+  revalidatePath("/admin/materials");
   revalidatePath("/library");
   revalidatePath("/map");
+  revalidatePath(`/materials/${materialId}`);
 }

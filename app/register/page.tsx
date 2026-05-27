@@ -20,42 +20,47 @@ export default async function RegisterPage({
         : null;
 
   return (
-    <main className="min-h-screen bg-stone-50 px-6 py-10 text-stone-900">
-      <section className="mx-auto flex min-h-[calc(100vh-160px)] max-w-7xl items-center justify-center">
-        <div className="w-full max-w-md rounded-[2rem] border border-stone-200 bg-white p-8 shadow-sm">
-          <p className="mb-2 text-sm font-semibold uppercase tracking-[0.25em] text-amber-700">
+    <main className="min-h-screen overflow-hidden bg-[#07181c] text-[#fff8e8]">
+      <section className="relative flex min-h-screen items-center justify-center px-6 py-12">
+        <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_18%_12%,rgba(58,166,160,0.18),transparent_28%),radial-gradient(circle_at_82%_12%,rgba(216,163,66,0.16),transparent_24%),linear-gradient(180deg,#07181c_0%,#0b2428_100%)]" />
+
+        <div className="relative w-full max-w-md rounded-[2.2rem] border border-[#e4d4bf] bg-[#fbf7f1] p-8 text-stone-950 shadow-2xl shadow-black/30 md:p-9">
+          <h1 className="mb-3 text-4xl font-extrabold tracking-tight">
             Регистрация
-          </p>
+          </h1>
 
-          <h1 className="mb-3 text-4xl font-bold">Создание аккаунта</h1>
-
-          <p className="mb-6 leading-7 text-stone-600">
-            Аккаунт нужен для персональных функций: избранного, прогресса целей
-            и коллекционных карточек.
+          <p className="mb-7 leading-7 text-stone-600">
+            Создайте аккаунт, чтобы сохранять материалы, проходить задания и
+            отслеживать личный прогресс.
           </p>
 
           {errorMessage && (
-            <div className="mb-5 rounded-2xl border border-red-200 bg-red-50 p-4 text-sm text-red-800">
+            <div className="mb-5 rounded-2xl border border-red-200 bg-red-50 p-4 text-sm font-medium text-red-800">
               {errorMessage}
             </div>
           )}
 
-          <form action={registerAction} className="space-y-4">
+          <form
+            action={registerAction}
+            autoComplete="off"
+            className="space-y-4"
+          >
             <div>
-              <label className="mb-2 block text-sm font-medium text-stone-700">
+              <label className="mb-2 block text-sm font-bold text-stone-800">
                 Имя
               </label>
 
               <input
                 name="name"
                 required
+                autoComplete="off"
                 placeholder="Анна"
-                className="w-full rounded-xl border border-stone-300 bg-stone-50 px-4 py-3 outline-none transition focus:border-amber-700 focus:bg-white"
+                className="w-full rounded-2xl border border-[#dccab3] bg-white px-4 py-3 text-stone-900 outline-none transition placeholder:text-stone-400 focus:border-[#d8a342] focus:ring-2 focus:ring-[#f3dfb1]"
               />
             </div>
 
             <div>
-              <label className="mb-2 block text-sm font-medium text-stone-700">
+              <label className="mb-2 block text-sm font-bold text-stone-800">
                 Email
               </label>
 
@@ -63,13 +68,14 @@ export default async function RegisterPage({
                 name="email"
                 type="email"
                 required
+                autoComplete="new-password"
                 placeholder="user@mail.ru"
-                className="w-full rounded-xl border border-stone-300 bg-stone-50 px-4 py-3 outline-none transition focus:border-amber-700 focus:bg-white"
+                className="w-full rounded-2xl border border-[#dccab3] bg-white px-4 py-3 text-stone-900 outline-none transition placeholder:text-stone-400 focus:border-[#d8a342] focus:ring-2 focus:ring-[#f3dfb1]"
               />
             </div>
 
             <div>
-              <label className="mb-2 block text-sm font-medium text-stone-700">
+              <label className="mb-2 block text-sm font-bold text-stone-800">
                 Пароль
               </label>
 
@@ -78,14 +84,15 @@ export default async function RegisterPage({
                 type="password"
                 required
                 minLength={6}
+                autoComplete="new-password"
                 placeholder="Минимум 6 символов"
-                className="w-full rounded-xl border border-stone-300 bg-stone-50 px-4 py-3 outline-none transition focus:border-amber-700 focus:bg-white"
+                className="w-full rounded-2xl border border-[#dccab3] bg-white px-4 py-3 text-stone-900 outline-none transition placeholder:text-stone-400 focus:border-[#d8a342] focus:ring-2 focus:ring-[#f3dfb1]"
               />
             </div>
 
             <button
               type="submit"
-              className="w-full rounded-xl bg-amber-700 px-5 py-3 font-medium text-white transition hover:bg-amber-800"
+              className="w-full rounded-2xl bg-[#d8a342] px-5 py-3 font-extrabold !text-[#06151a] shadow-md transition hover:-translate-y-0.5 hover:bg-[#f0bd5b]"
             >
               Зарегистрироваться
             </button>
@@ -95,7 +102,7 @@ export default async function RegisterPage({
             Уже есть аккаунт?{" "}
             <Link
               href="/login"
-              className="font-medium text-amber-800 underline-offset-4 hover:underline"
+              className="font-extrabold !text-[#8a5418] underline-offset-4 hover:underline"
             >
               Войти
             </Link>

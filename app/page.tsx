@@ -2,239 +2,181 @@ import Link from "next/link";
 import { prisma } from "@/lib/prisma";
 
 export default async function HomePage() {
-  const [materialsCount, regionsCount, tasksCount, goalsCount] =
-    await Promise.all([
-      prisma.material.count({
-        where: {
-          status: "PUBLISHED",
-        },
-      }),
-      prisma.region.count(),
-      prisma.interactiveTask.count(),
-      prisma.goal.count({
-        where: {
-          isActive: true,
-        },
-      }),
-    ]);
+  const [materialsCount, peoplesCount, tasksCount] = await Promise.all([
+    prisma.material.count({
+      where: {
+        status: "PUBLISHED",
+      },
+    }),
+    prisma.people.count(),
+    prisma.interactiveTask.count(),
+  ]);
 
   return (
-    <main className="min-h-screen bg-stone-50 text-stone-900">
-      <section className="relative overflow-hidden border-b border-stone-200">
-        <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_left,rgba(180,83,9,0.18),transparent_35%),radial-gradient(circle_at_bottom_right,rgba(120,113,108,0.18),transparent_35%)]" />
+    <main className="legendarium-page overflow-hidden pb-20">
+      <section className="mx-auto max-w-7xl px-6 pb-16 pt-10">
+        <div
+          className="relative min-h-[620px] overflow-hidden rounded-[2.5rem] border border-white/10 bg-cover shadow-2xl shadow-black/35"
+          style={{
+            backgroundImage: "url('/images/hero-bg-dark.png')",
+            backgroundPosition: "center right",
+          }}
+        >
+          <div className="absolute inset-0 bg-gradient-to-r from-[#06151a]/96 via-[#06151a]/72 to-[#06151a]/18" />
+          <div className="absolute inset-0 bg-gradient-to-t from-[#02080a]/70 via-transparent to-transparent" />
+          <div className="absolute inset-0 bg-[radial-gradient(circle_at_18%_18%,rgba(58,166,160,0.14),transparent_24%),radial-gradient(circle_at_72%_80%,rgba(216,163,66,0.12),transparent_28%)]" />
 
-        <div className="relative mx-auto grid min-h-[calc(100vh-73px)] max-w-7xl items-center gap-10 px-6 py-20 lg:grid-cols-[1.05fr_0.95fr]">
-          <div>
-            <p className="mb-5 inline-flex rounded-full bg-amber-100 px-4 py-2 text-sm font-semibold uppercase tracking-[0.25em] text-amber-800">
-              Фольклор народов России
-            </p>
+          <div className="relative z-10 flex min-h-[620px] items-center px-8 py-12 md:px-12 md:py-16 lg:py-20">
+            <div className="max-w-3xl">
+              <p className="mb-6 inline-flex rounded-full border border-[#d8a342]/35 bg-[#d8a342]/12 px-4 py-2 text-xs font-black uppercase tracking-[0.28em] text-[#f0bd5b] backdrop-blur">
+                Фольклор народов России
+              </p>
 
-            <h1 className="mb-6 max-w-4xl text-5xl font-bold leading-tight md:text-6xl">
-              Легендариум
-            </h1>
+              <h1 className="mb-6 text-6xl font-extrabold leading-[0.95] tracking-tight text-[#fff8e8] drop-shadow-lg md:text-7xl">
+                Легендариум
+              </h1>
 
-            <p className="mb-8 max-w-2xl text-xl leading-9 text-stone-700">
-              Интерактивная образовательная платформа для изучения легенд,
-              сказок, мифов, обрядов и культурных традиций народов России.
-            </p>
+              <p className="mb-9 max-w-2xl text-lg leading-9 text-[#d9c9b6] drop-shadow md:text-xl">
+                Интерактивная образовательная платформа для изучения легенд,
+                сказок, мифов, обрядов и культурных традиций народов России
+                через карту, библиотеку и интерактивные задания.
+              </p>
 
-            <div className="mb-10 flex flex-wrap gap-4">
-              <Link
-                href="/map"
-                className="rounded-xl bg-amber-700 px-6 py-3 font-medium text-white shadow-sm transition hover:bg-amber-800"
-              >
-                Открыть карту
-              </Link>
+              <div className="mb-10 flex flex-wrap items-center gap-4">
+                <Link
+                  href="/map"
+                  className="rounded-2xl bg-[#d8a342] px-7 py-4 text-base font-extrabold !text-[#06151a] shadow-lg shadow-[#d8a342]/30 transition hover:-translate-y-0.5 hover:bg-[#f0bd5b]"
+                >
+                  Открыть карту
+                </Link>
 
-              <Link
-                href="/library"
-                className="rounded-xl border border-stone-300 bg-white px-6 py-3 font-medium transition hover:bg-stone-100"
-              >
-                Перейти в библиотеку
-              </Link>
+                <Link
+                  href="/library"
+                  className="rounded-2xl border border-white/20 bg-white/10 px-5 py-3 text-sm font-extrabold !text-[#fff8e8] backdrop-blur transition hover:bg-white/18"
+                >
+                  Библиотека
+                </Link>
 
-              <Link
-                href="/goals"
-                className="rounded-xl border border-stone-300 bg-white px-6 py-3 font-medium transition hover:bg-stone-100"
-              >
-                Цели изучения
-              </Link>
-            </div>
-
-            <div className="grid max-w-2xl grid-cols-2 gap-3 sm:grid-cols-4">
-              <StatCard label="материалов" value={materialsCount} />
-              <StatCard label="регионов" value={regionsCount} />
-              <StatCard label="заданий" value={tasksCount} />
-              <StatCard label="целей" value={goalsCount} />
-            </div>
-          </div>
-
-          <div className="relative">
-            <div className="rounded-[2rem] border border-stone-200 bg-white/85 p-5 shadow-xl backdrop-blur">
-              <div className="mb-5 rounded-[1.5rem] bg-gradient-to-br from-amber-100 via-stone-100 to-stone-200 p-6">
-                <p className="mb-3 text-sm font-semibold uppercase tracking-[0.2em] text-amber-800">
-                  Интерактивный маршрут
-                </p>
-
-                <h2 className="mb-4 text-3xl font-bold">
-                  Изучай фольклор через карту, материалы и задания
-                </h2>
-
-                <p className="leading-7 text-stone-700">
-                  Пользователь выбирает регион, открывает фольклорный материал,
-                  изучает его содержание и выполняет интерактивное задание.
-                </p>
+                <Link
+                  href="/quests"
+                  className="rounded-2xl border border-white/20 bg-white/10 px-5 py-3 text-sm font-extrabold !text-[#fff8e8] backdrop-blur transition hover:bg-white/18"
+                >
+                  Задания
+                </Link>
               </div>
 
-              <div className="space-y-3">
-                <RouteItem number="01" title="Выбери регион на карте" />
-                <RouteItem number="02" title="Открой карточку материала" />
-                <RouteItem number="03" title="Пройди интерактивное задание" />
-                <RouteItem number="04" title="Собирай цели и карточки" />
+              <div className="grid max-w-2xl gap-4 sm:grid-cols-3">
+                <HeroStatCard value={materialsCount} label="материалов" />
+                <HeroStatCard value={peoplesCount} label="народов" />
+                <HeroStatCard value={tasksCount} label="заданий" />
               </div>
             </div>
           </div>
         </div>
       </section>
 
-      <section className="mx-auto max-w-7xl px-6 py-16">
+      <section className="mx-auto max-w-7xl px-6">
         <div className="mb-10 max-w-3xl">
-          <p className="mb-2 text-sm font-semibold uppercase tracking-[0.25em] text-amber-700">
+          <p className="mb-4 text-sm font-black uppercase tracking-[0.32em] text-[#d8a342]">
             Возможности платформы
           </p>
 
-          <h2 className="mb-4 text-4xl font-bold">
+          <h2 className="mb-5 text-4xl font-extrabold leading-tight text-[#fff8e8] md:text-5xl">
             Что можно делать в «Легендариуме»
           </h2>
 
-          <p className="leading-8 text-stone-700">
-            Платформа объединяет каталог материалов, территориальную навигацию,
-            интерактивные задания, цели изучения и административные инструменты
-            для управления контентом.
+          <p className="text-lg leading-8 text-[#cbbba7]">
+            Платформа объединяет карту, каталог фольклорных материалов,
+            интерактивные задания и персональный прогресс пользователя.
           </p>
         </div>
 
-        <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-4">
+        <div className="grid gap-5 md:grid-cols-2 xl:grid-cols-4">
           <FeatureCard
-            title="Интерактивная карта"
-            text="Материалы можно изучать через регионы и географическую привязку."
             href="/map"
-            linkText="Открыть карту"
+            icon="⌖"
+            title="Интерактивная карта"
+            text="Изучайте фольклор через регионы России, территориальную привязку и точки материалов."
+            action="Открыть карту"
+            color="from-[#2f8f63] to-[#3aa6a0]"
           />
 
           <FeatureCard
-            title="Библиотека"
-            text="Каталог поддерживает поиск и фильтрацию по региону, народу, жанру и тематике."
             href="/library"
-            linkText="Перейти в библиотеку"
+            icon="◫"
+            title="Библиотека"
+            text="Ищите материалы по региону, народу, жанру и тематике. Сохраняйте понравившееся."
+            action="Перейти в библиотеку"
+            color="from-[#3aa6a0] to-[#2f6f96]"
           />
 
           <FeatureCard
-            title="Задания"
-            text="Интерактивные задания помогают проверить понимание фольклорного материала."
             href="/quests"
-            linkText="Пройти задания"
+            icon="?"
+            title="Задания"
+            text="Проверяйте понимание легенд и сказок через интерактивные задания с результатами."
+            action="Пройти задания"
+            color="from-[#7352d6] to-[#3aa6a0]"
           />
 
           <FeatureCard
-            title="Цели изучения"
-            text="Тематические цели превращают изучение материалов в последовательный маршрут."
-            href="/goals"
-            linkText="Смотреть цели"
+            href="/profile"
+            icon="✦"
+            title="Личный маршрут"
+            text="Следите за прогрессом, избранным и коллекционными карточками в профиле."
+            action="Открыть профиль"
+            color="from-[#d8a342] to-[#2f8f63]"
           />
-        </div>
-      </section>
-
-      <section className="border-t border-stone-200 bg-white">
-        <div className="mx-auto grid max-w-7xl gap-8 px-6 py-16 lg:grid-cols-[0.9fr_1.1fr]">
-          <div>
-            <p className="mb-2 text-sm font-semibold uppercase tracking-[0.25em] text-amber-700">
-              Для администратора
-            </p>
-
-            <h2 className="mb-4 text-4xl font-bold">
-              Управление материалами и заданиями
-            </h2>
-
-            <p className="mb-6 leading-8 text-stone-700">
-              Административная часть позволяет добавлять и редактировать
-              фольклорные материалы, управлять справочниками, создавать задания
-              и настраивать цели изучения.
-            </p>
-
-            <Link
-              href="/admin"
-              className="inline-flex rounded-xl bg-amber-700 px-6 py-3 font-medium text-white transition hover:bg-amber-800"
-            >
-              Перейти в админ-панель
-            </Link>
-          </div>
-
-          <div className="grid gap-4 md:grid-cols-2">
-            <AdminFeature title="Материалы" text="Добавление, редактирование и архивация записей." />
-            <AdminFeature title="Справочники" text="Управление регионами, народами, жанрами, тематиками и источниками." />
-            <AdminFeature title="Задания" text="Создание заданий с выбором одного правильного ответа." />
-            <AdminFeature title="Цели" text="Настройка тематических целей и карточек-наград." />
-          </div>
         </div>
       </section>
     </main>
   );
 }
 
-function StatCard({ label, value }: { label: string; value: number }) {
+function HeroStatCard({ value, label }: { value: number; label: string }) {
   return (
-    <div className="rounded-2xl border border-stone-200 bg-white p-4 shadow-sm">
-      <p className="text-2xl font-bold text-stone-900">{value}</p>
-      <p className="text-sm text-stone-600">{label}</p>
-    </div>
-  );
-}
-
-function RouteItem({ number, title }: { number: string; title: string }) {
-  return (
-    <div className="flex items-center gap-3 rounded-2xl border border-stone-200 bg-stone-50 p-4">
-      <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-amber-700 text-sm font-bold text-white">
-        {number}
-      </span>
-
-      <p className="font-medium text-stone-800">{title}</p>
+    <div className="rounded-[1.5rem] border border-white/15 bg-white/10 p-5 shadow-lg shadow-black/20 backdrop-blur-md transition hover:-translate-y-1 hover:bg-white/14">
+      <p className="mb-1 text-4xl font-extrabold text-[#fff8e8]">{value}</p>
+      <p className="text-sm font-semibold text-[#d9c9b6]">{label}</p>
     </div>
   );
 }
 
 function FeatureCard({
+  href,
+  icon,
   title,
   text,
-  href,
-  linkText,
+  action,
+  color,
 }: {
+  href: string;
+  icon: string;
   title: string;
   text: string;
-  href: string;
-  linkText: string;
+  action: string;
+  color: string;
 }) {
   return (
-    <article className="flex min-h-[260px] flex-col rounded-3xl border border-stone-200 bg-white p-6 shadow-sm transition hover:-translate-y-1 hover:shadow-md">
-      <h3 className="mb-3 text-2xl font-semibold">{title}</h3>
-
-      <p className="mb-6 leading-7 text-stone-700">{text}</p>
-
-      <Link
-        href={href}
-        className="mt-auto inline-flex font-medium text-amber-800 underline-offset-4 hover:underline"
+    <Link
+      href={href}
+      className="group flex min-h-[350px] flex-col overflow-hidden rounded-[2rem] border border-white/10 bg-white/8 p-7 shadow-lg shadow-black/20 backdrop-blur transition hover:-translate-y-1 hover:bg-white/12 hover:shadow-xl"
+    >
+      <div
+        className={`mb-8 flex h-16 w-16 items-center justify-center rounded-3xl bg-gradient-to-br ${color} text-3xl text-white shadow-lg transition group-hover:scale-105`}
       >
-        {linkText}
-      </Link>
-    </article>
-  );
-}
+        {icon}
+      </div>
 
-function AdminFeature({ title, text }: { title: string; text: string }) {
-  return (
-    <div className="rounded-3xl border border-stone-200 bg-stone-50 p-5">
-      <h3 className="mb-2 text-xl font-semibold">{title}</h3>
-      <p className="leading-7 text-stone-700">{text}</p>
-    </div>
+      <h3 className="mb-4 text-2xl font-extrabold leading-tight text-[#fff8e8]">
+        {title}
+      </h3>
+
+      <p className="mb-8 leading-8 text-[#cbbba7]">{text}</p>
+
+      <span className="mt-auto inline-flex font-extrabold text-[#d8a342] transition group-hover:translate-x-1 group-hover:text-[#f0bd5b]">
+        {action} →
+      </span>
+    </Link>
   );
 }

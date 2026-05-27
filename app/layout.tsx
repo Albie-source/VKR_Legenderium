@@ -1,11 +1,23 @@
 import type { Metadata } from "next";
+import { Manrope, Playfair_Display } from "next/font/google";
 import Header from "@/components/Header";
 import "./globals.css";
 
+const manrope = Manrope({
+  subsets: ["latin", "cyrillic"],
+  variable: "--font-body",
+  weight: ["400", "500", "600", "700", "800"],
+});
+
+const playfair = Playfair_Display({
+  subsets: ["latin", "cyrillic"],
+  variable: "--font-heading",
+  weight: ["700", "800", "900"],
+});
+
 export const metadata: Metadata = {
   title: "Легендариум",
-  description:
-    "Интерактивная образовательная платформа для изучения фольклора народов России",
+  description: "Интерактивная платформа для изучения фольклора народов России",
 };
 
 export default function RootLayout({
@@ -15,7 +27,7 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="ru">
-      <body>
+      <body className={`${manrope.variable} ${playfair.variable}`}>
         <Header />
         {children}
       </body>

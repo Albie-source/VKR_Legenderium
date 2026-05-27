@@ -152,6 +152,13 @@ export default async function AdminTasksPage() {
                           </Link>
 
                           <Link
+                            href={`/admin/tasks/${task.id}/edit`}
+                            className="rounded-xl border border-amber-300 px-3 py-2 text-sm font-medium text-amber-800 transition hover:bg-amber-50"
+                          >
+                            Редактировать
+                          </Link>
+
+                          <Link
                             href={`/materials/${task.material.id}`}
                             className="rounded-xl border border-stone-300 px-3 py-2 text-sm font-medium text-stone-700 transition hover:bg-stone-100"
                           >
@@ -159,11 +166,7 @@ export default async function AdminTasksPage() {
                           </Link>
 
                           <form action={deleteTaskAction}>
-                            <input
-                              type="hidden"
-                              name="taskId"
-                              value={task.id}
-                            />
+                            <input type="hidden" name="taskId" value={task.id} />
 
                             <button
                               type="submit"

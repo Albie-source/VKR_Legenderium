@@ -55,11 +55,14 @@ export default function LibraryFilters({
   }
 
   return (
-    <section className="mb-10 rounded-[2rem] border border-stone-200 bg-white p-5 shadow-sm">
-      <div className="mb-5 flex flex-wrap items-start justify-between gap-4">
+    <section className="rounded-[2rem] border border-[#e4d4bf] bg-[#fbf7f1] p-6 shadow-md md:p-7">
+      <div className="mb-6 flex flex-wrap items-start justify-between gap-4">
         <div>
-          <h2 className="text-2xl font-semibold">Поиск и фильтрация</h2>
-          <p className="mt-1 text-sm leading-6 text-stone-600">
+          <h2 className="text-2xl font-extrabold text-stone-900">
+            Поиск и фильтрация
+          </h2>
+
+          <p className="mt-2 text-sm leading-6 text-stone-600">
             Найдите материал по названию, региону, народу, жанру или тематике.
           </p>
         </div>
@@ -67,7 +70,7 @@ export default function LibraryFilters({
         <button
           type="button"
           onClick={resetFilters}
-          className="rounded-xl border border-stone-300 px-4 py-2 text-sm font-medium text-stone-700 transition hover:bg-stone-100"
+          className="rounded-2xl border border-stone-300 bg-white px-4 py-2 text-sm font-bold text-stone-700 transition hover:bg-stone-50"
         >
           Сбросить
         </button>
@@ -75,7 +78,7 @@ export default function LibraryFilters({
 
       <div className="grid gap-4 lg:grid-cols-[1.4fr_1fr_1fr_1fr_1fr]">
         <div>
-          <label className="mb-2 block text-sm font-medium text-stone-700">
+          <label className="mb-2 block text-sm font-bold text-stone-800">
             Поиск
           </label>
 
@@ -88,7 +91,7 @@ export default function LibraryFilters({
               }
             }}
             placeholder="Например: дух, огонь, охотник"
-            className="w-full rounded-2xl border border-stone-300 bg-stone-50 px-4 py-3 outline-none transition focus:border-amber-700 focus:bg-white"
+            className="w-full rounded-2xl border border-[#dccab3] bg-white px-4 py-3 text-stone-800 outline-none transition placeholder:text-stone-400 focus:border-[#d8a342] focus:ring-2 focus:ring-[#f3dfb1]"
           />
         </div>
 
@@ -121,11 +124,11 @@ export default function LibraryFilters({
         />
       </div>
 
-      <div className="mt-5">
+      <div className="mt-6">
         <button
           type="button"
           onClick={applyFilters}
-          className="rounded-xl bg-amber-700 px-6 py-3 font-medium text-white transition hover:bg-amber-800"
+          className="rounded-2xl bg-[#d8a342] px-6 py-3 font-extrabold text-[#06151a] shadow-md transition hover:-translate-y-0.5 hover:bg-[#f0bd5b]"
         >
           Применить фильтры
         </button>
@@ -147,14 +150,14 @@ function FilterSelect({
 }) {
   return (
     <div>
-      <label className="mb-2 block text-sm font-medium text-stone-700">
+      <label className="mb-2 block text-sm font-bold text-stone-800">
         {label}
       </label>
 
       <select
         value={value}
         onChange={(event) => onChange(event.target.value)}
-        className="w-full rounded-2xl border border-stone-300 bg-stone-50 px-4 py-3 outline-none transition focus:border-amber-700 focus:bg-white"
+        className="w-full rounded-2xl border border-[#dccab3] bg-white px-4 py-3 text-stone-800 outline-none transition focus:border-[#d8a342] focus:ring-2 focus:ring-[#f3dfb1]"
       >
         <option value="">Все</option>
 
