@@ -74,7 +74,7 @@ export default async function MaterialPage({ params }: MaterialPageProps) {
           <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_12%_18%,rgba(58,166,160,0.16),transparent_28%),radial-gradient(circle_at_82%_20%,rgba(216,163,66,0.14),transparent_24%),radial-gradient(circle_at_70%_88%,rgba(47,143,99,0.10),transparent_28%)]" />
 
           <div className="relative grid gap-8 p-8 md:p-10 lg:grid-cols-[1.05fr_0.95fr] lg:items-center">
-            <div>
+            <div className="animate-fade-in-up">
               <div className="mb-5 flex flex-wrap gap-2 text-xs">
                 <span className="rounded-full border border-[#d8a342]/35 bg-[#d8a342]/12 px-3 py-1 font-black uppercase tracking-[0.12em] text-[#f0bd5b]">
                   {material.genre.name}
@@ -160,6 +160,29 @@ export default async function MaterialPage({ params }: MaterialPageProps) {
                 Полный текст пока не добавлен.
               </p>
             )}
+
+            {material.source && (
+              <p className="mt-6 border-t border-[#eadbc7] pt-4 text-sm text-stone-500">
+                <span className="font-semibold text-stone-700">Источник: </span>
+                {material.source.author && `${material.source.author}. `}
+                {material.source.title}
+                {material.source.year && `, ${material.source.year}`}
+                {material.source.type && ` (${material.source.type})`}
+                {material.source.url && (
+                  <>
+                    {" · "}
+                    <Link
+                      href={material.source.url}
+                      target="_blank"
+                      rel="noreferrer"
+                      className="text-[#b46b1f] underline underline-offset-2 transition hover:text-[#9f661f]"
+                    >
+                      Открыть
+                    </Link>
+                  </>
+                )}
+              </p>
+            )}
           </section>
 
           {(material.audioUrl || material.videoUrl) && (
@@ -202,45 +225,6 @@ export default async function MaterialPage({ params }: MaterialPageProps) {
             </section>
           )}
 
-          <section className="rounded-[2rem] border border-[#e4d4bf] bg-white p-7 shadow-md md:p-8">
-            <p className="mb-2 text-sm font-black uppercase tracking-[0.25em] text-[#b46b1f]">
-              Источник
-            </p>
-
-            <h2 className="mb-6 text-3xl font-extrabold text-stone-950">
-              Сведения о происхождении материала
-            </h2>
-
-            <div className="grid gap-4 md:grid-cols-2">
-              <SourceInfo title="Название" value={material.source.title} />
-
-              {material.source.author && (
-                <SourceInfo
-                  title="Автор / составитель"
-                  value={material.source.author}
-                />
-              )}
-
-              {material.source.year && (
-                <SourceInfo title="Год" value={String(material.source.year)} />
-              )}
-
-              {material.source.type && (
-                <SourceInfo title="Тип источника" value={material.source.type} />
-              )}
-            </div>
-
-            {material.source.url && (
-              <Link
-                href={material.source.url}
-                target="_blank"
-                rel="noreferrer"
-                className="mt-5 inline-flex rounded-2xl border border-[#d8a342]/45 bg-[#fff8e8] px-4 py-2 text-sm font-bold text-[#8a5418] transition hover:bg-[#fff1cf]"
-              >
-                Открыть источник
-              </Link>
-            )}
-          </section>
         </div>
 
         <aside className="space-y-6 lg:sticky lg:top-28 lg:self-start">
@@ -282,17 +266,7 @@ export default async function MaterialPage({ params }: MaterialPageProps) {
                 Перейти к заданию
               </Link>
             </section>
-          ) : (
-            <section className="rounded-[2rem] border border-[#e4d4bf] bg-white p-6 shadow-md">
-              <h2 className="mb-3 text-2xl font-extrabold text-stone-950">
-                Задание не добавлено
-              </h2>
-
-              <p className="leading-7 text-stone-700">
-                Для этого материала пока нет интерактивного задания.
-              </p>
-            </section>
-          )}
+          ) : null}
         </aside>
       </section>
     </main>
@@ -356,11 +330,3 @@ function CompactInfo({ title, value }: { title: string; value: string }) {
   );
 }
 
-function SourceInfo({ title, value }: { title: string; value: string }) {
-  return (
-    <div className="rounded-2xl border border-[#eadbc7] bg-[#fbf7f1] p-4">
-      <p className="mb-1 text-sm font-semibold text-stone-500">{title}</p>
-      <p className="font-bold text-stone-950">{value}</p>
-    </div>
-  );
-}

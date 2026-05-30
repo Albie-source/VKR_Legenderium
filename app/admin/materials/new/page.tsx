@@ -2,6 +2,7 @@ import Link from "next/link";
 import { requireAdmin } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { createMaterialAction } from "./actions";
+import MediaUploadField from "@/app/admin/materials/MediaUploadField";
 
 export default async function NewMaterialPage() {
   await requireAdmin();
@@ -153,41 +154,24 @@ export default async function NewMaterialPage() {
           </div>
 
           <div className="grid gap-4 md:grid-cols-3">
-            <div>
-              <label className="mb-2 block text-sm font-medium text-stone-700">
-                Изображение URL
-              </label>
-
-              <input
-                name="imageUrl"
-                placeholder="/images/example.jpg"
-                className="w-full rounded-xl border border-stone-300 px-4 py-3 outline-none transition focus:border-amber-700"
-              />
-            </div>
-
-            <div>
-              <label className="mb-2 block text-sm font-medium text-stone-700">
-                Аудио URL
-              </label>
-
-              <input
-                name="audioUrl"
-                placeholder="/audio/example.mp3"
-                className="w-full rounded-xl border border-stone-300 px-4 py-3 outline-none transition focus:border-amber-700"
-              />
-            </div>
-
-            <div>
-              <label className="mb-2 block text-sm font-medium text-stone-700">
-                Видео URL
-              </label>
-
-              <input
-                name="videoUrl"
-                placeholder="/video/example.mp4"
-                className="w-full rounded-xl border border-stone-300 px-4 py-3 outline-none transition focus:border-amber-700"
-              />
-            </div>
+            <MediaUploadField
+              name="imageUrl"
+              label="Изображение"
+              accept="image/*"
+              placeholder="/images/example.jpg"
+            />
+            <MediaUploadField
+              name="audioUrl"
+              label="Аудио"
+              accept="audio/*"
+              placeholder="/audio/example.mp3"
+            />
+            <MediaUploadField
+              name="videoUrl"
+              label="Видео"
+              accept="video/*"
+              placeholder="/video/example.mp4"
+            />
           </div>
 
           <div>

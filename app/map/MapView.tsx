@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import {
   CircleMarker,
   GeoJSON,
@@ -201,10 +201,10 @@ const REGION_NAME_NORMALIZED_MAP = new Map(
 
 export default function MapView({ regions }: MapViewProps) {
   const router = useRouter();
-  const selectedLayerRef = useRef<Layer | null>(null);
 
   const [geoJson, setGeoJson] = useState<GeoJsonObject | null>(null);
   const [selectedRegionId, setSelectedRegionId] = useState<number | null>(null);
+  const [selectedFeatureName, setSelectedFeatureName] = useState<string | null>(null);
   const [hoveredMaterialId, setHoveredMaterialId] = useState<number | null>(
     null
   );
@@ -264,16 +264,18 @@ export default function MapView({ regions }: MapViewProps) {
     [regions, regionsByNormalizedName]
   );
 
-  const highlightRegionLayer = useCallback((layer: Layer) => {
-    requestAnimationFrame(() => {
-      if (selectedLayerRef.current && selectedLayerRef.current !== layer) {
-        selectedLayerRef.current.setStyle(DEFAULT_REGION_STYLE);
+  const regionStyle = useCallback(
+    (feature?: GeoJsonObject) => {
+      if (feature && selectedFeatureName) {
+        const name = getFeatureRegionName(
+          feature as Feature<Geometry, RegionFeatureProperties>
+        );
+        if (name === selectedFeatureName) return SELECTED_REGION_STYLE;
       }
-
-      layer.setStyle(SELECTED_REGION_STYLE);
-      selectedLayerRef.current = layer;
-    });
-  }, []);
+      return DEFAULT_REGION_STYLE;
+    },
+    [selectedFeatureName]
+  );
 
   return (
     <div className="grid min-h-[calc(100vh-135px)] gap-5 xl:grid-cols-[1fr_420px]">
@@ -299,7 +301,7 @@ export default function MapView({ regions }: MapViewProps) {
           {geoJson && (
             <GeoJSON
               data={geoJson}
-              style={() => DEFAULT_REGION_STYLE}
+              style={regionStyle}
               onEachFeature={(feature, layer) => {
                 const typedFeature = feature as Feature<
                   Geometry,
@@ -318,8 +320,8 @@ export default function MapView({ regions }: MapViewProps) {
                 layer.on({
                   click: () => {
                     setHoveredMaterialId(null);
+                    setSelectedFeatureName(regionNameFromMap);
                     selectRegionByName(regionNameFromMap);
-                    highlightRegionLayer(layer);
 
                     const bounds = (layer as LayerWithInternals).getBounds?.();
                     const map = (layer as LayerWithInternals)._map;

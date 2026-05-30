@@ -28,21 +28,21 @@ export default async function HomePage() {
 
           <div className="relative z-10 flex min-h-[620px] items-center px-8 py-12 md:px-12 md:py-16 lg:py-20">
             <div className="max-w-3xl">
-              <p className="mb-6 inline-flex rounded-full border border-[#d8a342]/35 bg-[#d8a342]/12 px-4 py-2 text-xs font-black uppercase tracking-[0.28em] text-[#f0bd5b] backdrop-blur">
+              <p className="animate-fade-in-up mb-6 inline-flex rounded-full border border-[#d8a342]/35 bg-[#d8a342]/12 px-4 py-2 text-xs font-black uppercase tracking-[0.28em] text-[#f0bd5b] backdrop-blur">
                 Фольклор народов России
               </p>
 
-              <h1 className="mb-6 text-6xl font-extrabold leading-[0.95] tracking-tight text-[#fff8e8] drop-shadow-lg md:text-7xl">
+              <h1 className="animate-fade-in-up delay-100 mb-6 text-6xl font-extrabold leading-[0.95] tracking-tight text-[#fff8e8] drop-shadow-lg md:text-7xl">
                 Легендариум
               </h1>
 
-              <p className="mb-9 max-w-2xl text-lg leading-9 text-[#d9c9b6] drop-shadow md:text-xl">
+              <p className="animate-fade-in-up delay-150 mb-9 max-w-2xl text-lg leading-9 text-[#d9c9b6] drop-shadow md:text-xl">
                 Интерактивная образовательная платформа для изучения легенд,
                 сказок, мифов, обрядов и культурных традиций народов России
                 через карту, библиотеку и интерактивные задания.
               </p>
 
-              <div className="mb-10 flex flex-wrap items-center gap-4">
+              <div className="animate-fade-in-up delay-200 mb-10 flex flex-wrap items-center gap-4">
                 <Link
                   href="/map"
                   className="rounded-2xl bg-[#d8a342] px-7 py-4 text-base font-extrabold !text-[#06151a] shadow-lg shadow-[#d8a342]/30 transition hover:-translate-y-0.5 hover:bg-[#f0bd5b]"
@@ -65,7 +65,7 @@ export default async function HomePage() {
                 </Link>
               </div>
 
-              <div className="grid max-w-2xl gap-4 sm:grid-cols-3">
+              <div className="animate-fade-in-up delay-300 grid max-w-2xl gap-4 sm:grid-cols-3">
                 <HeroStatCard value={materialsCount} label="материалов" />
                 <HeroStatCard value={peoplesCount} label="народов" />
                 <HeroStatCard value={tasksCount} label="заданий" />
@@ -76,7 +76,7 @@ export default async function HomePage() {
       </section>
 
       <section className="mx-auto max-w-7xl px-6">
-        <div className="mb-10 max-w-3xl">
+        <div className="animate-fade-in-up mb-10 max-w-3xl">
           <p className="mb-4 text-sm font-black uppercase tracking-[0.32em] text-[#d8a342]">
             Возможности платформы
           </p>
@@ -92,41 +92,49 @@ export default async function HomePage() {
         </div>
 
         <div className="grid gap-5 md:grid-cols-2 xl:grid-cols-4">
-          <FeatureCard
-            href="/map"
-            icon="⌖"
-            title="Интерактивная карта"
-            text="Изучайте фольклор через регионы России, территориальную привязку и точки материалов."
-            action="Открыть карту"
-            color="from-[#2f8f63] to-[#3aa6a0]"
-          />
+          <div className="animate-fade-in-up delay-100">
+            <FeatureCard
+              href="/map"
+              icon="⌖"
+              title="Интерактивная карта"
+              text="Изучайте фольклор через регионы России, территориальную привязку и точки материалов."
+              action="Открыть карту"
+              color="from-[#2f8f63] to-[#3aa6a0]"
+            />
+          </div>
 
-          <FeatureCard
-            href="/library"
-            icon="◫"
-            title="Библиотека"
-            text="Ищите материалы по региону, народу, жанру и тематике. Сохраняйте понравившееся."
-            action="Перейти в библиотеку"
-            color="from-[#3aa6a0] to-[#2f6f96]"
-          />
+          <div className="animate-fade-in-up delay-200">
+            <FeatureCard
+              href="/library"
+              icon="◫"
+              title="Библиотека"
+              text="Ищите материалы по региону, народу, жанру и тематике. Сохраняйте понравившееся."
+              action="Перейти в библиотеку"
+              color="from-[#3aa6a0] to-[#2f6f96]"
+            />
+          </div>
 
-          <FeatureCard
-            href="/quests"
-            icon="?"
-            title="Задания"
-            text="Проверяйте понимание легенд и сказок через интерактивные задания с результатами."
-            action="Пройти задания"
-            color="from-[#7352d6] to-[#3aa6a0]"
-          />
+          <div className="animate-fade-in-up delay-300">
+            <FeatureCard
+              href="/quests"
+              icon="?"
+              title="Задания"
+              text="Проверяйте понимание легенд и сказок через интерактивные задания с результатами."
+              action="Пройти задания"
+              color="from-[#7352d6] to-[#3aa6a0]"
+            />
+          </div>
 
-          <FeatureCard
-            href="/profile"
-            icon="✦"
-            title="Личный маршрут"
-            text="Следите за прогрессом, избранным и коллекционными карточками в профиле."
-            action="Открыть профиль"
-            color="from-[#d8a342] to-[#2f8f63]"
-          />
+          <div className="animate-fade-in-up delay-400">
+            <FeatureCard
+              href="/profile"
+              icon="✦"
+              title="Личный маршрут"
+              text="Следите за прогрессом, избранным и коллекционными карточками в профиле."
+              action="Открыть профиль"
+              color="from-[#d8a342] to-[#2f8f63]"
+            />
+          </div>
         </div>
       </section>
     </main>

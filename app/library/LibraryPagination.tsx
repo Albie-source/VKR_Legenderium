@@ -37,7 +37,7 @@ export default function LibraryPagination({
         className={[
           "rounded-2xl border px-4 py-2 text-sm font-bold transition",
           currentPage === 1
-            ? "pointer-events-none border-stone-200 bg-white text-stone-300"
+            ? "pointer-events-none border-stone-300 bg-stone-100 text-stone-400"
             : "border-[#dccab3] bg-white text-stone-700 hover:border-[#d8a342] hover:text-[#9f661f]",
         ].join(" ")}
       >
@@ -76,7 +76,7 @@ export default function LibraryPagination({
         className={[
           "rounded-2xl border px-4 py-2 text-sm font-bold transition",
           currentPage === totalPages
-            ? "pointer-events-none border-stone-200 bg-white text-stone-300"
+            ? "pointer-events-none border-stone-300 bg-stone-100 text-stone-400"
             : "border-[#dccab3] bg-white text-stone-700 hover:border-[#d8a342] hover:text-[#9f661f]",
         ].join(" ")}
       >

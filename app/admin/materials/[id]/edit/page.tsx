@@ -3,6 +3,7 @@ import { notFound } from "next/navigation";
 import { requireAdmin } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { updateMaterialAction } from "./actions";
+import MediaUploadField from "@/app/admin/materials/MediaUploadField";
 
 type EditMaterialPageProps = {
   params: Promise<{
@@ -224,44 +225,27 @@ export default async function EditMaterialPage({
           </div>
 
           <div className="grid gap-4 md:grid-cols-3">
-            <div>
-              <label className="mb-2 block text-sm font-medium text-stone-700">
-                Изображение URL
-              </label>
-
-              <input
-                name="imageUrl"
-                defaultValue={material.imageUrl ?? ""}
-                placeholder="/images/example.jpg"
-                className="w-full rounded-xl border border-stone-300 px-4 py-3 outline-none transition focus:border-amber-700"
-              />
-            </div>
-
-            <div>
-              <label className="mb-2 block text-sm font-medium text-stone-700">
-                Аудио URL
-              </label>
-
-              <input
-                name="audioUrl"
-                defaultValue={material.audioUrl ?? ""}
-                placeholder="/audio/example.mp3"
-                className="w-full rounded-xl border border-stone-300 px-4 py-3 outline-none transition focus:border-amber-700"
-              />
-            </div>
-
-            <div>
-              <label className="mb-2 block text-sm font-medium text-stone-700">
-                Видео URL
-              </label>
-
-              <input
-                name="videoUrl"
-                defaultValue={material.videoUrl ?? ""}
-                placeholder="/video/example.mp4"
-                className="w-full rounded-xl border border-stone-300 px-4 py-3 outline-none transition focus:border-amber-700"
-              />
-            </div>
+            <MediaUploadField
+              name="imageUrl"
+              label="Изображение"
+              accept="image/*"
+              defaultValue={material.imageUrl ?? ""}
+              placeholder="/images/example.jpg"
+            />
+            <MediaUploadField
+              name="audioUrl"
+              label="Аудио"
+              accept="audio/*"
+              defaultValue={material.audioUrl ?? ""}
+              placeholder="/audio/example.mp3"
+            />
+            <MediaUploadField
+              name="videoUrl"
+              label="Видео"
+              accept="video/*"
+              defaultValue={material.videoUrl ?? ""}
+              placeholder="/video/example.mp4"
+            />
           </div>
 
           <div>

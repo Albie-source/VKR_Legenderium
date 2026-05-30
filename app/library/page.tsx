@@ -182,10 +182,11 @@ export default async function LibraryPage({ searchParams }: LibraryPageProps) {
         ) : (
           <>
             <div className="grid gap-6 md:grid-cols-2 xl:grid-cols-3">
-              {materials.map((material) => (
+              {materials.map((material, index) => (
                 <article
                   key={material.id}
-                  className="group flex min-h-[460px] flex-col overflow-hidden rounded-[2rem] border border-[#e4d4bf] bg-white shadow-md transition hover:-translate-y-1 hover:shadow-xl"
+                  style={{ animationDelay: `${index * 0.06}s` }}
+                  className="animate-fade-in-up group flex min-h-[460px] flex-col overflow-hidden rounded-[2rem] border border-[#e4d4bf] bg-white shadow-md transition hover:-translate-y-1 hover:shadow-xl"
                 >
                   <div className="relative h-52 overflow-hidden bg-[#eadfce]">
                     {material.imageUrl ? (
