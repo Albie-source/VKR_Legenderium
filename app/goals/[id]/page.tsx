@@ -1,11 +1,9 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import dynamic from "next/dynamic";
 import { prisma } from "@/lib/prisma";
 import { getCurrentUser } from "@/lib/auth";
 import type { RouteStop } from "./GoalMapClient";
-
-const GoalMapClient = dynamic(() => import("./GoalMapClient"), { ssr: false });
+import GoalMapWrapper from "./GoalMapWrapper";
 
 type GoalPageProps = {
   params: Promise<{ id: string }>;
@@ -209,7 +207,7 @@ export default async function GoalPage({ params }: GoalPageProps) {
             </p>
           </div>
         ) : (
-          <GoalMapClient stops={stops} isAuthenticated={Boolean(user)} />
+          <GoalMapWrapper stops={stops} isAuthenticated={Boolean(user)} />
         )}
       </section>
     </main>
