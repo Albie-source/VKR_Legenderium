@@ -50,9 +50,9 @@ export default function HeaderClient({ user, goals }: HeaderClientProps) {
           </Link>
 
           <nav className="hidden items-center gap-8 md:flex lg:gap-10">
-            <HeaderNavItem href="/map">Карта</HeaderNavItem>
-            <HeaderNavItem href="/library">Библиотека</HeaderNavItem>
-            <HeaderNavItem href="/quests">Задания</HeaderNavItem>
+            <HeaderNavItem href="/map" id="nav-map">Карта</HeaderNavItem>
+            <HeaderNavItem href="/library" id="nav-library">Библиотека</HeaderNavItem>
+            <HeaderNavItem href="/quests" id="nav-quests">Задания</HeaderNavItem>
 
             {user && (
               <HeaderNavButton onClick={() => setIsGoalsOpen(true)}>
@@ -71,6 +71,7 @@ export default function HeaderClient({ user, goals }: HeaderClientProps) {
             </Link>
           ) : user ? (
             <Link
+              id="nav-profile"
               href="/profile"
               className="rounded-2xl bg-[#d8a342] px-5 py-3 text-sm font-extrabold !text-[#06151a] shadow-md transition hover:bg-[#f0bd5b]"
             >
@@ -117,15 +118,18 @@ export default function HeaderClient({ user, goals }: HeaderClientProps) {
 
 function HeaderNavItem({
   href,
+  id,
   children,
 }: {
   href: string;
+  id?: string;
   children: ReactNode;
 }) {
   return (
     <Link
+      id={id}
       href={href}
-      className="text-[16px] font-extrabold text-[#fff8e8] transition hover:text-[#d8a342]"
+      className="rounded-xl px-2 py-1 text-[16px] font-extrabold text-[#fff8e8] transition hover:text-[#d8a342]"
     >
       {children}
     </Link>

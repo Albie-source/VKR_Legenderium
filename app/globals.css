@@ -430,3 +430,19 @@ select {
   background-clip: text;
   animation: shimmerGold 3s linear infinite;
 }
+
+/* Onboarding highlight */
+.onboarding-highlight {
+  position: relative;
+  z-index: 45;
+  outline: 2px solid #d8a342;
+  outline-offset: 4px;
+  border-radius: 0.75rem;
+  box-shadow: 0 0 0 6px rgba(216, 163, 66, 0.25), 0 0 20px rgba(216, 163, 66, 0.3);
+  animation: pulseHighlight 1.5s ease-in-out infinite;
+}
+
+@keyframes pulseHighlight {
+  0%, 100% { box-shadow: 0 0 0 6px rgba(216, 163, 66, 0.25), 0 0 20px rgba(216, 163, 66, 0.3); }
+  50% { box-shadow: 0 0 0 10px rgba(216, 163, 66, 0.15), 0 0 30px rgba(216, 163, 66, 0.45); }
+}

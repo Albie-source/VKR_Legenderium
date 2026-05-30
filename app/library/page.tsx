@@ -3,6 +3,7 @@ import { Prisma } from "@prisma/client";
 import { prisma } from "@/lib/prisma";
 import LibraryFilters from "./LibraryFilters";
 import LibraryPagination from "./LibraryPagination";
+import MascotHint from "@/components/MascotHint";
 
 const PAGE_SIZE = 12;
 
@@ -126,6 +127,11 @@ export default async function LibraryPage({ searchParams }: LibraryPageProps) {
 
   return (
     <main className="overflow-hidden bg-[#f4ecdf] pb-20">
+      <MascotHint
+        storageKey="hint_library"
+        message="Используй фильтры сверху, чтобы найти легенды нужного народа или региона. Каждый прочитанный материал приближает нас к восстановлению архива!"
+        mood="thinking"
+      />
       <section className="border-b border-white/10 bg-[radial-gradient(circle_at_18%_12%,rgba(58,166,160,0.16),transparent_28%),radial-gradient(circle_at_82%_8%,rgba(216,163,66,0.12),transparent_24%),linear-gradient(180deg,#07181c_0%,#0b2428_100%)]">
         <div className="mx-auto max-w-7xl px-6 py-12">
           <div className="relative overflow-hidden rounded-[2.5rem] border border-white/10 bg-[#0b1f22] px-8 py-10 shadow-2xl shadow-black/25 md:px-10 md:py-12">

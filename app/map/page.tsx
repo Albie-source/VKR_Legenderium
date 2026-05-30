@@ -1,6 +1,7 @@
 import { prisma } from "@/lib/prisma";
 import MapClient from "./MapClient";
 import type { GoalStop } from "./MapClient";
+import MascotHint from "@/components/MascotHint";
 
 type MapPageProps = {
   searchParams: Promise<{ goal?: string }>;
@@ -125,6 +126,11 @@ export default async function MapPage({ searchParams }: MapPageProps) {
       <section className="mx-auto max-w-[1600px] px-6 py-6">
         <MapClient regions={preparedRegions} goalStops={goalStops} />
       </section>
+      <MascotHint
+        storageKey="hint_map"
+        message="Нажми на любой регион на карте — и я расскажу, какие предания там хранятся. Именно с них мы начнём восстанавливать архив!"
+        mood="excited"
+      />
     </main>
   );
 }
