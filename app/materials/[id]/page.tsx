@@ -7,6 +7,7 @@ import {
   removeFromFavoritesAction,
   requireLoginForFavoriteAction,
 } from "./actions";
+import TtsPlayer from "./TtsPlayer";
 
 type MaterialPageProps = {
   params: Promise<{
@@ -177,6 +178,10 @@ export default async function MaterialPage({ params }: MaterialPageProps) {
                 Содержание материала
               </h2>
             </div>
+
+            {process.env.YANDEX_TTS_API_KEY && material.fullText && (
+              <TtsPlayer text={material.fullText} />
+            )}
 
             {material.fullText ? (
               <p className="whitespace-pre-line text-lg leading-9 text-stone-800">
