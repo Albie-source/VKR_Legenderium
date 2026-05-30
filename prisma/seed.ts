@@ -876,6 +876,137 @@ async function createDemoTasks(
       },
     });
   }
+
+  // New interactive task types — one example each, attached to the first material
+  const baseMaterial = createdMaterials[0];
+  if (baseMaterial) {
+    await prisma.interactiveTask.create({
+      data: {
+        materialId: baseMaterial.id,
+        title: `Визуальная новелла: путь героя`,
+        description: "Пройдите историю и сделайте правильный выбор.",
+        type: "visual_novel",
+        difficulty: "medium",
+        config: {
+          scenes: [
+            {
+              id: "start",
+              text: "Охотник вошёл в тёмный лес. У развилки он увидел старика, который предложил ему два пути: левый — через болото, правый — через гору. Что выберет охотник?",
+              choices: [
+                { text: "Пойти через болото", nextScene: "swamp" },
+                { text: "Пойти через гору", nextScene: "mountain" },
+              ],
+            },
+            {
+              id: "swamp",
+              text: "В болоте охотник встретил духа воды. Дух спросил: «Зачем ты пришёл в мои владения?» Охотник ответил уважительно и получил совет. Он нашёл путь домой.",
+              isEnd: true,
+              isCorrect: true,
+            },
+            {
+              id: "mountain",
+              text: "На горе разразилась буря. Охотник заблудился и вернулся на развилку ни с чем.",
+              isEnd: true,
+              isCorrect: false,
+            },
+          ],
+          explanation: "В фольклоре болото часто связано с духами, которые помогают уважительным путникам. Правильный выбор — проявить уважение к природе.",
+        },
+      },
+    });
+
+    await prisma.interactiveTask.create({
+      data: {
+        materialId: baseMaterial.id,
+        title: `Найдите скрытые объекты`,
+        description: "Кликайте на изображение, чтобы найти спрятанные фольклорные символы.",
+        type: "hidden_objects",
+        difficulty: "easy",
+        config: {
+          question: "Найдите три фольклорных символа на картине",
+          imageUrl: baseMaterial.imageUrl ?? "/materials/1.png",
+          objects: [
+            { id: "o1", label: "Дерево-великан", x: 15, y: 35, radius: 12 },
+            { id: "o2", label: "Огонь", x: 60, y: 70, radius: 10 },
+            { id: "o3", label: "Птица", x: 80, y: 25, radius: 10 },
+          ],
+          explanation: "Дерево, огонь и птица — три ключевых символа в фольклоре народов Сибири.",
+        },
+      },
+    });
+
+    await prisma.interactiveTask.create({
+      data: {
+        materialId: baseMaterial.id,
+        title: `Кто я? Угадай персонажа`,
+        description: "Узнайте фольклорного персонажа по подсказкам.",
+        type: "who_am_i",
+        difficulty: "medium",
+        config: {
+          clues: [
+            "Я живу в лесу и охраняю его от чужаков.",
+            "Меня боятся охотники и заблудившиеся путники.",
+            "Я могу менять облик и запутывать дороги.",
+            "В некоторых легендах я помогаю тем, кто знает правильные слова.",
+          ],
+          answer: "Леший",
+          options: ["Леший", "Водяной", "Домовой", "Банник"],
+          explanation: "Леший — дух-хозяин леса в славянской мифологии. Он охраняет лес, может заводить людей в чащу, но иногда помогает уважительным путникам.",
+        },
+      },
+    });
+
+    await prisma.interactiveTask.create({
+      data: {
+        materialId: baseMaterial.id,
+        title: `Мемо: фольклорные пары`,
+        description: "Найдите пары карточек: символ и его значение в фольклоре.",
+        type: "memo",
+        difficulty: "easy",
+        config: {
+          question: "Найдите пары: фольклорный образ и его значение",
+          pairs: [
+            { id: "p1", cardA: "Медведь", cardB: "Хозяин тайги" },
+            { id: "p2", cardA: "Огонь", cardB: "Священный дар" },
+            { id: "p3", cardA: "Ворон", cardB: "Вестник перемен" },
+            { id: "p4", cardA: "Вода", cardB: "Граница миров" },
+          ],
+          explanation: "В фольклоре народов Севера животные и природные стихии несут глубокий символический смысл.",
+        },
+      },
+    });
+
+    await prisma.interactiveTask.create({
+      data: {
+        materialId: baseMaterial.id,
+        title: `Собери образ: традиционный костюм`,
+        description: "Выберите правильные элементы традиционного костюма народа.",
+        type: "assemble_outfit",
+        difficulty: "medium",
+        config: {
+          question: "Соберите традиционный женский костюм народов Поволжья",
+          character: "Девушка из Татарстана",
+          slots: [
+            { id: "head", label: "Головной убор", correctItem: "Калфак" },
+            { id: "outer", label: "Верхняя одежда", correctItem: "Камзол" },
+            { id: "dress", label: "Основное платье", correctItem: "Күлмәк (рубаха-платье)" },
+            { id: "shoes", label: "Обувь", correctItem: "Читек (мягкие сапоги)" },
+          ],
+          items: [
+            { id: "i1", label: "Калфак", slotId: "head" },
+            { id: "i2", label: "Кокошник", slotId: "head" },
+            { id: "i3", label: "Камзол", slotId: "outer" },
+            { id: "i4", label: "Шуба", slotId: "outer" },
+            { id: "i5", label: "Күлмәк (рубаха-платье)", slotId: "dress" },
+            { id: "i6", label: "Сарафан", slotId: "dress" },
+            { id: "i7", label: "Читек (мягкие сапоги)", slotId: "shoes" },
+            { id: "i8", label: "Лапти", slotId: "shoes" },
+          ],
+          explanation: "Калфак, камзол, күлмәк и читек — традиционные элементы женского татарского костюма, отражающие богатую культуру народа.",
+        },
+      },
+    });
+  }
 }
 
 async function createDemoGoals() {

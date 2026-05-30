@@ -185,6 +185,11 @@ function formatTaskType(type: string) {
     matching: "Сопоставление",
     ordering: "Порядок",
     text_input: "Ответ текстом",
+    visual_novel: "Визуальная новелла",
+    hidden_objects: "Скрытые объекты",
+    who_am_i: "Кто я?",
+    memo: "Мемо",
+    assemble_outfit: "Собери образ",
   };
 
   return labels[type] ?? type;
