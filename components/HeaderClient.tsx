@@ -88,6 +88,27 @@ export default function HeaderClient({ user, goals }: HeaderClientProps) {
           </div>
         </div>
 
+        {user && goals.length > 0 && (() => {
+          const completedCount = goals.filter((g) => g.isCompleted).length;
+          const pct = Math.round((completedCount / goals.length) * 100);
+          return (
+            <div className="border-t border-white/5 px-6 py-1.5">
+              <div className="mx-auto flex max-w-7xl items-center gap-3">
+                <span className="shrink-0 text-[11px] font-bold text-white/35">Архив восстановлен</span>
+                <div className="h-1 flex-1 overflow-hidden rounded-full bg-white/8">
+                  <div
+                    className="h-full rounded-full bg-gradient-to-r from-[#2f8f63] to-[#d8a342] transition-all duration-1000"
+                    style={{ width: `${pct}%` }}
+                  />
+                </div>
+                <span className="shrink-0 text-[11px] font-black text-[#d8a342]">
+                  {completedCount}/{goals.length}
+                </span>
+              </div>
+            </div>
+          );
+        })()}
+
         <nav className="flex gap-3 overflow-x-auto border-t border-white/10 px-6 py-3 md:hidden">
           <MobileNavLink href="/map">Карта</MobileNavLink>
           <MobileNavLink href="/library">Библиотека</MobileNavLink>

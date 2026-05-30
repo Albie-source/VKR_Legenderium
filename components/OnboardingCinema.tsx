@@ -56,6 +56,7 @@ type OnboardingCinemaProps = {
 
 export default function OnboardingCinema({ autoStart = true, onFinish }: OnboardingCinemaProps) {
   const [beatIndex, setBeatIndex] = useState<number | null>(null);
+  const [showSplash, setShowSplash] = useState(false);
   const [textVisible, setTextVisible] = useState(true);
   const [closing, setClosing] = useState(false);
   const [muted, setMuted] = useState(false);
@@ -143,7 +144,7 @@ export default function OnboardingCinema({ autoStart = true, onFinish }: Onboard
   useEffect(() => {
     if (typeof window === "undefined") return;
     if (autoStart && !localStorage.getItem(STORAGE_KEY)) {
-      setTimeout(() => setBeatIndex(0), 700);
+      setTimeout(() => setShowSplash(true), 700);
     }
   }, [autoStart]);
 
@@ -208,6 +209,57 @@ export default function OnboardingCinema({ autoStart = true, onFinish }: Onboard
     window.addEventListener("keydown", onKey);
     return () => window.removeEventListener("keydown", onKey);
   }, [handleAdvance, finish]);
+
+  if (beatIndex === null && showSplash) {
+    return (
+      <div className="fixed inset-0 z-50 select-none">
+        {/* Background */}
+        <div
+          className="absolute inset-0 bg-cover bg-center"
+          style={{ backgroundImage: `url(${SCENE_BG[1]})` }}
+        />
+        <div className="absolute inset-0 bg-gradient-to-b from-black/70 via-black/55 to-black/85" />
+
+        {/* Content */}
+        <div className="relative flex h-full flex-col items-center justify-center px-6 text-center">
+          <p className="mb-5 text-[11px] font-black uppercase tracking-[0.42em] text-[#d8a342]/70">
+            Добро пожаловать в
+          </p>
+          <h1 className="mb-3 font-heading text-6xl font-black leading-none tracking-tight text-[#fff8e8] drop-shadow-2xl md:text-7xl">
+            Легендариум
+          </h1>
+          <p className="mb-2 text-lg font-semibold text-[#cbbba7]">Фольклор народов России</p>
+          <div className="mb-10 h-px w-24 bg-[#d8a342]/40" />
+          <p className="mb-10 max-w-sm text-[15px] leading-7 text-[#cbbba7]">
+            История Архивариуса Мирона и великого свода легенд, рассеянных по всей России
+          </p>
+
+          <button
+            type="button"
+            onClick={() => {
+              startAudio();
+              setShowSplash(false);
+              setBeatIndex(0);
+            }}
+            className="mb-5 rounded-2xl bg-[#d8a342] px-10 py-4 text-[17px] font-extrabold text-[#06151a] shadow-2xl shadow-[#d8a342]/30 transition hover:bg-[#f0bd5b] hover:-translate-y-0.5 active:scale-95"
+          >
+            Начать историю
+          </button>
+
+          <button
+            type="button"
+            onClick={() => {
+              setShowSplash(false);
+              finish();
+            }}
+            className="text-sm text-white/35 transition hover:text-white/60"
+          >
+            Пропустить
+          </button>
+        </div>
+      </div>
+    );
+  }
 
   if (beatIndex === null) return null;
 

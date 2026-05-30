@@ -975,6 +975,49 @@ function AssembleOutfitTask({
   );
 }
 
+// ─── Miron celebration popup ──────────────────────────────────────────────────
+
+function MironCelebration({ goals }: { goals: { id: number; title: string; cardTitle: string }[] }) {
+  const [visible, setVisible] = useState(true);
+
+  useEffect(() => {
+    const t = setTimeout(() => setVisible(false), 5500);
+    return () => clearTimeout(t);
+  }, []);
+
+  return (
+    <div
+      className={[
+        "fixed bottom-24 right-6 z-50 flex max-w-xs items-end gap-3 transition-all duration-500",
+        visible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-4 pointer-events-none",
+      ].join(" ")}
+    >
+      <img
+        src="/images/miron-happy.png"
+        alt="Мирон"
+        className="h-28 w-auto shrink-0 object-contain drop-shadow-xl"
+      />
+      <div className="rounded-2xl border border-[#d8a342]/30 bg-[#0b1f22]/95 p-4 shadow-2xl backdrop-blur-md">
+        <p className="mb-1 text-[10px] font-black uppercase tracking-[0.24em] text-[#d8a342]">
+          Архивариус Мирон
+        </p>
+        <p className="text-sm font-semibold leading-6 text-[#fff8e8]">
+          {goals.length > 0
+            ? `Превосходно! Свиток «${goals[0].cardTitle}» восстановлен для архива!`
+            : "Превосходно! Архив пополнен ещё одной страницей!"}
+        </p>
+        <button
+          type="button"
+          onClick={() => setVisible(false)}
+          className="mt-2 text-xs text-white/35 transition hover:text-white/60"
+        >
+          Закрыть
+        </button>
+      </div>
+    </div>
+  );
+}
+
 // ─── Result Block ─────────────────────────────────────────────────────────────
 
 function ResultBlock({
@@ -994,6 +1037,9 @@ function ResultBlock({
 }) {
   return (
     <div className="space-y-5">
+      {serverResult?.isAuthenticated && serverResult.isCorrect && serverResult.progressUpdated && (
+        <MironCelebration goals={serverResult.completedGoals} />
+      )}
       <div className={["rounded-[1.5rem] border p-6 shadow-sm", isCorrect ? "border-emerald-300 bg-emerald-50 text-emerald-950" : "border-red-300 bg-red-50 text-red-950"].join(" ")}>
         <p className="mb-2 text-sm font-black uppercase tracking-[0.2em]">Результат</p>
         <h3 className="mb-3 text-2xl font-extrabold">{isCorrect ? "Верно!" : "Ответ неверный"}</h3>

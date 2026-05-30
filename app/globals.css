@@ -32,6 +32,7 @@
   --color-background: var(--bg-page);
   --color-foreground: var(--text-main);
   --font-sans: var(--font-body), system-ui, sans-serif;
+  --font-heading: var(--font-heading), serif;
 }
 
 * {
