@@ -95,10 +95,10 @@ const BEATS: Beat[] = [
 ];
 
 const SCENE_BG: Record<number, string> = {
-  1: "/images/scene-library.jpg",
-  2: "/images/scene-storm.jpg",
-  3: "/images/scene-aftermath.jpg",
-  4: "/images/scene-dawn.jpg",
+  1: "/images/scene-library.png",
+  2: "/images/scene-storm.png",
+  3: "/images/scene-aftermath.png",
+  4: "/images/scene-dawn.png",
 };
 
 const SCENE_TITLES: Record<number, string> = {
