@@ -21,6 +21,10 @@ export default function OnboardingFlow() {
     } else {
       setPhase("cinema");
     }
+
+    const handleRewatch = () => setPhase("cinema");
+    window.addEventListener("legendarium:rewatch", handleRewatch);
+    return () => window.removeEventListener("legendarium:rewatch", handleRewatch);
   }, []);
 
   function onCinemaDone() {

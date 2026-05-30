@@ -8,6 +8,7 @@ export default function RewatchStoryButton() {
   function handleClick() {
     localStorage.removeItem("legendarium_cinema_done");
     localStorage.removeItem("legendarium_onboarding_done");
+    window.dispatchEvent(new CustomEvent("legendarium:rewatch"));
     router.push("/");
   }
 
