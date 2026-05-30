@@ -3,6 +3,8 @@ import { revalidatePath } from "next/cache";
 import { requireUser } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { logoutAction } from "../login/actions";
+import MascotHint from "@/components/MascotHint";
+import RewatchStoryButton from "@/components/RewatchStoryButton";
 
 export default async function ProfilePage() {
   const user = await requireUser();
@@ -87,6 +89,11 @@ export default async function ProfilePage() {
 
   return (
     <main className="overflow-hidden bg-[#f4ecdf] pb-20">
+      <MascotHint
+        storageKey="hint_profile"
+        message="Здесь хранится твой путь: прочитанные легенды, выполненные задания и коллекционные карточки. Чем больше исследуешь — тем полнее архив!"
+        mood="happy"
+      />
       <section className="border-b border-white/10 bg-[radial-gradient(circle_at_18%_12%,rgba(58,166,160,0.16),transparent_28%),radial-gradient(circle_at_82%_8%,rgba(216,163,66,0.12),transparent_24%),linear-gradient(180deg,#07181c_0%,#0b2428_100%)]">
         <div className="mx-auto max-w-7xl px-6 py-12">
           <div className="relative overflow-hidden rounded-[2.5rem] border border-white/10 bg-[#0b1f22] p-8 shadow-2xl shadow-black/25 md:p-10">
@@ -114,14 +121,17 @@ export default async function ProfilePage() {
                 {user.email}
               </p>
 
-              <form action={logoutAction} className="mt-5">
-                <button
-                  type="submit"
-                  className="rounded-2xl border border-white/10 bg-white/8 px-5 py-3 text-sm font-extrabold !text-[#fff8e8] shadow-sm backdrop-blur transition hover:bg-white/14"
-                >
-                  Выйти из аккаунта
-                </button>
-              </form>
+              <div className="mt-5 flex flex-wrap gap-3">
+                <RewatchStoryButton />
+                <form action={logoutAction}>
+                  <button
+                    type="submit"
+                    className="rounded-2xl border border-white/10 bg-white/8 px-5 py-3 text-sm font-extrabold !text-[#fff8e8] shadow-sm backdrop-blur transition hover:bg-white/14"
+                  >
+                    Выйти из аккаунта
+                  </button>
+                </form>
+              </div>
             </div>
             </div>
           </div>

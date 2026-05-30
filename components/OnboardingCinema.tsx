@@ -59,6 +59,8 @@ export default function OnboardingCinema({ autoStart = true, onFinish }: Onboard
   const [textVisible, setTextVisible] = useState(true);
   const [closing, setClosing] = useState(false);
   const [muted, setMuted] = useState(false);
+  const [displayedText, setDisplayedText] = useState("");
+  const typewriterRef = useRef<ReturnType<typeof setInterval> | null>(null);
 
   // Two-layer background crossfade
   const [baseBg, setBaseBg] = useState<number>(1);
@@ -88,6 +90,21 @@ export default function OnboardingCinema({ autoStart = true, onFinish }: Onboard
       stormRef.current?.pause();
     };
   }, []);
+
+  // Typewriter effect — runs on every beat change
+  useEffect(() => {
+    if (beatIndex === null) return;
+    const fullText = BEATS[beatIndex].text;
+    setDisplayedText("");
+    if (typewriterRef.current) clearInterval(typewriterRef.current);
+    let i = 0;
+    typewriterRef.current = setInterval(() => {
+      i++;
+      setDisplayedText(fullText.slice(0, i));
+      if (i >= fullText.length) clearInterval(typewriterRef.current!);
+    }, 28);
+    return () => { if (typewriterRef.current) clearInterval(typewriterRef.current); };
+  }, [beatIndex]);
 
   // Adjust volumes when scene changes or mute toggles
   useEffect(() => {
@@ -159,6 +176,15 @@ export default function OnboardingCinema({ autoStart = true, onFinish }: Onboard
   const handleAdvance = useCallback(() => {
     if (beatIndex === null) return;
     startAudio();
+
+    // If typewriter still running — skip to full text
+    const fullText = BEATS[beatIndex].text;
+    if (displayedText.length < fullText.length) {
+      if (typewriterRef.current) clearInterval(typewriterRef.current);
+      setDisplayedText(fullText);
+      return;
+    }
+
     playPage();
     if (beatIndex >= BEATS.length - 1) {
       finish();
@@ -169,7 +195,7 @@ export default function OnboardingCinema({ autoStart = true, onFinish }: Onboard
       setBeatIndex(beatIndex + 1);
       setTextVisible(true);
     }, 160);
-  }, [beatIndex, finish]); // eslint-disable-line react-hooks/exhaustive-deps
+  }, [beatIndex, displayedText, finish]); // eslint-disable-line react-hooks/exhaustive-deps
 
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => {
@@ -292,13 +318,12 @@ export default function OnboardingCinema({ autoStart = true, onFinish }: Onboard
           </p>
 
           <p
-            key={`text-${beatIndex}`}
             className={[
               "min-h-[3.5rem] text-[15px] leading-7 text-[#f0e8dc] transition-opacity duration-150 md:text-base md:leading-8",
               textVisible ? "opacity-100" : "opacity-0",
             ].join(" ")}
           >
-            {beat.text}
+            {displayedText}
           </p>
 
           <div className="mt-4 flex items-center justify-between gap-4">
