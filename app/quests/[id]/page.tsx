@@ -18,9 +18,12 @@ export default async function QuestPage({ params }: QuestPageProps) {
     notFound();
   }
 
-  const task = await prisma.interactiveTask.findUnique({
+  const task = await prisma.interactiveTask.findFirst({
     where: {
       id: taskId,
+      material: {
+        status: "PUBLISHED",
+      },
     },
     include: {
       material: {
