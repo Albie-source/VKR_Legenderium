@@ -11,7 +11,6 @@ type Beat = {
   speaker: Speaker;
   text: string;
   studentSprite: "curious" | "shocked" | "pledge" | "ready" | null;
-  mironSprite: "happy" | "sad";
 };
 
 const BEATS: Beat[] = [
@@ -20,77 +19,66 @@ const BEATS: Beat[] = [
     speaker: "miron",
     text: "Много лет я собирал это сокровище, мой юный друг. Каждый свиток — живая память народа. Легенды, сказания, обряды... всё, что передавалось из уст в уста тысячелетиями.",
     studentSprite: "curious",
-    mironSprite: "happy",
   },
   {
     scene: 1,
     speaker: "student",
     text: "Неужели столько? Со всей России?",
     studentSprite: "curious",
-    mironSprite: "happy",
   },
   {
     scene: 1,
     speaker: "miron",
     text: "Со всей огромной, необъятной России. Пока они здесь — они живы.",
     studentSprite: "curious",
-    mironSprite: "happy",
   },
   {
     scene: 2,
     speaker: "miron",
     text: "Нет! Закрой окна! Свитки!",
     studentSprite: "shocked",
-    mironSprite: "sad",
   },
   {
     scene: 2,
     speaker: "student",
     text: "Я не успеваю! Их слишком много!",
     studentSprite: "shocked",
-    mironSprite: "sad",
   },
   {
     scene: 3,
     speaker: "miron",
     text: "Всё... Ветер разнёс записи по всей стране. Голоса народов — рассеяны как пыль.",
     studentSprite: null,
-    mironSprite: "sad",
   },
   {
     scene: 3,
     speaker: "miron",
     text: "Я слишком стар, чтобы объехать всю Россию в поисках утерянного...",
     studentSprite: null,
-    mironSprite: "sad",
   },
   {
     scene: 4,
     speaker: "student",
     text: "Тогда это сделаю я. Объеду все регионы, найду каждую легенду — и оцифрую. Ни один ураган больше не уничтожит память народа.",
     studentSprite: "pledge",
-    mironSprite: "sad",
   },
   {
     scene: 4,
     speaker: "miron",
     text: "Но это... огромный путь...",
     studentSprite: "pledge",
-    mironSprite: "sad",
   },
   {
     scene: 4,
     speaker: "student",
     text: "Ты собирал эти истории всю жизнь. Я сохраню их навсегда.",
     studentSprite: "ready",
-    mironSprite: "sad",
   },
   {
     scene: 4,
     speaker: "miron",
     text: "Тогда — в путь. Легендариум ждёт тебя.",
     studentSprite: "ready",
-    mironSprite: "happy",
   },
 ];
 
@@ -115,15 +103,14 @@ const STUDENT_SPRITE: Record<string, string> = {
   ready: "/images/student-ready.png",
 };
 
-const MIRON_SPRITE: Record<string, string> = {
-  happy: "/images/miron-happy.png",
-  sad: "/images/miron-sad.png",
-};
-
 export default function OnboardingCinema() {
   const [beatIndex, setBeatIndex] = useState<number | null>(null);
   const [textVisible, setTextVisible] = useState(true);
   const [closing, setClosing] = useState(false);
+
+  // Two-layer background crossfade
+  const [baseBg, setBaseBg] = useState<number>(1);
+  const [incomingBg, setIncomingBg] = useState<number | null>(null);
 
   useEffect(() => {
     if (typeof window === "undefined") return;
@@ -131,6 +118,20 @@ export default function OnboardingCinema() {
       setTimeout(() => setBeatIndex(0), 700);
     }
   }, []);
+
+  // Crossfade background when scene changes
+  useEffect(() => {
+    if (beatIndex === null) return;
+    const scene = BEATS[beatIndex].scene;
+    if (scene === baseBg) return;
+
+    setIncomingBg(scene);
+    const t = setTimeout(() => {
+      setBaseBg(scene);
+      setIncomingBg(null);
+    }, 420);
+    return () => clearTimeout(t);
+  }, [beatIndex, baseBg]);
 
   const finish = useCallback(() => {
     setClosing(true);
@@ -142,20 +143,17 @@ export default function OnboardingCinema() {
   }, []);
 
   const handleAdvance = useCallback(() => {
-    setBeatIndex((cur) => {
-      if (cur === null) return null;
-      if (cur >= BEATS.length - 1) {
-        finish();
-        return cur;
-      }
-      setTextVisible(false);
-      setTimeout(() => {
-        setBeatIndex((c) => (c !== null ? c + 1 : null));
-        setTextVisible(true);
-      }, 160);
-      return cur;
-    });
-  }, [finish]);
+    if (beatIndex === null) return;
+    if (beatIndex >= BEATS.length - 1) {
+      finish();
+      return;
+    }
+    setTextVisible(false);
+    setTimeout(() => {
+      setBeatIndex(beatIndex + 1);
+      setTextVisible(true);
+    }, 160);
+  }, [beatIndex, finish]);
 
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => {
@@ -178,7 +176,6 @@ export default function OnboardingCinema() {
 
   const speakerLabel = beat.speaker === "miron" ? "Архивариус Мирон" : "Ученик";
   const speakerColor = beat.speaker === "miron" ? "#d8a342" : "#3aa6a0";
-
   const studentActive = beat.speaker === "student";
   const mironActive = beat.speaker === "miron";
 
@@ -190,17 +187,25 @@ export default function OnboardingCinema() {
       ].join(" ")}
       onClick={handleAdvance}
     >
-      {/* Background — key triggers fade-in on scene change */}
+      {/* Base background — always visible, never unmounts */}
       <div
-        key={`bg-${beat.scene}`}
-        className="absolute inset-0 animate-fade-in bg-cover bg-center"
-        style={{ backgroundImage: `url(${SCENE_BG[beat.scene]})` }}
+        className="absolute inset-0 bg-cover bg-center"
+        style={{ backgroundImage: `url(${SCENE_BG[baseBg]})` }}
       />
 
-      {/* Bottom gradient for readability */}
+      {/* Incoming background — fades in on top when scene changes */}
+      {incomingBg !== null && (
+        <div
+          key={incomingBg}
+          className="absolute inset-0 animate-fade-in bg-cover bg-center"
+          style={{ backgroundImage: `url(${SCENE_BG[incomingBg]})` }}
+        />
+      )}
+
+      {/* Bottom gradient */}
       <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-black/88 via-black/20 to-transparent" />
 
-      {/* Scene title — fades in on new scene */}
+      {/* Scene title */}
       {sceneChanged && (
         <div
           key={`title-${beat.scene}`}
@@ -212,7 +217,7 @@ export default function OnboardingCinema() {
         </div>
       )}
 
-      {/* Characters */}
+      {/* Characters — both full-body for visual consistency */}
       <div className="pointer-events-none absolute inset-x-0 bottom-[148px] flex items-end justify-between px-6 sm:px-16 md:px-24">
         {/* Student — left */}
         <div
@@ -231,12 +236,12 @@ export default function OnboardingCinema() {
             <img
               src={STUDENT_SPRITE[beat.studentSprite]}
               alt="Ученик"
-              className="h-[50vh] max-h-[400px] w-auto object-contain"
+              className="h-[52vh] max-h-[420px] w-auto object-contain"
             />
           )}
         </div>
 
-        {/* Miron — right */}
+        {/* Miron — right, full-body sprite */}
         <div
           className="transition-all duration-500"
           style={{
@@ -249,9 +254,9 @@ export default function OnboardingCinema() {
           }}
         >
           <img
-            src={MIRON_SPRITE[beat.mironSprite]}
+            src="/images/miron-full.png"
             alt="Архивариус Мирон"
-            className="h-[50vh] max-h-[400px] w-auto object-contain"
+            className="h-[52vh] max-h-[420px] w-auto object-contain"
           />
         </div>
       </div>
@@ -280,7 +285,6 @@ export default function OnboardingCinema() {
           </p>
 
           <div className="mt-4 flex items-center justify-between gap-4">
-            {/* Scene progress */}
             <div className="flex items-center gap-1.5">
               {([1, 2, 3, 4] as const).map((s) => (
                 <div
@@ -302,28 +306,14 @@ export default function OnboardingCinema() {
             <div className="flex shrink-0 items-center gap-3">
               <button
                 type="button"
-                onClick={(e) => {
-                  e.stopPropagation();
-                  finish();
-                }}
+                onClick={(e) => { e.stopPropagation(); finish(); }}
                 className="cursor-pointer text-xs text-white/40 transition hover:text-white/70"
               >
                 Пропустить
               </button>
               <button
                 type="button"
-                onClick={(e) => {
-                  e.stopPropagation();
-                  if (isLast) {
-                    finish();
-                  } else {
-                    setTextVisible(false);
-                    setTimeout(() => {
-                      setBeatIndex((cur) => (cur !== null ? cur + 1 : null));
-                      setTextVisible(true);
-                    }, 160);
-                  }
-                }}
+                onClick={(e) => { e.stopPropagation(); handleAdvance(); }}
                 className="cursor-pointer rounded-xl bg-[#d8a342] px-5 py-2.5 text-sm font-extrabold text-[#06151a] transition hover:bg-[#f0bd5b] active:scale-95"
               >
                 {isLast ? "В путь!" : "Далее →"}
