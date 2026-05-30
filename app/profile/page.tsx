@@ -42,12 +42,7 @@ export default async function ProfilePage() {
           userId: user.id,
         },
         include: {
-          goal: {
-            include: {
-              genre: true,
-              topic: true,
-            },
-          },
+          goal: true,
         },
         orderBy: {
           completedAt: "desc",

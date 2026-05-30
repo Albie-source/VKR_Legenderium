@@ -10,8 +10,8 @@ export default async function ProgressPage() {
       isActive: true,
     },
     include: {
-      genre: true,
-      topic: true,
+      genres: { include: { genre: true } },
+      topics: { include: { topic: true } },
       progress: {
         where: {
           userId: user.id,
@@ -72,13 +72,17 @@ export default async function ProgressPage() {
                   className="rounded-[2rem] border border-stone-200 bg-white p-6 shadow-sm"
                 >
                   <div className="mb-4 flex flex-wrap gap-2 text-xs">
-                    <span className="rounded-full bg-amber-100 px-3 py-1 font-medium text-amber-800">
-                      {goal.genre.name}
-                    </span>
+                    {goal.genres.map(({ genre }) => (
+                      <span key={genre.id} className="rounded-full bg-amber-100 px-3 py-1 font-medium text-amber-800">
+                        {genre.name}
+                      </span>
+                    ))}
 
-                    <span className="rounded-full bg-stone-100 px-3 py-1 text-stone-700">
-                      {goal.topic.name}
-                    </span>
+                    {goal.topics.map(({ topic }) => (
+                      <span key={topic.id} className="rounded-full bg-stone-100 px-3 py-1 text-stone-700">
+                        {topic.name}
+                      </span>
+                    ))}
 
                     {progress?.isCompleted && (
                       <span className="rounded-full bg-green-100 px-3 py-1 text-green-800">
@@ -113,7 +117,7 @@ export default async function ProgressPage() {
 
                   <div className="mt-5 flex flex-wrap gap-3">
                     <Link
-                      href={`/library?genre=${goal.genreId}&topic=${goal.topicId}`}
+                      href={`/library${goal.genres[0]?.genreId ? `?genre=${goal.genres[0].genreId}` : ""}`}
                       className="rounded-xl bg-amber-700 px-5 py-3 text-sm font-medium text-white transition hover:bg-amber-800"
                     >
                       Перейти к материалам

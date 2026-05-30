@@ -13,8 +13,8 @@ export default async function CollectionPage() {
     include: {
       goal: {
         include: {
-          genre: true,
-          topic: true,
+          genres: { include: { genre: true } },
+          topics: { include: { topic: true } },
         },
       },
     },
@@ -100,13 +100,17 @@ export default async function CollectionPage() {
 
                 <div className="p-6">
                   <div className="mb-4 flex flex-wrap gap-2 text-xs">
-                    <span className="rounded-full bg-amber-100 px-3 py-1 font-medium text-amber-800">
-                      {progress.goal.genre.name}
-                    </span>
+                    {progress.goal.genres.map(({ genre }) => (
+                      <span key={genre.id} className="rounded-full bg-amber-100 px-3 py-1 font-medium text-amber-800">
+                        {genre.name}
+                      </span>
+                    ))}
 
-                    <span className="rounded-full bg-stone-100 px-3 py-1 text-stone-700">
-                      {progress.goal.topic.name}
-                    </span>
+                    {progress.goal.topics.map(({ topic }) => (
+                      <span key={topic.id} className="rounded-full bg-stone-100 px-3 py-1 text-stone-700">
+                        {topic.name}
+                      </span>
+                    ))}
                   </div>
 
                   <h3 className="mb-3 text-2xl font-semibold">
