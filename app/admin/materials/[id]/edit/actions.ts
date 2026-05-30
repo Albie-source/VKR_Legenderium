@@ -4,6 +4,7 @@ import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import { requireAdmin } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
+import { materialSchema } from "@/lib/schemas";
 
 export async function updateMaterialAction(
   materialId: number,
@@ -11,73 +12,50 @@ export async function updateMaterialAction(
 ) {
   await requireAdmin();
 
-  const title = String(formData.get("title") ?? "").trim();
-  const shortDescription = String(
-    formData.get("shortDescription") ?? ""
-  ).trim();
-  const fullText = String(formData.get("fullText") ?? "").trim();
-
-  const regionId = Number(formData.get("regionId"));
-  const peopleId = Number(formData.get("peopleId"));
-  const genreId = Number(formData.get("genreId"));
-  const sourceId = Number(formData.get("sourceId"));
-
-  const latitudeValue = String(formData.get("latitude") ?? "").trim();
-  const longitudeValue = String(formData.get("longitude") ?? "").trim();
-
-  const imageUrl = String(formData.get("imageUrl") ?? "").trim();
-  const audioUrl = String(formData.get("audioUrl") ?? "").trim();
-  const videoUrl = String(formData.get("videoUrl") ?? "").trim();
-
-  const status = String(formData.get("status") ?? "DRAFT");
-
   const topicIds = formData
     .getAll("topicIds")
-    .map((value) => Number(value))
-    .filter((value) => !Number.isNaN(value));
+    .map((v) => Number(v))
+    .filter((v) => !Number.isNaN(v));
 
-  if (
-    Number.isNaN(materialId) ||
-    !title ||
-    Number.isNaN(regionId) ||
-    Number.isNaN(peopleId) ||
-    Number.isNaN(genreId) ||
-    Number.isNaN(sourceId)
-  ) {
-    return;
-  }
+  const result = materialSchema.safeParse({
+    title: formData.get("title") ?? "",
+    shortDescription: formData.get("shortDescription") ?? "",
+    fullText: formData.get("fullText") ?? "",
+    regionId: formData.get("regionId"),
+    peopleId: formData.get("peopleId"),
+    genreId: formData.get("genreId"),
+    sourceId: formData.get("sourceId"),
+    latitude: formData.get("latitude") ?? "",
+    longitude: formData.get("longitude") ?? "",
+    imageUrl: formData.get("imageUrl") ?? "",
+    audioUrl: formData.get("audioUrl") ?? "",
+    videoUrl: formData.get("videoUrl") ?? "",
+    status: formData.get("status") ?? "DRAFT",
+  });
+
+  if (!result.success || Number.isNaN(materialId)) return;
+
+  const data = result.data;
 
   await prisma.material.update({
-    where: {
-      id: materialId,
-    },
+    where: { id: materialId },
     data: {
-      title,
-      shortDescription: shortDescription || null,
-      fullText: fullText || null,
-
-      latitude: latitudeValue ? Number(latitudeValue) : null,
-      longitude: longitudeValue ? Number(longitudeValue) : null,
-
-      imageUrl: imageUrl || null,
-      audioUrl: audioUrl || null,
-      videoUrl: videoUrl || null,
-
-      status:
-        status === "PUBLISHED" || status === "ARCHIVED" || status === "DRAFT"
-          ? status
-          : "DRAFT",
-
-      regionId,
-      peopleId,
-      genreId,
-      sourceId,
-
+      title: data.title,
+      shortDescription: data.shortDescription,
+      fullText: data.fullText,
+      latitude: data.latitude,
+      longitude: data.longitude,
+      imageUrl: data.imageUrl,
+      audioUrl: data.audioUrl,
+      videoUrl: data.videoUrl,
+      status: data.status,
+      regionId: data.regionId,
+      peopleId: data.peopleId,
+      genreId: data.genreId,
+      sourceId: data.sourceId,
       topics: {
         deleteMany: {},
-        create: topicIds.map((topicId) => ({
-          topicId,
-        })),
+        create: topicIds.map((topicId) => ({ topicId })),
       },
     },
   });

@@ -3,50 +3,47 @@
 import { redirect } from "next/navigation";
 import { requireAdmin } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
+import { taskSchema } from "@/lib/schemas";
 
 export async function createTaskAction(formData: FormData) {
   await requireAdmin();
 
-  const materialId = Number(formData.get("materialId"));
+  const result = taskSchema.safeParse({
+    materialId: formData.get("materialId"),
+    title: formData.get("title") ?? "",
+    description: formData.get("description") ?? "",
+    question: formData.get("question") ?? "",
+    option1: formData.get("option1") ?? "",
+    option2: formData.get("option2") ?? "",
+    option3: formData.get("option3") ?? "",
+    option4: formData.get("option4") ?? "",
+    correctAnswer: formData.get("correctAnswer") ?? "",
+    explanation: formData.get("explanation") ?? "",
+    difficulty: formData.get("difficulty") ?? "",
+  });
 
-  const title = String(formData.get("title") ?? "").trim();
-  const description = String(formData.get("description") ?? "").trim();
-  const question = String(formData.get("question") ?? "").trim();
+  if (!result.success) return;
 
-  const option1 = String(formData.get("option1") ?? "").trim();
-  const option2 = String(formData.get("option2") ?? "").trim();
-  const option3 = String(formData.get("option3") ?? "").trim();
-  const option4 = String(formData.get("option4") ?? "").trim();
+  const data = result.data;
 
-  const correctAnswer = String(formData.get("correctAnswer") ?? "").trim();
-  const explanation = String(formData.get("explanation") ?? "").trim();
-  const difficulty = String(formData.get("difficulty") ?? "").trim();
+  const options = [data.option1, data.option2, data.option3, data.option4].filter(
+    (o): o is string => o != null && o.length > 0
+  );
 
-  const options = [option1, option2, option3, option4].filter(Boolean);
-
-  if (
-    Number.isNaN(materialId) ||
-    !title ||
-    !question ||
-    options.length < 2 ||
-    !correctAnswer ||
-    !options.includes(correctAnswer)
-  ) {
-    return;
-  }
+  if (options.length < 2 || !options.includes(data.correctAnswer)) return;
 
   const task = await prisma.interactiveTask.create({
     data: {
-      materialId,
-      title,
-      description: description || null,
+      materialId: data.materialId,
+      title: data.title,
+      description: data.description,
       type: "single_choice",
-      difficulty: difficulty || null,
+      difficulty: data.difficulty,
       config: {
-        question,
+        question: data.question,
         options,
-        correctAnswer,
-        explanation: explanation || null,
+        correctAnswer: data.correctAnswer,
+        explanation: data.explanation,
       },
     },
   });

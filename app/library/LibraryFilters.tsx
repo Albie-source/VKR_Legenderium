@@ -38,6 +38,7 @@ export default function LibraryFilters({
     if (peopleId) params.set("people", peopleId);
     if (genreId) params.set("genre", genreId);
     if (topicId) params.set("topic", topicId);
+    // reset to page 1 when filters change
 
     const queryString = params.toString();
 

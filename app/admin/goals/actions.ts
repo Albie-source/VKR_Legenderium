@@ -3,42 +3,34 @@
 import { revalidatePath } from "next/cache";
 import { requireAdmin } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
+import { goalSchema } from "@/lib/schemas";
 
 export async function createGoalAction(formData: FormData) {
   await requireAdmin();
 
-  const title = String(formData.get("title") ?? "").trim();
-  const description = String(formData.get("description") ?? "").trim();
-  const requiredMaterialsCount = Number(
-    formData.get("requiredMaterialsCount")
-  );
+  const result = goalSchema.safeParse({
+    title: formData.get("title") ?? "",
+    description: formData.get("description") ?? "",
+    requiredMaterialsCount: formData.get("requiredMaterialsCount"),
+    cardTitle: formData.get("cardTitle") ?? "",
+    cardImageUrl: formData.get("cardImageUrl") ?? "",
+    genreId: formData.get("genreId"),
+    topicId: formData.get("topicId"),
+  });
 
-  const cardTitle = String(formData.get("cardTitle") ?? "").trim();
-  const cardImageUrl = String(formData.get("cardImageUrl") ?? "").trim();
+  if (!result.success) return;
 
-  const genreId = Number(formData.get("genreId"));
-  const topicId = Number(formData.get("topicId"));
-
-  if (
-    !title ||
-    !cardTitle ||
-    Number.isNaN(requiredMaterialsCount) ||
-    requiredMaterialsCount <= 0 ||
-    Number.isNaN(genreId) ||
-    Number.isNaN(topicId)
-  ) {
-    return;
-  }
+  const data = result.data;
 
   await prisma.goal.create({
     data: {
-      title,
-      description: description || null,
-      requiredMaterialsCount,
-      cardTitle,
-      cardImageUrl: cardImageUrl || null,
-      genreId,
-      topicId,
+      title: data.title,
+      description: data.description,
+      requiredMaterialsCount: data.requiredMaterialsCount,
+      cardTitle: data.cardTitle,
+      cardImageUrl: data.cardImageUrl,
+      genreId: data.genreId,
+      topicId: data.topicId,
       isActive: true,
     },
   });
@@ -58,12 +50,8 @@ export async function toggleGoalActivityAction(formData: FormData) {
   }
 
   await prisma.goal.update({
-    where: {
-      id: goalId,
-    },
-    data: {
-      isActive: !isActive,
-    },
+    where: { id: goalId },
+    data: { isActive: !isActive },
   });
 
   revalidatePath("/admin/goals");

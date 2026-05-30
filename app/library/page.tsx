@@ -2,6 +2,9 @@ import Link from "next/link";
 import { Prisma } from "@prisma/client";
 import { prisma } from "@/lib/prisma";
 import LibraryFilters from "./LibraryFilters";
+import LibraryPagination from "./LibraryPagination";
+
+const PAGE_SIZE = 12;
 
 type LibraryPageProps = {
   searchParams: Promise<{
@@ -10,6 +13,7 @@ type LibraryPageProps = {
     people?: string;
     genre?: string;
     topic?: string;
+    page?: string;
   }>;
 };
 
@@ -21,6 +25,8 @@ export default async function LibraryPage({ searchParams }: LibraryPageProps) {
   const peopleId = Number(params.people);
   const genreId = Number(params.genre);
   const topicId = Number(params.topic);
+
+  const currentPage = Math.max(1, Number(params.page) || 1);
 
   const where: Prisma.MaterialWhereInput = {
     status: "PUBLISHED",
@@ -61,48 +67,55 @@ export default async function LibraryPage({ searchParams }: LibraryPageProps) {
     };
   }
 
-  const [materials, regions, peoples, genres, topics] = await Promise.all([
-    prisma.material.findMany({
-      where,
-      include: {
-        region: true,
-        people: true,
-        genre: true,
-        topics: {
-          include: {
-            topic: true,
+  const [materials, totalCount, regions, peoples, genres, topics] =
+    await Promise.all([
+      prisma.material.findMany({
+        where,
+        include: {
+          region: true,
+          people: true,
+          genre: true,
+          topics: {
+            include: {
+              topic: true,
+            },
           },
         },
-      },
-      orderBy: {
-        createdAt: "desc",
-      },
-    }),
+        orderBy: {
+          createdAt: "desc",
+        },
+        take: PAGE_SIZE,
+        skip: (currentPage - 1) * PAGE_SIZE,
+      }),
 
-    prisma.region.findMany({
-      orderBy: {
-        name: "asc",
-      },
-    }),
+      prisma.material.count({ where }),
 
-    prisma.people.findMany({
-      orderBy: {
-        name: "asc",
-      },
-    }),
+      prisma.region.findMany({
+        orderBy: {
+          name: "asc",
+        },
+      }),
 
-    prisma.genre.findMany({
-      orderBy: {
-        name: "asc",
-      },
-    }),
+      prisma.people.findMany({
+        orderBy: {
+          name: "asc",
+        },
+      }),
 
-    prisma.topic.findMany({
-      orderBy: {
-        name: "asc",
-      },
-    }),
-  ]);
+      prisma.genre.findMany({
+        orderBy: {
+          name: "asc",
+        },
+      }),
+
+      prisma.topic.findMany({
+        orderBy: {
+          name: "asc",
+        },
+      }),
+    ]);
+
+  const totalPages = Math.ceil(totalCount / PAGE_SIZE);
 
   const hasActiveFilters =
     Boolean(search) ||
@@ -160,81 +173,88 @@ export default async function LibraryPage({ searchParams }: LibraryPageProps) {
           </div>
 
           <span className="rounded-full border border-[#d8c3a5] bg-white px-4 py-2 text-sm font-bold text-stone-700 shadow-sm">
-            Количество: {materials.length}
+            Всего: {totalCount}
           </span>
         </div>
 
         {materials.length === 0 ? (
           <EmptyState />
         ) : (
-          <div className="grid gap-6 md:grid-cols-2 xl:grid-cols-3">
-            {materials.map((material) => (
-              <article
-                key={material.id}
-                className="group flex min-h-[460px] flex-col overflow-hidden rounded-[2rem] border border-[#e4d4bf] bg-white shadow-md transition hover:-translate-y-1 hover:shadow-xl"
-              >
-                <div className="relative h-52 overflow-hidden bg-[#eadfce]">
-                  {material.imageUrl ? (
-                    <img
-                      src={material.imageUrl}
-                      alt={material.title}
-                      className="h-full w-full object-cover object-[center_42%] transition duration-500 group-hover:scale-105"
-                    />
-                  ) : (
-                    <div className="flex h-full items-center justify-center bg-[radial-gradient(circle_at_35%_25%,rgba(216,163,66,0.18),transparent_28%),linear-gradient(135deg,#efe4d3,#e5d4bd)] px-6 text-center text-sm font-semibold text-stone-600">
-                      Изображение не добавлено
+          <>
+            <div className="grid gap-6 md:grid-cols-2 xl:grid-cols-3">
+              {materials.map((material) => (
+                <article
+                  key={material.id}
+                  className="group flex min-h-[460px] flex-col overflow-hidden rounded-[2rem] border border-[#e4d4bf] bg-white shadow-md transition hover:-translate-y-1 hover:shadow-xl"
+                >
+                  <div className="relative h-52 overflow-hidden bg-[#eadfce]">
+                    {material.imageUrl ? (
+                      <img
+                        src={material.imageUrl}
+                        alt={material.title}
+                        className="h-full w-full object-cover object-[center_42%] transition duration-500 group-hover:scale-105"
+                      />
+                    ) : (
+                      <div className="flex h-full items-center justify-center bg-[radial-gradient(circle_at_35%_25%,rgba(216,163,66,0.18),transparent_28%),linear-gradient(135deg,#efe4d3,#e5d4bd)] px-6 text-center text-sm font-semibold text-stone-600">
+                        Изображение не добавлено
+                      </div>
+                    )}
+
+                    <div className="absolute inset-0 bg-gradient-to-t from-black/35 via-transparent to-transparent" />
+
+                    <div className="absolute left-4 top-4 rounded-full border border-[#d8a342]/30 bg-[#fff8e8]/90 px-3 py-1 text-xs font-extrabold text-[#9f661f] shadow-sm backdrop-blur">
+                      {material.genre.name}
                     </div>
-                  )}
-
-                  <div className="absolute inset-0 bg-gradient-to-t from-black/35 via-transparent to-transparent" />
-
-                  <div className="absolute left-4 top-4 rounded-full border border-[#d8a342]/30 bg-[#fff8e8]/90 px-3 py-1 text-xs font-extrabold text-[#9f661f] shadow-sm backdrop-blur">
-                    {material.genre.name}
-                  </div>
-                </div>
-
-                <div className="flex flex-1 flex-col p-5">
-                  <div className="mb-3 flex flex-wrap gap-2 text-xs">
-                    <span className="rounded-full border border-[#3aa6a0]/20 bg-[#e7f7f5] px-3 py-1 font-bold text-[#247670]">
-                      {material.region.name}
-                    </span>
-
-                    <span className="rounded-full border border-stone-200 bg-stone-100 px-3 py-1 font-bold text-stone-700">
-                      {material.people.name}
-                    </span>
                   </div>
 
-                  <h3 className="mb-3 text-2xl font-extrabold leading-tight text-stone-950">
-                    {material.title}
-                  </h3>
+                  <div className="flex flex-1 flex-col p-5">
+                    <div className="mb-3 flex flex-wrap gap-2 text-xs">
+                      <span className="rounded-full border border-[#3aa6a0]/20 bg-[#e7f7f5] px-3 py-1 font-bold text-[#247670]">
+                        {material.region.name}
+                      </span>
 
-                  <p className="mb-4 line-clamp-4 flex-1 text-sm leading-6 text-stone-600">
-                    {material.shortDescription}
-                  </p>
-
-                  {material.topics.length > 0 && (
-                    <div className="mb-5 flex flex-wrap gap-2">
-                      {material.topics.map(({ topic }) => (
-                        <span
-                          key={topic.id}
-                          className="rounded-full border border-[#eadbc7] bg-[#faf4eb] px-3 py-1 text-xs font-semibold text-stone-600"
-                        >
-                          {topic.name}
-                        </span>
-                      ))}
+                      <span className="rounded-full border border-stone-200 bg-stone-100 px-3 py-1 font-bold text-stone-700">
+                        {material.people.name}
+                      </span>
                     </div>
-                  )}
 
-                  <Link
-                    href={`/materials/${material.id}`}
-                    className="mt-auto rounded-2xl bg-[#d8a342] px-4 py-3 text-center text-sm font-extrabold text-[#06151a] shadow-md transition hover:-translate-y-0.5 hover:bg-[#f0bd5b]"
-                  >
-                    Открыть материал
-                  </Link>
-                </div>
-              </article>
-            ))}
-          </div>
+                    <h3 className="mb-3 text-2xl font-extrabold leading-tight text-stone-950">
+                      {material.title}
+                    </h3>
+
+                    <p className="mb-4 line-clamp-4 flex-1 text-sm leading-6 text-stone-600">
+                      {material.shortDescription}
+                    </p>
+
+                    {material.topics.length > 0 && (
+                      <div className="mb-5 flex flex-wrap gap-2">
+                        {material.topics.map(({ topic }) => (
+                          <span
+                            key={topic.id}
+                            className="rounded-full border border-[#eadbc7] bg-[#faf4eb] px-3 py-1 text-xs font-semibold text-stone-600"
+                          >
+                            {topic.name}
+                          </span>
+                        ))}
+                      </div>
+                    )}
+
+                    <Link
+                      href={`/materials/${material.id}`}
+                      className="mt-auto rounded-2xl bg-[#d8a342] px-4 py-3 text-center text-sm font-extrabold text-[#06151a] shadow-md transition hover:-translate-y-0.5 hover:bg-[#f0bd5b]"
+                    >
+                      Открыть материал
+                    </Link>
+                  </div>
+                </article>
+              ))}
+            </div>
+
+            <LibraryPagination
+              currentPage={currentPage}
+              totalPages={totalPages}
+            />
+          </>
         )}
       </section>
     </main>

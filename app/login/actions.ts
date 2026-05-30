@@ -5,13 +5,23 @@ import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
 import { prisma } from "@/lib/prisma";
 import { AUTH_COOKIE_NAME, signSession } from "@/lib/auth";
+import { loginSchema } from "@/lib/schemas";
 
 export async function loginAction(formData: FormData) {
-  const email = String(formData.get("email") ?? "").trim().toLowerCase();
-  const password = String(formData.get("password") ?? "").trim();
-  const next = String(formData.get("next") ?? "").trim();
+  const result = loginSchema.safeParse({
+    email: formData.get("email") ?? "",
+    password: formData.get("password") ?? "",
+    next: formData.get("next") ?? "",
+  });
 
-  const user = await prisma.user.findUnique({ where: { email } });
+  if (!result.success) {
+    redirect("/login?error=1");
+  }
+
+  const { email, password, next } = result.data;
+  const normalizedEmail = email.trim().toLowerCase();
+
+  const user = await prisma.user.findUnique({ where: { email: normalizedEmail } });
 
   if (!user) {
     redirect(makeLoginErrorUrl(next));

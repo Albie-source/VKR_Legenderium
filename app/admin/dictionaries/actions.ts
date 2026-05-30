@@ -3,21 +3,22 @@
 import { revalidatePath } from "next/cache";
 import { requireAdmin } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
+import { dictionaryEntrySchema, sourceSchema } from "@/lib/schemas";
 
 export async function createRegionAction(formData: FormData) {
   await requireAdmin();
 
-  const name = String(formData.get("name") ?? "").trim();
-  const description = String(formData.get("description") ?? "").trim();
+  const result = dictionaryEntrySchema.safeParse({
+    name: formData.get("name") ?? "",
+    description: formData.get("description") ?? "",
+  });
 
-  if (!name) {
-    return;
-  }
+  if (!result.success) return;
 
   await prisma.region.create({
     data: {
-      name,
-      description: description || null,
+      name: result.data.name,
+      description: result.data.description,
     },
   });
 
@@ -27,17 +28,17 @@ export async function createRegionAction(formData: FormData) {
 export async function createPeopleAction(formData: FormData) {
   await requireAdmin();
 
-  const name = String(formData.get("name") ?? "").trim();
-  const description = String(formData.get("description") ?? "").trim();
+  const result = dictionaryEntrySchema.safeParse({
+    name: formData.get("name") ?? "",
+    description: formData.get("description") ?? "",
+  });
 
-  if (!name) {
-    return;
-  }
+  if (!result.success) return;
 
   await prisma.people.create({
     data: {
-      name,
-      description: description || null,
+      name: result.data.name,
+      description: result.data.description,
     },
   });
 
@@ -47,17 +48,17 @@ export async function createPeopleAction(formData: FormData) {
 export async function createGenreAction(formData: FormData) {
   await requireAdmin();
 
-  const name = String(formData.get("name") ?? "").trim();
-  const description = String(formData.get("description") ?? "").trim();
+  const result = dictionaryEntrySchema.safeParse({
+    name: formData.get("name") ?? "",
+    description: formData.get("description") ?? "",
+  });
 
-  if (!name) {
-    return;
-  }
+  if (!result.success) return;
 
   await prisma.genre.create({
     data: {
-      name,
-      description: description || null,
+      name: result.data.name,
+      description: result.data.description,
     },
   });
 
@@ -67,17 +68,17 @@ export async function createGenreAction(formData: FormData) {
 export async function createTopicAction(formData: FormData) {
   await requireAdmin();
 
-  const name = String(formData.get("name") ?? "").trim();
-  const description = String(formData.get("description") ?? "").trim();
+  const result = dictionaryEntrySchema.safeParse({
+    name: formData.get("name") ?? "",
+    description: formData.get("description") ?? "",
+  });
 
-  if (!name) {
-    return;
-  }
+  if (!result.success) return;
 
   await prisma.topic.create({
     data: {
-      name,
-      description: description || null,
+      name: result.data.name,
+      description: result.data.description,
     },
   });
 
@@ -87,23 +88,25 @@ export async function createTopicAction(formData: FormData) {
 export async function createSourceAction(formData: FormData) {
   await requireAdmin();
 
-  const title = String(formData.get("title") ?? "").trim();
-  const author = String(formData.get("author") ?? "").trim();
-  const yearValue = String(formData.get("year") ?? "").trim();
-  const type = String(formData.get("type") ?? "").trim();
-  const url = String(formData.get("url") ?? "").trim();
+  const result = sourceSchema.safeParse({
+    title: formData.get("title") ?? "",
+    author: formData.get("author") ?? "",
+    year: formData.get("year") ?? "",
+    type: formData.get("type") ?? "",
+    url: formData.get("url") ?? "",
+  });
 
-  if (!title) {
-    return;
-  }
+  if (!result.success) return;
+
+  const data = result.data;
 
   await prisma.source.create({
     data: {
-      title,
-      author: author || null,
-      year: yearValue ? Number(yearValue) : null,
-      type: type || null,
-      url: url || null,
+      title: data.title,
+      author: data.author,
+      year: data.year,
+      type: data.type,
+      url: data.url,
     },
   });
 
