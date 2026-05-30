@@ -269,7 +269,7 @@ export default function OnboardingCinema({ autoStart = true, onFinish }: Onboard
                 onClick={(e) => { e.stopPropagation(); handleAdvance(); }}
                 className="cursor-pointer rounded-xl bg-[#d8a342] px-5 py-2.5 text-sm font-extrabold text-[#06151a] transition hover:bg-[#f0bd5b] active:scale-95"
               >
-                {isLast ? "В путь!" : "Далее →"}
+                {isLast ? "В путь!" : "Далее"}
               </button>
             </div>
           </div>
