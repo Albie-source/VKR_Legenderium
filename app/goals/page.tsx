@@ -3,16 +3,13 @@ import { prisma } from "@/lib/prisma";
 
 export default async function GoalsPage() {
   const goals = await prisma.goal.findMany({
-    where: {
-      isActive: true,
-    },
+    where: { isActive: true },
     include: {
-      genre: true,
-      topic: true,
+      genres: { include: { genre: true } },
+      topics: { include: { topic: true } },
+      region: true,
     },
-    orderBy: {
-      createdAt: "desc",
-    },
+    orderBy: { createdAt: "desc" },
   });
 
   const totalRequiredMaterials = goals.reduce(
@@ -24,18 +21,15 @@ export default async function GoalsPage() {
     <main className="min-h-screen bg-stone-50 text-stone-900">
       <section className="relative overflow-hidden border-b border-stone-200 bg-white">
         <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_left,rgba(180,83,9,0.16),transparent_32%),radial-gradient(circle_at_bottom_right,rgba(120,113,108,0.14),transparent_34%)]" />
-
         <div className="relative mx-auto max-w-7xl px-6 py-14">
           <p className="mb-3 inline-flex rounded-full bg-amber-100 px-4 py-2 text-sm font-semibold uppercase tracking-[0.25em] text-amber-800">
             Цели изучения
           </p>
-
           <div className="grid gap-8 lg:grid-cols-[1.1fr_0.9fr] lg:items-end">
             <div>
               <h1 className="mb-5 text-5xl font-bold leading-tight">
                 Тематические цели и коллекционные карточки
               </h1>
-
               <p className="max-w-3xl text-lg leading-8 text-stone-700">
                 Цели помогают изучать фольклор не случайно, а по смысловым
                 маршрутам. Пользователь знакомится с материалами определённого
@@ -43,7 +37,6 @@ export default async function GoalsPage() {
                 коллекционную карточку-награду.
               </p>
             </div>
-
             <div className="grid grid-cols-2 gap-3">
               <HeroStat title="Активных целей" value={goals.length} />
               <HeroStat title="Материалов в целях" value={totalRequiredMaterials} />
@@ -56,13 +49,10 @@ export default async function GoalsPage() {
         <div className="mb-6 flex flex-wrap items-center justify-between gap-4">
           <div>
             <h2 className="text-3xl font-bold">Маршруты изучения</h2>
-
             <p className="mt-1 text-sm text-stone-600">
-              Выберите цель и перейдите к материалам, которые подходят под её
-              условия.
+              Выберите цель и перейдите к тематическому маршруту на карте.
             </p>
           </div>
-
           <Link
             href="/library"
             className="rounded-xl border border-stone-300 bg-white px-4 py-2 text-sm font-medium text-stone-700 shadow-sm transition hover:bg-stone-100"
@@ -83,13 +73,27 @@ export default async function GoalsPage() {
                 <div className="grid min-h-[360px] gap-0 md:grid-cols-[1fr_240px]">
                   <div className="flex flex-col p-6">
                     <div className="mb-4 flex flex-wrap gap-2 text-xs">
-                      <span className="rounded-full bg-amber-100 px-3 py-1 font-medium text-amber-800">
-                        {goal.genre.name}
-                      </span>
-
-                      <span className="rounded-full bg-stone-100 px-3 py-1 text-stone-700">
-                        {goal.topic.name}
-                      </span>
+                      {goal.genres.map(({ genre }) => (
+                        <span
+                          key={genre.id}
+                          className="rounded-full bg-amber-100 px-3 py-1 font-medium text-amber-800"
+                        >
+                          {genre.name}
+                        </span>
+                      ))}
+                      {goal.topics.map(({ topic }) => (
+                        <span
+                          key={topic.id}
+                          className="rounded-full bg-stone-100 px-3 py-1 text-stone-700"
+                        >
+                          {topic.name}
+                        </span>
+                      ))}
+                      {goal.region && (
+                        <span className="rounded-full bg-blue-100 px-3 py-1 text-blue-800">
+                          {goal.region.name}
+                        </span>
+                      )}
                     </div>
 
                     <h3 className="mb-3 text-3xl font-bold leading-tight">
@@ -107,26 +111,15 @@ export default async function GoalsPage() {
                         title="Нужно изучить"
                         value={`${goal.requiredMaterialsCount} материал(ов)`}
                       />
-
-                      <InfoBox
-                        title="Награда"
-                        value={goal.cardTitle}
-                      />
+                      <InfoBox title="Награда" value={goal.cardTitle} />
                     </div>
 
-                    <div className="mt-auto flex flex-wrap gap-3">
+                    <div className="mt-auto">
                       <Link
-                        href={`/library?genre=${goal.genreId}&topic=${goal.topicId}`}
-                        className="rounded-xl bg-amber-700 px-5 py-3 text-sm font-medium text-white transition hover:bg-amber-800"
+                        href={`/goals/${goal.id}`}
+                        className="inline-flex rounded-xl bg-amber-700 px-5 py-3 text-sm font-medium text-white transition hover:bg-amber-800"
                       >
-                        Перейти к материалам
-                      </Link>
-
-                      <Link
-                        href={`/library?topic=${goal.topicId}`}
-                        className="rounded-xl border border-stone-300 px-5 py-3 text-sm font-medium text-stone-700 transition hover:bg-stone-100"
-                      >
-                        Материалы по теме
+                        Открыть маршрут на карте →
                       </Link>
                     </div>
                   </div>
@@ -135,7 +128,6 @@ export default async function GoalsPage() {
                     <p className="mb-3 text-sm font-semibold uppercase tracking-[0.2em] text-amber-800">
                       Карточка-награда
                     </p>
-
                     <div className="rounded-[1.5rem] border border-amber-200 bg-white p-4 shadow-sm">
                       <div className="mb-4 flex h-44 items-center justify-center overflow-hidden rounded-2xl bg-gradient-to-br from-amber-100 via-stone-100 to-stone-200">
                         {goal.cardImageUrl ? (
@@ -150,11 +142,9 @@ export default async function GoalsPage() {
                           </div>
                         )}
                       </div>
-
                       <h4 className="text-center text-xl font-bold">
                         {goal.cardTitle}
                       </h4>
-
                       <p className="mt-2 text-center text-sm text-stone-500">
                         Коллекционная награда
                       </p>
@@ -173,15 +163,13 @@ export default async function GoalsPage() {
             title="1. Выберите цель"
             text="Цель задаёт тематический маршрут: например, изучение легенд о духах или сказок о животных."
           />
-
           <ExplanationCard
-            title="2. Изучите материалы"
-            text="Переход по цели открывает библиотеку с фильтрами по нужному жанру и тематике."
+            title="2. Пройдите маршрут"
+            text="Откройте карту маршрута, читайте материалы и выполняйте задания в каждой точке."
           />
-
           <ExplanationCard
             title="3. Получите карточку"
-            text="После выполнения условий цели пользователь получает коллекционную карточку-награду."
+            text="После выполнения всех условий цели пользователь получает коллекционную карточку-награду."
           />
         </div>
       </section>
@@ -222,16 +210,13 @@ function EmptyState() {
       <div className="mx-auto mb-5 flex h-16 w-16 items-center justify-center rounded-3xl bg-amber-100 text-2xl">
         ★
       </div>
-
       <h3 className="mb-3 text-2xl font-semibold">
         Активные цели пока не добавлены
       </h3>
-
       <p className="mx-auto mb-6 max-w-xl leading-7 text-stone-600">
         Цели можно создать в административной панели. После публикации они
         появятся на этой странице.
       </p>
-
       <Link
         href="/library"
         className="inline-flex rounded-xl bg-amber-700 px-5 py-3 font-medium text-white transition hover:bg-amber-800"

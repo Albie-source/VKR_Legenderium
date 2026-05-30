@@ -67,8 +67,10 @@ export const goalSchema = z.object({
   requiredMaterialsCount: z.coerce.number().int().positive().max(1000),
   cardTitle: z.string().min(1).max(500),
   cardImageUrl: optionalStr(),
-  genreId: coerceId(),
-  topicId: coerceId(),
+  regionId: z.preprocess(
+    (v) => (String(v ?? "").trim() === "" ? null : Number(v)),
+    z.number().int().positive().nullable().optional()
+  ),
 });
 
 export const dictionaryEntrySchema = z.object({

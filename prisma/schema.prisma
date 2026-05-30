@@ -25,52 +25,53 @@ model User {
   role         UserRole @default(USER)
   createdAt    DateTime @default(now())
 
-  materials     Material[]
-  favorites     Favorite[]
-  taskAttempts  TaskAttempt[]
-  goalProgress  GoalProgress[]
+  materials    Material[]
+  favorites    Favorite[]
+  taskAttempts TaskAttempt[]
+  goalProgress GoalProgress[]
 
   @@map("users")
 }
 
 model Region {
-  id          Int      @id @default(autoincrement())
-  name        String   @unique
+  id          Int    @id @default(autoincrement())
+  name        String @unique
   description String?
 
-  materials   Material[]
+  materials Material[]
+  goals     Goal[]
 
   @@map("regions")
 }
 
 model People {
-  id          Int      @id @default(autoincrement())
-  name        String   @unique
+  id          Int    @id @default(autoincrement())
+  name        String @unique
   description String?
 
-  materials   Material[]
+  materials Material[]
 
   @@map("peoples")
 }
 
 model Genre {
-  id          Int      @id @default(autoincrement())
-  name        String   @unique
+  id          Int    @id @default(autoincrement())
+  name        String @unique
   description String?
 
-  materials   Material[]
-  goals       Goal[]
+  materials  Material[]
+  goalGenres GoalGenre[]
 
   @@map("genres")
 }
 
 model Topic {
-  id          Int      @id @default(autoincrement())
-  name        String   @unique
+  id          Int    @id @default(autoincrement())
+  name        String @unique
   description String?
 
-  materials   MaterialTopic[]
-  goals       Goal[]
+  materials  MaterialTopic[]
+  goalTopics GoalTopic[]
 
   @@map("topics")
 }
@@ -94,33 +95,34 @@ model Material {
   shortDescription String?
   fullText         String?
 
-  latitude         Float?
-  longitude        Float?
+  latitude  Float?
+  longitude Float?
 
-  imageUrl         String?
-  audioUrl         String?
-  videoUrl         String?
+  imageUrl String?
+  audioUrl String?
+  videoUrl String?
 
-  status           PublishStatus @default(DRAFT)
+  status PublishStatus @default(DRAFT)
 
-  regionId         Int
-  peopleId         Int
-  genreId          Int
-  sourceId         Int
-  createdById      Int
+  regionId    Int
+  peopleId    Int
+  genreId     Int
+  sourceId    Int?
+  createdById Int
 
-  region           Region        @relation(fields: [regionId], references: [id])
-  people           People        @relation(fields: [peopleId], references: [id])
-  genre            Genre         @relation(fields: [genreId], references: [id])
-  source           Source        @relation(fields: [sourceId], references: [id])
-  createdBy        User          @relation(fields: [createdById], references: [id])
+  region    Region   @relation(fields: [regionId], references: [id])
+  people    People   @relation(fields: [peopleId], references: [id])
+  genre     Genre    @relation(fields: [genreId], references: [id])
+  source    Source?  @relation(fields: [sourceId], references: [id])
+  createdBy User     @relation(fields: [createdById], references: [id])
 
-  topics           MaterialTopic[]
-  favorites        Favorite[]
-  tasks            InteractiveTask[]
+  topics          MaterialTopic[]
+  favorites       Favorite[]
+  tasks           InteractiveTask[]
+  goalMaterials   GoalMaterial[]
 
-  createdAt        DateTime      @default(now())
-  updatedAt        DateTime      @updatedAt
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 
   @@index([status])
   @@index([genreId])
@@ -133,8 +135,8 @@ model MaterialTopic {
   materialId Int
   topicId    Int
 
-  material   Material @relation(fields: [materialId], references: [id], onDelete: Cascade)
-  topic      Topic    @relation(fields: [topicId], references: [id], onDelete: Cascade)
+  material Material @relation(fields: [materialId], references: [id], onDelete: Cascade)
+  topic    Topic    @relation(fields: [topicId], references: [id], onDelete: Cascade)
 
   @@id([materialId, topicId])
   @@map("material_topics")
@@ -146,8 +148,8 @@ model Favorite {
   materialId Int
   createdAt  DateTime @default(now())
 
-  user       User     @relation(fields: [userId], references: [id], onDelete: Cascade)
-  material   Material @relation(fields: [materialId], references: [id], onDelete: Cascade)
+  user     User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  material Material @relation(fields: [materialId], references: [id], onDelete: Cascade)
 
   @@unique([userId, materialId])
   @@index([userId])
@@ -155,20 +157,19 @@ model Favorite {
 }
 
 model InteractiveTask {
-  id          Int      @id @default(autoincrement())
+  id          Int     @id @default(autoincrement())
   materialId  Int
-
   title       String
   description String?
   type        String
   config      Json
   difficulty  String?
 
-  material    Material      @relation(fields: [materialId], references: [id], onDelete: Cascade)
-  attempts    TaskAttempt[]
+  material Material      @relation(fields: [materialId], references: [id], onDelete: Cascade)
+  attempts TaskAttempt[]
 
-  createdAt   DateTime      @default(now())
-  updatedAt   DateTime      @updatedAt
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 
   @@index([materialId])
   @@map("interactive_tasks")
@@ -178,13 +179,12 @@ model TaskAttempt {
   id          Int      @id @default(autoincrement())
   userId      Int
   taskId      Int
-
   isCompleted Boolean
   score       Int      @default(0)
   completedAt DateTime @default(now())
 
-  user        User            @relation(fields: [userId], references: [id], onDelete: Cascade)
-  task        InteractiveTask @relation(fields: [taskId], references: [id], onDelete: Cascade)
+  user User            @relation(fields: [userId], references: [id], onDelete: Cascade)
+  task InteractiveTask @relation(fields: [taskId], references: [id], onDelete: Cascade)
 
   @@index([userId])
   @@index([taskId])
@@ -192,42 +192,73 @@ model TaskAttempt {
 }
 
 model Goal {
-  id                     Int      @id @default(autoincrement())
-  title                  String
-  description             String?
-  requiredMaterialsCount  Int
+  id                    Int     @id @default(autoincrement())
+  title                 String
+  description           String?
+  requiredMaterialsCount Int
 
-  cardTitle               String
-  cardImageUrl            String?
+  cardTitle    String
+  cardImageUrl String?
+  isActive     Boolean @default(true)
 
-  isActive                Boolean @default(true)
+  regionId Int?
+  region   Region? @relation(fields: [regionId], references: [id])
 
-  genreId                 Int
-  topicId                 Int
+  genres          GoalGenre[]
+  topics          GoalTopic[]
+  pinnedMaterials GoalMaterial[]
+  progress        GoalProgress[]
 
-  genre                   Genre   @relation(fields: [genreId], references: [id])
-  topic                   Topic   @relation(fields: [topicId], references: [id])
-
-  progress                GoalProgress[]
-
-  createdAt               DateTime @default(now())
-  updatedAt               DateTime @updatedAt
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 
   @@map("goals")
 }
 
+model GoalGenre {
+  goalId  Int
+  genreId Int
+
+  goal  Goal  @relation(fields: [goalId], references: [id], onDelete: Cascade)
+  genre Genre @relation(fields: [genreId], references: [id], onDelete: Cascade)
+
+  @@id([goalId, genreId])
+  @@map("goal_genres")
+}
+
+model GoalTopic {
+  goalId  Int
+  topicId Int
+
+  goal  Goal  @relation(fields: [goalId], references: [id], onDelete: Cascade)
+  topic Topic @relation(fields: [topicId], references: [id], onDelete: Cascade)
+
+  @@id([goalId, topicId])
+  @@map("goal_topics")
+}
+
+model GoalMaterial {
+  goalId     Int
+  materialId Int
+
+  goal     Goal     @relation(fields: [goalId], references: [id], onDelete: Cascade)
+  material Material @relation(fields: [materialId], references: [id], onDelete: Cascade)
+
+  @@id([goalId, materialId])
+  @@map("goal_materials")
+}
+
 model GoalProgress {
-  id              Int      @id @default(autoincrement())
+  id              Int       @id @default(autoincrement())
   userId          Int
   goalId          Int
-
-  currentProgress Int      @default(0)
-  isCompleted     Boolean  @default(false)
-  rewardReceived  Boolean  @default(false)
+  currentProgress Int       @default(0)
+  isCompleted     Boolean   @default(false)
+  rewardReceived  Boolean   @default(false)
   completedAt     DateTime?
 
-  user            User     @relation(fields: [userId], references: [id], onDelete: Cascade)
-  goal            Goal     @relation(fields: [goalId], references: [id], onDelete: Cascade)
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  goal Goal @relation(fields: [goalId], references: [id], onDelete: Cascade)
 
   @@unique([userId, goalId])
   @@index([userId])

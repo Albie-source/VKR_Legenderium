@@ -7,21 +7,13 @@ export default async function Header() {
 
   const goals = user
     ? await prisma.goal.findMany({
-        where: {
-          isActive: true,
-        },
+        where: { isActive: true },
         include: {
-          genre: true,
-          topic: true,
-          progress: {
-            where: {
-              userId: user.id,
-            },
-          },
+          genres: { include: { genre: true } },
+          topics: { include: { topic: true } },
+          progress: { where: { userId: user.id } },
         },
-        orderBy: {
-          createdAt: "desc",
-        },
+        orderBy: { createdAt: "desc" },
       })
     : [];
 
@@ -37,8 +29,8 @@ export default async function Header() {
       isCompleted: progress?.isCompleted ?? false,
       rewardReceived: progress?.rewardReceived ?? false,
       cardTitle: goal.cardTitle,
-      genreName: goal.genre.name,
-      topicName: goal.topic.name,
+      genreNames: goal.genres.map((g) => g.genre.name),
+      topicNames: goal.topics.map((t) => t.topic.name),
     };
   });
 
@@ -46,11 +38,7 @@ export default async function Header() {
     <HeaderClient
       user={
         user
-          ? {
-              name: user.name,
-              email: user.email,
-              role: user.role,
-            }
+          ? { name: user.name, email: user.email, role: user.role }
           : null
       }
       goals={preparedGoals}

@@ -8,17 +8,31 @@ import { goalSchema } from "@/lib/schemas";
 export async function createGoalAction(formData: FormData) {
   await requireAdmin();
 
+  const genreIds = formData
+    .getAll("genreIds")
+    .map(Number)
+    .filter((n) => !Number.isNaN(n) && n > 0);
+
+  const topicIds = formData
+    .getAll("topicIds")
+    .map(Number)
+    .filter((n) => !Number.isNaN(n) && n > 0);
+
+  const pinnedMaterialIds = formData
+    .getAll("pinnedMaterialIds")
+    .map(Number)
+    .filter((n) => !Number.isNaN(n) && n > 0);
+
   const result = goalSchema.safeParse({
     title: formData.get("title") ?? "",
     description: formData.get("description") ?? "",
     requiredMaterialsCount: formData.get("requiredMaterialsCount"),
     cardTitle: formData.get("cardTitle") ?? "",
     cardImageUrl: formData.get("cardImageUrl") ?? "",
-    genreId: formData.get("genreId"),
-    topicId: formData.get("topicId"),
+    regionId: formData.get("regionId") ?? "",
   });
 
-  if (!result.success) return;
+  if (!result.success || genreIds.length === 0) return;
 
   const data = result.data;
 
@@ -29,9 +43,13 @@ export async function createGoalAction(formData: FormData) {
       requiredMaterialsCount: data.requiredMaterialsCount,
       cardTitle: data.cardTitle,
       cardImageUrl: data.cardImageUrl,
-      genreId: data.genreId,
-      topicId: data.topicId,
+      regionId: data.regionId ?? null,
       isActive: true,
+      genres: { create: genreIds.map((genreId) => ({ genreId })) },
+      topics: { create: topicIds.map((topicId) => ({ topicId })) },
+      pinnedMaterials: {
+        create: pinnedMaterialIds.map((materialId) => ({ materialId })),
+      },
     },
   });
 
@@ -45,9 +63,7 @@ export async function toggleGoalActivityAction(formData: FormData) {
   const goalId = Number(formData.get("goalId"));
   const isActive = String(formData.get("isActive")) === "true";
 
-  if (Number.isNaN(goalId)) {
-    return;
-  }
+  if (Number.isNaN(goalId)) return;
 
   await prisma.goal.update({
     where: { id: goalId },

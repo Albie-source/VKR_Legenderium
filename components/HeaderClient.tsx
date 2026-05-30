@@ -18,8 +18,8 @@ type HeaderGoal = {
   isCompleted: boolean;
   rewardReceived: boolean;
   cardTitle: string;
-  genreName: string;
-  topicName: string;
+  genreNames: string[];
+  topicNames: string[];
 };
 
 type HeaderClientProps = {
@@ -251,8 +251,12 @@ function GoalsPanel({
                     className="rounded-[1.8rem] border border-white/10 bg-white/8 p-5 shadow-lg shadow-black/20 backdrop-blur"
                   >
                     <div className="mb-4 flex flex-wrap gap-2">
-                      <span className="badge-genre">{goal.genreName}</span>
-                      <span className="badge-topic">{goal.topicName}</span>
+                      {goal.genreNames.map((name) => (
+                        <span key={name} className="badge-genre">{name}</span>
+                      ))}
+                      {goal.topicNames.map((name) => (
+                        <span key={name} className="badge-topic">{name}</span>
+                      ))}
 
                       {goal.isCompleted && (
                         <span className="badge-success">Выполнена</span>

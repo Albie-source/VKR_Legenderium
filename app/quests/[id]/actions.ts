@@ -138,12 +138,37 @@ export async function saveTaskResultAction(
 
     const materialTopicIds = task.material.topics.map((topic) => topic.topicId);
 
-    const matchingGoals = await prisma.goal.findMany({
-      where: {
-        isActive: true,
-        genreId: task.material.genreId,
-        topicId: { in: materialTopicIds },
+    const activeGoals = await prisma.goal.findMany({
+      where: { isActive: true },
+      include: {
+        genres: true,
+        topics: true,
+        pinnedMaterials: true,
       },
+    });
+
+    const matchingGoals = activeGoals.filter((goal) => {
+      if (goal.pinnedMaterials.length > 0) {
+        return goal.pinnedMaterials.some(
+          (pm) => pm.materialId === task.materialId
+        );
+      }
+      if (
+        goal.genres.length > 0 &&
+        !goal.genres.some((g) => g.genreId === task.material.genreId)
+      ) {
+        return false;
+      }
+      if (
+        goal.topics.length > 0 &&
+        !goal.topics.some((t) => materialTopicIds.includes(t.topicId))
+      ) {
+        return false;
+      }
+      if (goal.regionId && goal.regionId !== task.material.regionId) {
+        return false;
+      }
+      return true;
     });
 
     const completedGoals: SaveTaskResult["completedGoals"] = [];
