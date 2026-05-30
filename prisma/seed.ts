@@ -924,8 +924,8 @@ async function createDemoGoals() {
         requiredMaterialsCount: 3,
         cardTitle: "Хранитель тайги",
         cardImageUrl: "/materials/1.png",
-        genreId: legend.id,
-        topicId: spirits.id,
+        genres: { create: { genreId: legend.id } },
+        topics: { create: { topicId: spirits.id } },
       },
     });
   }
@@ -939,8 +939,8 @@ async function createDemoGoals() {
         requiredMaterialsCount: 3,
         cardTitle: "Следопыт лесных троп",
         cardImageUrl: "/materials/2.png",
-        genreId: fairyTale.id,
-        topicId: animals.id,
+        genres: { create: { genreId: fairyTale.id } },
+        topics: { create: { topicId: animals.id } },
       },
     });
   }
@@ -954,8 +954,8 @@ async function createDemoGoals() {
         requiredMaterialsCount: 2,
         cardTitle: "Хранитель традиций",
         cardImageUrl: "/materials/3.png",
-        genreId: ritualGenre.id,
-        topicId: rituals.id,
+        genres: { create: { genreId: ritualGenre.id } },
+        topics: { create: { topicId: rituals.id } },
       },
     });
   }
