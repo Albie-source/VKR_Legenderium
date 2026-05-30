@@ -653,11 +653,15 @@ async function main() {
 
   await clearDatabase();
 
+  const bcrypt = await import("bcryptjs");
+  const adminHash = await bcrypt.hash("admin123", 10);
+  const userHash  = await bcrypt.hash("user123",  10);
+
   const admin = await prisma.user.create({
     data: {
       name: "Администратор",
       email: "admin@legendarium.ru",
-      passwordHash: "admin123",
+      passwordHash: adminHash,
       role: UserRole.ADMIN,
     },
   });
@@ -666,7 +670,7 @@ async function main() {
     data: {
       name: "Пользователь",
       email: "user@legendarium.ru",
-      passwordHash: "user123",
+      passwordHash: userHash,
       role: UserRole.USER,
     },
   });
