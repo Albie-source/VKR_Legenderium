@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useRef, useState } from "react";
 import { createHiddenObjectsTaskAction } from "./actions";
 
 type Material = {
@@ -19,19 +19,25 @@ type ObjectDraft = {
 };
 
 export default function HiddenObjectsEditor({ materials }: { materials: Material[] }) {
-  const [imageInput, setImageInput] = useState("");
-  const [loadedUrl, setLoadedUrl] = useState("");
+  const fileInputRef = useRef<HTMLInputElement>(null);
+  const [previewUrl, setPreviewUrl] = useState("");
+  const [fileName, setFileName] = useState("");
   const [imageError, setImageError] = useState(false);
   const [objects, setObjects] = useState<ObjectDraft[]>([]);
   const [selectedId, setSelectedId] = useState<string | null>(null);
 
-  function loadImage() {
-    if (!imageInput.trim()) return;
+  function handleFileSelect(e: React.ChangeEvent<HTMLInputElement>) {
+    const file = e.target.files?.[0];
+    if (!file) return;
     setImageError(false);
-    setLoadedUrl(imageInput.trim());
+    setObjects([]);
+    setSelectedId(null);
+    setFileName(file.name);
+    setPreviewUrl(URL.createObjectURL(file));
   }
 
   function handleImageClick(e: React.MouseEvent<HTMLDivElement>) {
+    if (!previewUrl) return;
     const rect = e.currentTarget.getBoundingClientRect();
     const x = parseFloat(((e.clientX - rect.left) / rect.width * 100).toFixed(2));
     const y = parseFloat(((e.clientY - rect.top) / rect.height * 100).toFixed(2));
@@ -59,6 +65,16 @@ export default function HiddenObjectsEditor({ materials }: { materials: Material
   return (
     <form action={createHiddenObjectsTaskAction} className="space-y-6">
       <input type="hidden" name="objectsJson" value={JSON.stringify(configObjects)} />
+
+      {/* Hidden real file input */}
+      <input
+        ref={fileInputRef}
+        type="file"
+        name="imageFile"
+        accept="image/*"
+        className="hidden"
+        onChange={handleFileSelect}
+      />
 
       {/* Material */}
       <div>
@@ -125,47 +141,43 @@ export default function HiddenObjectsEditor({ materials }: { materials: Material
         />
       </div>
 
-      {/* Image URL */}
+      {/* Image upload */}
       <div>
-        <label className="mb-2 block text-sm font-medium text-stone-700">URL изображения *</label>
-        <input type="hidden" name="imageUrl" value={loadedUrl} />
-        <div className="flex gap-2">
-          <input
-            value={imageInput}
-            onChange={(e) => setImageInput(e.target.value)}
-            onKeyDown={(e) => e.key === "Enter" && (e.preventDefault(), loadImage())}
-            placeholder="https://example.com/image.jpg или /images/my-image.png"
-            className="flex-1 rounded-xl border border-stone-300 px-4 py-3 outline-none transition focus:border-amber-700"
-          />
+        <label className="mb-2 block text-sm font-medium text-stone-700">Изображение *</label>
+        <div className="flex items-center gap-3">
           <button
             type="button"
-            onClick={loadImage}
-            className="rounded-xl bg-amber-700 px-5 py-3 font-medium text-white transition hover:bg-amber-800"
+            onClick={() => fileInputRef.current?.click()}
+            className="rounded-xl border border-stone-300 bg-white px-5 py-3 text-sm font-medium text-stone-700 transition hover:border-amber-700 hover:bg-amber-50"
           >
-            Загрузить
+            Загрузить с компьютера
           </button>
+          {fileName && (
+            <span className="text-sm text-stone-600">
+              ✓ <span className="font-medium">{fileName}</span>
+            </span>
+          )}
         </div>
         {imageError && (
-          <p className="mt-1 text-sm text-red-600">Не удалось загрузить изображение. Проверьте URL.</p>
+          <p className="mt-1 text-sm text-red-600">Не удалось отобразить изображение.</p>
         )}
       </div>
 
       {/* Coordinate picker */}
       <div>
         <div className="mb-2 flex items-center justify-between">
-          <label className="text-sm font-medium text-stone-700">
-            Расставь объекты на картинке *
-          </label>
-          {loadedUrl && (
-            <span className="text-xs text-stone-500">
-              Кликни на картинку — появится маркер
-            </span>
+          <label className="text-sm font-medium text-stone-700">Расставь объекты на картинке *</label>
+          {previewUrl && (
+            <span className="text-xs text-stone-500">Кликни на картинку — появится маркер</span>
           )}
         </div>
 
-        {!loadedUrl ? (
-          <div className="flex h-48 items-center justify-center rounded-2xl border-2 border-dashed border-stone-300 bg-stone-50 text-sm text-stone-400">
-            Сначала загрузите изображение выше
+        {!previewUrl ? (
+          <div
+            className="flex h-48 cursor-pointer items-center justify-center rounded-2xl border-2 border-dashed border-stone-300 bg-stone-50 text-sm text-stone-400 transition hover:border-amber-400 hover:bg-amber-50"
+            onClick={() => fileInputRef.current?.click()}
+          >
+            Нажмите, чтобы загрузить изображение
           </div>
         ) : (
           <div
@@ -173,14 +185,13 @@ export default function HiddenObjectsEditor({ materials }: { materials: Material
             onClick={handleImageClick}
           >
             <img
-              src={loadedUrl}
+              src={previewUrl}
               alt="Картинка задания"
               className="w-full"
               draggable={false}
               onError={() => setImageError(true)}
             />
 
-            {/* Markers */}
             {objects.map((obj, index) => (
               <div
                 key={obj.id}
@@ -191,12 +202,7 @@ export default function HiddenObjectsEditor({ materials }: { materials: Material
                 {/* Radius circle */}
                 <div
                   className="absolute -translate-x-1/2 -translate-y-1/2 rounded-full border-2 border-amber-400/50 bg-amber-400/15 pointer-events-none"
-                  style={{
-                    width: `${obj.radius * 2}%`,
-                    aspectRatio: "1",
-                    left: "50%",
-                    top: "50%",
-                  }}
+                  style={{ width: `${obj.radius * 2}%`, aspectRatio: "1", left: "50%", top: "50%" }}
                 />
                 {/* Dot */}
                 <div
@@ -218,18 +224,14 @@ export default function HiddenObjectsEditor({ materials }: { materials: Material
       {/* Objects list */}
       {objects.length > 0 && (
         <div>
-          <p className="mb-3 text-sm font-medium text-stone-700">
-            Объекты ({objects.length})
-          </p>
+          <p className="mb-3 text-sm font-medium text-stone-700">Объекты ({objects.length})</p>
           <div className="space-y-3">
             {objects.map((obj, index) => (
               <div
                 key={obj.id}
                 className={[
-                  "rounded-2xl border p-4 transition",
-                  selectedId === obj.id
-                    ? "border-amber-400 bg-amber-50"
-                    : "border-stone-200 bg-stone-50",
+                  "rounded-2xl border p-4 transition cursor-pointer",
+                  selectedId === obj.id ? "border-amber-400 bg-amber-50" : "border-stone-200 bg-stone-50",
                 ].join(" ")}
                 onClick={() => setSelectedId(obj.id)}
               >
@@ -237,7 +239,6 @@ export default function HiddenObjectsEditor({ materials }: { materials: Material
                   <span className="flex h-7 w-7 shrink-0 items-center justify-center rounded-xl bg-amber-700 text-sm font-extrabold text-white">
                     {index + 1}
                   </span>
-
                   <div className="flex-1 space-y-2">
                     <input
                       value={obj.label}
@@ -246,11 +247,8 @@ export default function HiddenObjectsEditor({ materials }: { materials: Material
                       className="w-full rounded-lg border border-stone-300 bg-white px-3 py-1.5 text-sm outline-none focus:border-amber-700"
                       onClick={(e) => e.stopPropagation()}
                     />
-
                     <div className="flex items-center gap-3">
-                      <span className="text-xs text-stone-500">
-                        X: {obj.x}% Y: {obj.y}%
-                      </span>
+                      <span className="text-xs text-stone-500">X: {obj.x}% Y: {obj.y}%</span>
                       <label className="flex items-center gap-2 text-xs text-stone-500">
                         Радиус:
                         <input
@@ -266,7 +264,6 @@ export default function HiddenObjectsEditor({ materials }: { materials: Material
                       </label>
                     </div>
                   </div>
-
                   <button
                     type="button"
                     onClick={(e) => { e.stopPropagation(); removeObject(obj.id); }}
@@ -293,18 +290,16 @@ export default function HiddenObjectsEditor({ materials }: { materials: Material
         />
       </div>
 
-      {/* Validation hint */}
-      {objects.length === 0 && (
+      {objects.length === 0 && previewUrl && (
         <p className="rounded-xl border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-800">
-          Добавь хотя бы один объект — кликни на загруженное изображение.
+          Кликни на изображение, чтобы добавить объекты.
         </p>
       )}
 
-      {/* Submit */}
       <div className="flex flex-wrap gap-3 pt-2">
         <button
           type="submit"
-          disabled={objects.length === 0 || !loadedUrl}
+          disabled={objects.length === 0 || !previewUrl}
           className="rounded-xl bg-amber-700 px-6 py-3 font-medium text-white transition hover:bg-amber-800 disabled:cursor-not-allowed disabled:bg-stone-300 disabled:text-stone-500"
         >
           Сохранить задание
