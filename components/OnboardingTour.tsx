@@ -113,6 +113,22 @@ export default function OnboardingTour() {
         onClick={finish}
       />
 
+      {/* Full-body illustration on first step */}
+      {step === 0 && (
+        <div
+          className={[
+            "fixed bottom-0 left-48 z-50 pointer-events-none transition-all duration-500",
+            closing ? "opacity-0 translate-y-8" : "opacity-100 translate-y-0",
+          ].join(" ")}
+        >
+          <img
+            src="/images/miron-full.png"
+            alt="Архивариус Мирон"
+            className="h-[420px] w-auto drop-shadow-2xl"
+          />
+        </div>
+      )}
+
       {/* Mascot panel */}
       <div
         className={[
