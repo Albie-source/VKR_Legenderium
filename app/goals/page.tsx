@@ -116,7 +116,7 @@ export default async function GoalsPage() {
 
                     <div className="mt-auto">
                       <Link
-                        href={`/goals/${goal.id}`}
+                        href="/map"
                         className="inline-flex rounded-xl bg-amber-700 px-5 py-3 text-sm font-medium text-white transition hover:bg-amber-800"
                       >
                         Открыть маршрут на карте →
