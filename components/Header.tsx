@@ -5,8 +5,10 @@ import HeaderClient from "./HeaderClient";
 export default async function Header() {
   const user = await getCurrentUser();
 
-  const goals = user
-    ? await prisma.goal.findMany({
+  let goals: Awaited<ReturnType<typeof prisma.goal.findMany>> = [];
+  if (user) {
+    try {
+      goals = await prisma.goal.findMany({
         where: { isActive: true },
         include: {
           genres: { include: { genre: true } },
@@ -14,8 +16,11 @@ export default async function Header() {
           progress: { where: { userId: user.id } },
         },
         orderBy: { createdAt: "desc" },
-      })
-    : [];
+      });
+    } catch {
+      goals = [];
+    }
+  }
 
   const preparedGoals = goals.map((goal) => {
     const progress = goal.progress[0];
