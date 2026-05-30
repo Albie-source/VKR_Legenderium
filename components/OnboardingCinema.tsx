@@ -166,8 +166,7 @@ export default function OnboardingCinema() {
       {/* Characters */}
       <div className="pointer-events-none absolute inset-x-0 bottom-[148px] flex items-end justify-between px-6 sm:px-16 md:px-24">
 
-        {/* Student — left. CSS bust-crop: image is ~2.3× taller than container,
-            overflow:hidden clips the lower body, leaving head + shoulders. */}
+        {/* Student — left */}
         <div
           className="transition-all duration-500"
           style={{
@@ -181,20 +180,15 @@ export default function OnboardingCinema() {
           }}
         >
           {beat.studentSprite && (
-            <div
-              className="flex items-start justify-center overflow-hidden"
-              style={{ height: "44vh", maxHeight: "350px", width: "clamp(150px, 18vw, 240px)" }}
-            >
-              <img
-                src={STUDENT_SPRITE[beat.studentSprite]}
-                alt="Ученик"
-                style={{ height: "100vh", maxHeight: "800px", width: "auto", flexShrink: 0 }}
-              />
-            </div>
+            <img
+              src={STUDENT_SPRITE[beat.studentSprite]}
+              alt="Ученик"
+              className="h-[44vh] max-h-[350px] w-auto object-contain"
+            />
           )}
         </div>
 
-        {/* Miron — right. Bust-shot PNGs, same height as student crop. */}
+        {/* Miron — right */}
         <div
           className="transition-all duration-500"
           style={{
@@ -209,7 +203,7 @@ export default function OnboardingCinema() {
           <img
             src={`/images/miron-${beat.mironMood}.png`}
             alt="Архивариус Мирон"
-            style={{ height: "44vh", maxHeight: "350px", width: "auto" }}
+            className="h-[44vh] max-h-[350px] w-auto object-contain"
           />
         </div>
       </div>
