@@ -34,8 +34,15 @@ export type MaterialItem = {
   }[];
 };
 
+export type GoalStop = {
+  id: number;
+  latitude: number;
+  longitude: number;
+};
+
 type MapClientProps = {
   regions: RegionItem[];
+  goalStops?: GoalStop[];
 };
 
 const MapView = dynamic(() => import("./MapView"), {
@@ -47,6 +54,6 @@ const MapView = dynamic(() => import("./MapView"), {
   ),
 });
 
-export default function MapClient({ regions }: MapClientProps) {
-  return <MapView regions={regions} />;
+export default function MapClient({ regions, goalStops }: MapClientProps) {
+  return <MapView regions={regions} goalStops={goalStops} />;
 }

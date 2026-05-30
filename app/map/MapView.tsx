@@ -7,13 +7,14 @@ import {
   CircleMarker,
   GeoJSON,
   MapContainer,
+  Polyline,
   TileLayer,
   Tooltip,
   useMap,
 } from "react-leaflet";
 import type { Feature, GeoJsonObject, Geometry } from "geojson";
 import type { Layer, Map as LeafletMap } from "leaflet";
-import type { MaterialItem, RegionItem } from "./MapClient";
+import type { GoalStop, MaterialItem, RegionItem } from "./MapClient";
 
 type LayerWithInternals = Layer & {
   getBounds?: () => import("leaflet").LatLngBounds;
@@ -22,6 +23,7 @@ type LayerWithInternals = Layer & {
 
 type MapViewProps = {
   regions: RegionItem[];
+  goalStops?: GoalStop[];
 };
 
 type RegionFeatureProperties = {
@@ -199,7 +201,7 @@ const REGION_NAME_NORMALIZED_MAP = new Map(
   ])
 );
 
-export default function MapView({ regions }: MapViewProps) {
+export default function MapView({ regions, goalStops }: MapViewProps) {
   const router = useRouter();
 
   const [geoJson, setGeoJson] = useState<GeoJsonObject | null>(null);
@@ -297,6 +299,26 @@ export default function MapView({ regions }: MapViewProps) {
           />
 
           <MapStartPosition />
+
+          {goalStops && goalStops.length > 1 && (
+            <Polyline
+              positions={goalStops.map((s) => [s.latitude, s.longitude] as [number, number])}
+              pathOptions={{ color: "#d8a342", weight: 3, dashArray: "10 7", opacity: 0.9 }}
+            />
+          )}
+
+          {goalStops && goalStops.map((stop, i) => (
+            <CircleMarker
+              key={`goal-stop-${stop.id}`}
+              center={[stop.latitude, stop.longitude]}
+              radius={11}
+              pathOptions={{ color: "#fff8e8", weight: 2.5, fillColor: "#d8a342", fillOpacity: 1 }}
+            >
+              <Tooltip direction="top" offset={[0, -10]} opacity={1} permanent>
+                <span className="font-bold">{i + 1}</span>
+              </Tooltip>
+            </CircleMarker>
+          ))}
 
           {geoJson && (
             <GeoJSON
