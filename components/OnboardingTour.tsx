@@ -55,17 +55,25 @@ const STEPS: Step[] = [
   },
 ];
 
-export default function OnboardingTour() {
+type OnboardingTourProps = {
+  autoStart?: boolean;
+  onFinish?: () => void;
+};
+
+export default function OnboardingTour({ autoStart = true, onFinish }: OnboardingTourProps) {
   const [step, setStep] = useState<number | null>(null);
   const [closing, setClosing] = useState(false);
 
   useEffect(() => {
     if (typeof window === "undefined") return;
-    const done = localStorage.getItem(STORAGE_KEY);
-    if (!done) {
-      setTimeout(() => setStep(0), 800);
+    if (autoStart) {
+      const done = localStorage.getItem(STORAGE_KEY);
+      if (!done) setTimeout(() => setStep(0), 800);
+    } else {
+      // Started externally (e.g. after cinema)
+      setTimeout(() => setStep(0), 400);
     }
-  }, []);
+  }, [autoStart]);
 
   // Highlight nav item
   useEffect(() => {
@@ -95,6 +103,7 @@ export default function OnboardingTour() {
       localStorage.setItem(STORAGE_KEY, "1");
       setStep(null);
       setClosing(false);
+      onFinish?.();
     }, 400);
   }
 

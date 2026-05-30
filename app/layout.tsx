@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import { Manrope, Playfair_Display } from "next/font/google";
 import Header from "@/components/Header";
-import OnboardingCinema from "@/components/OnboardingCinema";
+import OnboardingFlow from "@/components/OnboardingFlow";
 import "./globals.css";
 
 const manrope = Manrope({
@@ -31,7 +31,7 @@ export default function RootLayout({
       <body className={`${manrope.variable} ${playfair.variable}`}>
         <Header />
         {children}
-        <OnboardingCinema />
+        <OnboardingFlow />
       </body>
     </html>
   );

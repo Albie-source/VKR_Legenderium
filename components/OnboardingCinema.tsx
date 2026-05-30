@@ -2,7 +2,7 @@
 
 import { useCallback, useEffect, useState } from "react";
 
-const STORAGE_KEY = "legendarium_onboarding_done";
+const STORAGE_KEY = "legendarium_cinema_done";
 
 type Speaker = "miron" | "student";
 
@@ -49,7 +49,12 @@ const STUDENT_SPRITE: Record<string, string> = {
   ready: "/images/student-ready.png",
 };
 
-export default function OnboardingCinema() {
+type OnboardingCinemaProps = {
+  autoStart?: boolean;
+  onFinish?: () => void;
+};
+
+export default function OnboardingCinema({ autoStart = true, onFinish }: OnboardingCinemaProps) {
   const [beatIndex, setBeatIndex] = useState<number | null>(null);
   const [textVisible, setTextVisible] = useState(true);
   const [closing, setClosing] = useState(false);
@@ -60,10 +65,10 @@ export default function OnboardingCinema() {
 
   useEffect(() => {
     if (typeof window === "undefined") return;
-    if (!localStorage.getItem(STORAGE_KEY)) {
+    if (autoStart && !localStorage.getItem(STORAGE_KEY)) {
       setTimeout(() => setBeatIndex(0), 700);
     }
-  }, []);
+  }, [autoStart]);
 
   // Crossfade background when scene changes
   useEffect(() => {
@@ -85,8 +90,9 @@ export default function OnboardingCinema() {
       localStorage.setItem(STORAGE_KEY, "1");
       setBeatIndex(null);
       setClosing(false);
+      onFinish?.();
     }, 600);
-  }, []);
+  }, [onFinish]);
 
   const handleAdvance = useCallback(() => {
     if (beatIndex === null) return;
