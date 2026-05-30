@@ -37,10 +37,26 @@ export default async function NewTaskPage() {
           </h1>
 
           <p className="max-w-3xl text-stone-700">
-            На данном этапе MVP поддерживает задание типа «выбор одного
-            правильного ответа». Оно используется для проверки понимания
-            фольклорного материала.
+            Выберите тип задания. Ниже — форма для задания с выбором ответа.
+            Для других типов воспользуйтесь специализированными редакторами.
           </p>
+        </div>
+
+        {/* Task type selector */}
+        <div className="mb-8 grid gap-3 sm:grid-cols-2">
+          <div className="rounded-2xl border-2 border-amber-700 bg-amber-50 p-4">
+            <p className="mb-1 text-xs font-bold uppercase tracking-[0.2em] text-amber-700">Активный тип</p>
+            <p className="text-lg font-bold text-stone-900">Выбор ответа</p>
+            <p className="mt-1 text-sm text-stone-600">Один правильный вариант из нескольких</p>
+          </div>
+          <Link
+            href="/admin/tasks/new/hidden-objects"
+            className="rounded-2xl border border-stone-300 bg-white p-4 transition hover:border-amber-700 hover:bg-amber-50"
+          >
+            <p className="mb-1 text-xs font-bold uppercase tracking-[0.2em] text-stone-500">Другой тип →</p>
+            <p className="text-lg font-bold text-stone-900">Скрытые объекты</p>
+            <p className="mt-1 text-sm text-stone-600">Кликни на картинку, найди все предметы</p>
+          </Link>
         </div>
 
         <form
