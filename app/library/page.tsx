@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { Suspense } from "react";
 import { Prisma } from "@prisma/client";
 import { prisma } from "@/lib/prisma";
 import LibraryFilters from "./LibraryFilters";
@@ -158,12 +159,14 @@ export default async function LibraryPage({ searchParams }: LibraryPageProps) {
       </section>
 
       <section className="mx-auto max-w-7xl px-6 pt-10">
-        <LibraryFilters
-          regions={regions}
-          peoples={peoples}
-          genres={genres}
-          topics={topics}
-        />
+        <Suspense fallback={null}>
+          <LibraryFilters
+            regions={regions}
+            peoples={peoples}
+            genres={genres}
+            topics={topics}
+          />
+        </Suspense>
 
         <div className="mb-6 mt-10 flex flex-wrap items-center justify-between gap-4">
           <div>
@@ -257,10 +260,12 @@ export default async function LibraryPage({ searchParams }: LibraryPageProps) {
               ))}
             </div>
 
-            <LibraryPagination
-              currentPage={currentPage}
-              totalPages={totalPages}
-            />
+            <Suspense fallback={null}>
+              <LibraryPagination
+                currentPage={currentPage}
+                totalPages={totalPages}
+              />
+            </Suspense>
           </>
         )}
       </section>
