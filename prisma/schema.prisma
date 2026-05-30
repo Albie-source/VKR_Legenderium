@@ -122,6 +122,10 @@ model Material {
   createdAt        DateTime      @default(now())
   updatedAt        DateTime      @updatedAt
 
+  @@index([status])
+  @@index([genreId])
+  @@index([regionId])
+  @@index([peopleId])
   @@map("materials")
 }
 
@@ -146,6 +150,7 @@ model Favorite {
   material   Material @relation(fields: [materialId], references: [id], onDelete: Cascade)
 
   @@unique([userId, materialId])
+  @@index([userId])
   @@map("favorites")
 }
 
@@ -165,6 +170,7 @@ model InteractiveTask {
   createdAt   DateTime      @default(now())
   updatedAt   DateTime      @updatedAt
 
+  @@index([materialId])
   @@map("interactive_tasks")
 }
 
@@ -180,6 +186,8 @@ model TaskAttempt {
   user        User            @relation(fields: [userId], references: [id], onDelete: Cascade)
   task        InteractiveTask @relation(fields: [taskId], references: [id], onDelete: Cascade)
 
+  @@index([userId])
+  @@index([taskId])
   @@map("task_attempts")
 }
 
@@ -222,5 +230,6 @@ model GoalProgress {
   goal            Goal     @relation(fields: [goalId], references: [id], onDelete: Cascade)
 
   @@unique([userId, goalId])
+  @@index([userId])
   @@map("goal_progress")
 }

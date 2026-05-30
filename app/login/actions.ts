@@ -4,18 +4,14 @@ import bcrypt from "bcryptjs";
 import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
 import { prisma } from "@/lib/prisma";
-import { AUTH_COOKIE_NAME } from "@/lib/auth";
+import { AUTH_COOKIE_NAME, signSession } from "@/lib/auth";
 
 export async function loginAction(formData: FormData) {
   const email = String(formData.get("email") ?? "").trim().toLowerCase();
   const password = String(formData.get("password") ?? "").trim();
   const next = String(formData.get("next") ?? "").trim();
 
-  const user = await prisma.user.findUnique({
-    where: {
-      email,
-    },
-  });
+  const user = await prisma.user.findUnique({ where: { email } });
 
   if (!user) {
     redirect(makeLoginErrorUrl(next));
@@ -23,30 +19,13 @@ export async function loginAction(formData: FormData) {
 
   const isPasswordValid = await bcrypt.compare(password, user.passwordHash);
 
-  // Временная поддержка старых паролей из seed, если они были записаны обычной строкой.
-  // После первого успешного входа пароль автоматически перезапишется bcrypt-хэшем.
-  const isLegacyPasswordValid = user.passwordHash === password;
-
-  if (!isPasswordValid && !isLegacyPasswordValid) {
+  if (!isPasswordValid) {
     redirect(makeLoginErrorUrl(next));
-  }
-
-  if (isLegacyPasswordValid) {
-    const newPasswordHash = await bcrypt.hash(password, 10);
-
-    await prisma.user.update({
-      where: {
-        id: user.id,
-      },
-      data: {
-        passwordHash: newPasswordHash,
-      },
-    });
   }
 
   const cookieStore = await cookies();
 
-  cookieStore.set(AUTH_COOKIE_NAME, String(user.id), {
+  cookieStore.set(AUTH_COOKIE_NAME, signSession(user.id), {
     httpOnly: true,
     sameSite: "lax",
     path: "/",

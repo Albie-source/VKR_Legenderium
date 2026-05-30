@@ -28,6 +28,7 @@ type SaveTaskResult = {
     title: string;
     cardTitle: string;
   }[];
+  error?: string;
 };
 
 function isSingleChoiceConfig(config: unknown): config is SingleChoiceConfig {
@@ -68,155 +69,144 @@ export async function saveTaskResultAction(
   taskId: number,
   selectedAnswer: string
 ): Promise<SaveTaskResult> {
-  const user = await getCurrentUser();
+  try {
+    const user = await getCurrentUser();
 
-  const task = await prisma.interactiveTask.findUnique({
-    where: {
-      id: taskId,
-    },
-    include: {
-      material: {
-        include: {
-          topics: true,
+    const task = await prisma.interactiveTask.findUnique({
+      where: { id: taskId },
+      include: {
+        material: {
+          include: { topics: true },
         },
       },
-    },
-  });
+    });
 
-  if (!task) {
-    return {
-      isAuthenticated: Boolean(user),
-      isCorrect: false,
-      progressUpdated: false,
-      completedGoals: [],
-    };
-  }
+    if (!task) {
+      return {
+        isAuthenticated: Boolean(user),
+        isCorrect: false,
+        progressUpdated: false,
+        completedGoals: [],
+      };
+    }
 
-  let isCorrect = false;
+    let isCorrect = false;
 
-  if (task.type === "single_choice" && isSingleChoiceConfig(task.config)) {
-    isCorrect = selectedAnswer === task.config.correctAnswer;
-  } else if (task.type === "matching" && isMatchingConfig(task.config)) {
-    isCorrect = checkMatchingAnswer(task.config, selectedAnswer);
-  } else {
-    return {
-      isAuthenticated: Boolean(user),
-      isCorrect: false,
-      progressUpdated: false,
-      completedGoals: [],
-    };
-  }
+    if (task.type === "single_choice" && isSingleChoiceConfig(task.config)) {
+      isCorrect = selectedAnswer === task.config.correctAnswer;
+    } else if (task.type === "matching" && isMatchingConfig(task.config)) {
+      isCorrect = checkMatchingAnswer(task.config, selectedAnswer);
+    } else {
+      return {
+        isAuthenticated: Boolean(user),
+        isCorrect: false,
+        progressUpdated: false,
+        completedGoals: [],
+      };
+    }
 
-  if (!user) {
-    return {
-      isAuthenticated: false,
-      isCorrect,
-      progressUpdated: false,
-      completedGoals: [],
-    };
-  }
+    if (!user) {
+      return {
+        isAuthenticated: false,
+        isCorrect,
+        progressUpdated: false,
+        completedGoals: [],
+      };
+    }
 
-  const previousSuccessfulAttempt = await prisma.taskAttempt.findFirst({
-    where: {
-      userId: user.id,
-      taskId: task.id,
-      isCompleted: true,
-    },
-  });
+    const previousSuccessfulAttempt = await prisma.taskAttempt.findFirst({
+      where: { userId: user.id, taskId: task.id, isCompleted: true },
+    });
 
-  await prisma.taskAttempt.create({
-    data: {
-      userId: user.id,
-      taskId: task.id,
-      isCompleted: isCorrect,
-      score: isCorrect ? 100 : 0,
-    },
-  });
+    await prisma.taskAttempt.create({
+      data: {
+        userId: user.id,
+        taskId: task.id,
+        isCompleted: isCorrect,
+        score: isCorrect ? 100 : 0,
+      },
+    });
 
-  if (!isCorrect || previousSuccessfulAttempt) {
+    if (!isCorrect || previousSuccessfulAttempt) {
+      return {
+        isAuthenticated: true,
+        isCorrect,
+        progressUpdated: false,
+        completedGoals: [],
+      };
+    }
+
+    const materialTopicIds = task.material.topics.map((topic) => topic.topicId);
+
+    const matchingGoals = await prisma.goal.findMany({
+      where: {
+        isActive: true,
+        genreId: task.material.genreId,
+        topicId: { in: materialTopicIds },
+      },
+    });
+
+    const completedGoals: SaveTaskResult["completedGoals"] = [];
+
+    for (const goal of matchingGoals) {
+      const existingProgress = await prisma.goalProgress.findUnique({
+        where: { userId_goalId: { userId: user.id, goalId: goal.id } },
+      });
+
+      if (existingProgress?.isCompleted) {
+        continue;
+      }
+
+      const currentProgress = existingProgress?.currentProgress ?? 0;
+      const newProgress = Math.min(
+        currentProgress + 1,
+        goal.requiredMaterialsCount
+      );
+      const isGoalCompleted = newProgress >= goal.requiredMaterialsCount;
+
+      await prisma.goalProgress.upsert({
+        where: { userId_goalId: { userId: user.id, goalId: goal.id } },
+        update: {
+          currentProgress: newProgress,
+          isCompleted: isGoalCompleted,
+          rewardReceived: isGoalCompleted,
+          completedAt: isGoalCompleted ? new Date() : null,
+        },
+        create: {
+          userId: user.id,
+          goalId: goal.id,
+          currentProgress: newProgress,
+          isCompleted: isGoalCompleted,
+          rewardReceived: isGoalCompleted,
+          completedAt: isGoalCompleted ? new Date() : null,
+        },
+      });
+
+      if (isGoalCompleted) {
+        completedGoals.push({
+          id: goal.id,
+          title: goal.title,
+          cardTitle: goal.cardTitle,
+        });
+      }
+    }
+
     return {
       isAuthenticated: true,
       isCorrect,
+      progressUpdated: matchingGoals.length > 0,
+      completedGoals,
+    };
+  } catch (err) {
+    console.error("saveTaskResultAction error:", err);
+    return {
+      isAuthenticated: false,
+      isCorrect: false,
       progressUpdated: false,
       completedGoals: [],
+      error: "Произошла ошибка при сохранении результата. Попробуйте снова.",
     };
   }
-
-  const materialTopicIds = task.material.topics.map((topic) => topic.topicId);
-
-  const matchingGoals = await prisma.goal.findMany({
-    where: {
-      isActive: true,
-      genreId: task.material.genreId,
-      topicId: {
-        in: materialTopicIds,
-      },
-    },
-  });
-
-  const completedGoals: SaveTaskResult["completedGoals"] = [];
-
-  for (const goal of matchingGoals) {
-    const existingProgress = await prisma.goalProgress.findUnique({
-      where: {
-        userId_goalId: {
-          userId: user.id,
-          goalId: goal.id,
-        },
-      },
-    });
-
-    const currentProgress = existingProgress?.currentProgress ?? 0;
-
-    if (existingProgress?.isCompleted) {
-      continue;
-    }
-
-    const newProgress = Math.min(
-      currentProgress + 1,
-      goal.requiredMaterialsCount
-    );
-
-    const isGoalCompleted = newProgress >= goal.requiredMaterialsCount;
-
-    await prisma.goalProgress.upsert({
-      where: {
-        userId_goalId: {
-          userId: user.id,
-          goalId: goal.id,
-        },
-      },
-      update: {
-        currentProgress: newProgress,
-        isCompleted: isGoalCompleted,
-        rewardReceived: isGoalCompleted,
-        completedAt: isGoalCompleted ? new Date() : null,
-      },
-      create: {
-        userId: user.id,
-        goalId: goal.id,
-        currentProgress: newProgress,
-        isCompleted: isGoalCompleted,
-        rewardReceived: isGoalCompleted,
-        completedAt: isGoalCompleted ? new Date() : null,
-      },
-    });
-
-    if (isGoalCompleted) {
-      completedGoals.push({
-        id: goal.id,
-        title: goal.title,
-        cardTitle: goal.cardTitle,
-      });
-    }
-  }
-
-  return {
-    isAuthenticated: true,
-    isCorrect,
-    progressUpdated: matchingGoals.length > 0,
-    completedGoals,
-  };
 }
 
 function checkMatchingAnswer(config: MatchingConfig, selectedAnswer: string) {
