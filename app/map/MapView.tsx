@@ -12,7 +12,13 @@ import {
   useMap,
 } from "react-leaflet";
 import type { Feature, GeoJsonObject, Geometry } from "geojson";
+import type { Layer, Map as LeafletMap } from "leaflet";
 import type { MaterialItem, RegionItem } from "./MapClient";
+
+type LayerWithInternals = Layer & {
+  getBounds?: () => import("leaflet").LatLngBounds;
+  _map?: LeafletMap;
+};
 
 type MapViewProps = {
   regions: RegionItem[];
@@ -195,7 +201,7 @@ const REGION_NAME_NORMALIZED_MAP = new Map(
 
 export default function MapView({ regions }: MapViewProps) {
   const router = useRouter();
-  const selectedLayerRef = useRef<any>(null);
+  const selectedLayerRef = useRef<Layer | null>(null);
 
   const [geoJson, setGeoJson] = useState<GeoJsonObject | null>(null);
   const [selectedRegionId, setSelectedRegionId] = useState<number | null>(null);
@@ -258,7 +264,7 @@ export default function MapView({ regions }: MapViewProps) {
     [regions, regionsByNormalizedName]
   );
 
-  const highlightRegionLayer = useCallback((layer: any) => {
+  const highlightRegionLayer = useCallback((layer: Layer) => {
     requestAnimationFrame(() => {
       if (selectedLayerRef.current && selectedLayerRef.current !== layer) {
         selectedLayerRef.current.setStyle(DEFAULT_REGION_STYLE);
@@ -315,8 +321,8 @@ export default function MapView({ regions }: MapViewProps) {
                     selectRegionByName(regionNameFromMap);
                     highlightRegionLayer(layer);
 
-                    const bounds = (layer as any).getBounds?.();
-                    const map = (layer as any)._map;
+                    const bounds = (layer as LayerWithInternals).getBounds?.();
+                    const map = (layer as LayerWithInternals)._map;
 
                     if (bounds && map) {
                       map.fitBounds(bounds, {
