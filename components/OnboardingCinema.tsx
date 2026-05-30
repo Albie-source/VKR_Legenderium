@@ -11,75 +11,21 @@ type Beat = {
   speaker: Speaker;
   text: string;
   studentSprite: "curious" | "shocked" | "pledge" | "ready" | null;
+  mironMood: "happy" | "sad";
 };
 
 const BEATS: Beat[] = [
-  {
-    scene: 1,
-    speaker: "miron",
-    text: "Много лет я собирал это сокровище, мой юный друг. Каждый свиток — живая память народа. Легенды, сказания, обряды... всё, что передавалось из уст в уста тысячелетиями.",
-    studentSprite: "curious",
-  },
-  {
-    scene: 1,
-    speaker: "student",
-    text: "Неужели столько? Со всей России?",
-    studentSprite: "curious",
-  },
-  {
-    scene: 1,
-    speaker: "miron",
-    text: "Со всей огромной, необъятной России. Пока они здесь — они живы.",
-    studentSprite: "curious",
-  },
-  {
-    scene: 2,
-    speaker: "miron",
-    text: "Нет! Закрой окна! Свитки!",
-    studentSprite: "shocked",
-  },
-  {
-    scene: 2,
-    speaker: "student",
-    text: "Я не успеваю! Их слишком много!",
-    studentSprite: "shocked",
-  },
-  {
-    scene: 3,
-    speaker: "miron",
-    text: "Всё... Ветер разнёс записи по всей стране. Голоса народов — рассеяны как пыль.",
-    studentSprite: null,
-  },
-  {
-    scene: 3,
-    speaker: "miron",
-    text: "Я слишком стар, чтобы объехать всю Россию в поисках утерянного...",
-    studentSprite: null,
-  },
-  {
-    scene: 4,
-    speaker: "student",
-    text: "Тогда это сделаю я. Объеду все регионы, найду каждую легенду — и оцифрую. Ни один ураган больше не уничтожит память народа.",
-    studentSprite: "pledge",
-  },
-  {
-    scene: 4,
-    speaker: "miron",
-    text: "Но это... огромный путь...",
-    studentSprite: "pledge",
-  },
-  {
-    scene: 4,
-    speaker: "student",
-    text: "Ты собирал эти истории всю жизнь. Я сохраню их навсегда.",
-    studentSprite: "ready",
-  },
-  {
-    scene: 4,
-    speaker: "miron",
-    text: "Тогда — в путь. Легендариум ждёт тебя.",
-    studentSprite: "ready",
-  },
+  { scene: 1, speaker: "miron",   text: "Много лет я собирал это сокровище, мой юный друг. Каждый свиток — живая память народа. Легенды, сказания, обряды... всё, что передавалось из уст в уста тысячелетиями.", studentSprite: "curious", mironMood: "happy" },
+  { scene: 1, speaker: "student", text: "Неужели столько? Со всей России?",                                                                                                                                           studentSprite: "curious", mironMood: "happy" },
+  { scene: 1, speaker: "miron",   text: "Со всей огромной, необъятной России. Пока они здесь — они живы.",                                                                                                            studentSprite: "curious", mironMood: "happy" },
+  { scene: 2, speaker: "miron",   text: "Нет! Закрой окна! Свитки!",                                                                                                                                                  studentSprite: "shocked", mironMood: "sad"   },
+  { scene: 2, speaker: "student", text: "Я не успеваю! Их слишком много!",                                                                                                                                            studentSprite: "shocked", mironMood: "sad"   },
+  { scene: 3, speaker: "miron",   text: "Всё... Ветер разнёс записи по всей стране. Голоса народов — рассеяны как пыль.",                                                                                             studentSprite: null,      mironMood: "sad"   },
+  { scene: 3, speaker: "miron",   text: "Я слишком стар, чтобы объехать всю Россию в поисках утерянного...",                                                                                                          studentSprite: null,      mironMood: "sad"   },
+  { scene: 4, speaker: "student", text: "Тогда это сделаю я. Объеду все регионы, найду каждую легенду — и оцифрую. Ни один ураган больше не уничтожит память народа.",                                               studentSprite: "pledge",  mironMood: "sad"   },
+  { scene: 4, speaker: "miron",   text: "Но это... огромный путь...",                                                                                                                                                 studentSprite: "pledge",  mironMood: "sad"   },
+  { scene: 4, speaker: "student", text: "Ты собирал эти истории всю жизнь. Я сохраню их навсегда.",                                                                                                                   studentSprite: "ready",   mironMood: "sad"   },
+  { scene: 4, speaker: "miron",   text: "Тогда — в путь. Легендариум ждёт тебя.",                                                                                                                                     studentSprite: "ready",   mironMood: "happy" },
 ];
 
 const SCENE_BG: Record<number, string> = {
@@ -217,9 +163,11 @@ export default function OnboardingCinema() {
         </div>
       )}
 
-      {/* Characters — both full-body for visual consistency */}
+      {/* Characters */}
       <div className="pointer-events-none absolute inset-x-0 bottom-[148px] flex items-end justify-between px-6 sm:px-16 md:px-24">
-        {/* Student — left */}
+
+        {/* Student — left. CSS bust-crop: image is ~2.3× taller than container,
+            overflow:hidden clips the lower body, leaving head + shoulders. */}
         <div
           className="transition-all duration-500"
           style={{
@@ -233,15 +181,20 @@ export default function OnboardingCinema() {
           }}
         >
           {beat.studentSprite && (
-            <img
-              src={STUDENT_SPRITE[beat.studentSprite]}
-              alt="Ученик"
-              className="h-[52vh] max-h-[420px] w-auto object-contain"
-            />
+            <div
+              className="flex items-start justify-center overflow-hidden"
+              style={{ height: "44vh", maxHeight: "350px", width: "clamp(150px, 18vw, 240px)" }}
+            >
+              <img
+                src={STUDENT_SPRITE[beat.studentSprite]}
+                alt="Ученик"
+                style={{ height: "100vh", maxHeight: "800px", width: "auto", flexShrink: 0 }}
+              />
+            </div>
           )}
         </div>
 
-        {/* Miron — right, full-body sprite */}
+        {/* Miron — right. Bust-shot PNGs, same height as student crop. */}
         <div
           className="transition-all duration-500"
           style={{
@@ -254,9 +207,9 @@ export default function OnboardingCinema() {
           }}
         >
           <img
-            src="/images/miron-full.png"
+            src={`/images/miron-${beat.mironMood}.png`}
             alt="Архивариус Мирон"
-            className="h-[52vh] max-h-[420px] w-auto object-contain"
+            style={{ height: "44vh", maxHeight: "350px", width: "auto" }}
           />
         </div>
       </div>
