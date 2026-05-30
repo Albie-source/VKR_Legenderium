@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 
 const STORAGE_KEY = "legendarium_cinema_done";
 
@@ -58,10 +58,70 @@ export default function OnboardingCinema({ autoStart = true, onFinish }: Onboard
   const [beatIndex, setBeatIndex] = useState<number | null>(null);
   const [textVisible, setTextVisible] = useState(true);
   const [closing, setClosing] = useState(false);
+  const [muted, setMuted] = useState(false);
 
   // Two-layer background crossfade
   const [baseBg, setBaseBg] = useState<number>(1);
   const [incomingBg, setIncomingBg] = useState<number | null>(null);
+
+  // Audio refs
+  const ambientRef = useRef<HTMLAudioElement | null>(null);
+  const stormRef   = useRef<HTMLAudioElement | null>(null);
+  const pageRef    = useRef<HTMLAudioElement | null>(null);
+  const audioStarted = useRef(false);
+  const mutedRef   = useRef(false);
+
+  // Init audio elements once
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+    ambientRef.current = new Audio("/sounds/onboarding-ambient.mp3");
+    ambientRef.current.loop = true;
+
+    stormRef.current = new Audio("/sounds/onboarding-storm.mp3");
+    stormRef.current.loop = true;
+    stormRef.current.volume = 0;
+
+    pageRef.current = new Audio("/sounds/onboarding-page.mp3");
+
+    return () => {
+      ambientRef.current?.pause();
+      stormRef.current?.pause();
+    };
+  }, []);
+
+  // Adjust volumes when scene changes or mute toggles
+  useEffect(() => {
+    if (!audioStarted.current) return;
+    const isStorm = beatIndex !== null && BEATS[beatIndex]?.scene === 2;
+    const m = mutedRef.current;
+    if (ambientRef.current) ambientRef.current.volume = m ? 0 : (isStorm ? 0.12 : 0.38);
+    if (stormRef.current)   stormRef.current.volume   = m ? 0 : (isStorm ? 0.52 : 0);
+  }, [beatIndex, muted]);
+
+  function startAudio() {
+    if (audioStarted.current) return;
+    audioStarted.current = true;
+    if (!mutedRef.current) {
+      ambientRef.current?.play().catch(() => {});
+      stormRef.current?.play().catch(() => {});
+    }
+  }
+
+  function playPage() {
+    if (mutedRef.current || !pageRef.current) return;
+    pageRef.current.currentTime = 0;
+    pageRef.current.volume = 0.45;
+    pageRef.current.play().catch(() => {});
+  }
+
+  function toggleMute() {
+    const next = !mutedRef.current;
+    mutedRef.current = next;
+    setMuted(next);
+    const isStorm = beatIndex !== null && BEATS[beatIndex]?.scene === 2;
+    if (ambientRef.current) ambientRef.current.volume = next ? 0 : (isStorm ? 0.12 : 0.38);
+    if (stormRef.current)   stormRef.current.volume   = next ? 0 : (isStorm ? 0.52 : 0);
+  }
 
   useEffect(() => {
     if (typeof window === "undefined") return;
@@ -85,6 +145,8 @@ export default function OnboardingCinema({ autoStart = true, onFinish }: Onboard
   }, [beatIndex, baseBg]);
 
   const finish = useCallback(() => {
+    ambientRef.current?.pause();
+    stormRef.current?.pause();
     setClosing(true);
     setTimeout(() => {
       localStorage.setItem(STORAGE_KEY, "1");
@@ -96,6 +158,8 @@ export default function OnboardingCinema({ autoStart = true, onFinish }: Onboard
 
   const handleAdvance = useCallback(() => {
     if (beatIndex === null) return;
+    startAudio();
+    playPage();
     if (beatIndex >= BEATS.length - 1) {
       finish();
       return;
@@ -105,7 +169,7 @@ export default function OnboardingCinema({ autoStart = true, onFinish }: Onboard
       setBeatIndex(beatIndex + 1);
       setTextVisible(true);
     }, 160);
-  }, [beatIndex, finish]);
+  }, [beatIndex, finish]); // eslint-disable-line react-hooks/exhaustive-deps
 
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => {
@@ -257,6 +321,14 @@ export default function OnboardingCinema({ autoStart = true, onFinish }: Onboard
             </div>
 
             <div className="flex shrink-0 items-center gap-3">
+              <button
+                type="button"
+                onClick={(e) => { e.stopPropagation(); toggleMute(); }}
+                className="cursor-pointer text-lg text-white/40 transition hover:text-white/70"
+                aria-label={muted ? "Включить звук" : "Выключить звук"}
+              >
+                {muted ? "🔇" : "🔊"}
+              </button>
               <button
                 type="button"
                 onClick={(e) => { e.stopPropagation(); finish(); }}
