@@ -414,7 +414,7 @@ export default function MapView({ regions }: MapViewProps) {
 
               {selectedRegion.peoples.length === 0 ? (
                 <p className="rounded-2xl border border-white/10 bg-white/8 p-4 text-sm text-[#cbbba7]">
-                  Народы пока не указаны через материалы региона.
+                  В этом регионе народы пока не указаны.
                 </p>
               ) : (
                 <div className="flex flex-wrap gap-2">

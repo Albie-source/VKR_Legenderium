@@ -63,12 +63,32 @@ export default async function MaterialPage({ params }: MaterialPageProps) {
   return (
     <main className="overflow-hidden bg-[linear-gradient(180deg,#07181c_0%,#0b2428_28%,#f4ecdf_28%,#f4ecdf_100%)] pb-20">
       <section className="mx-auto max-w-7xl px-6 pt-10">
-        <Link
-          href="/library"
-          className="mb-6 inline-flex rounded-2xl border border-white/10 bg-white/8 px-4 py-2 text-sm font-bold text-[#fff8e8] shadow-sm backdrop-blur transition hover:bg-white/14"
-        >
-          ← Вернуться в библиотеку
-        </Link>
+        <nav className="mb-6 flex flex-wrap items-center gap-1.5 text-sm font-semibold">
+          <Link
+            href="/"
+            className="text-[#d6c8b6]/60 transition hover:text-[#fff8e8]"
+          >
+            Главная
+          </Link>
+          <span className="text-[#d6c8b6]/30">›</span>
+          <Link
+            href="/library"
+            className="text-[#d6c8b6]/60 transition hover:text-[#fff8e8]"
+          >
+            Библиотека
+          </Link>
+          <span className="text-[#d6c8b6]/30">›</span>
+          <Link
+            href={`/library?genre=${material.genreId}`}
+            className="text-[#d6c8b6]/60 transition hover:text-[#fff8e8]"
+          >
+            {material.genre.name}
+          </Link>
+          <span className="text-[#d6c8b6]/30">›</span>
+          <span className="max-w-[220px] truncate text-[#fff8e8]">
+            {material.title}
+          </span>
+        </nav>
 
         <div className="relative overflow-hidden rounded-[2.5rem] border border-white/10 bg-[#0b1f22] shadow-2xl shadow-black/25">
           <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_12%_18%,rgba(58,166,160,0.16),transparent_28%),radial-gradient(circle_at_82%_20%,rgba(216,163,66,0.14),transparent_24%),radial-gradient(circle_at_70%_88%,rgba(47,143,99,0.10),transparent_28%)]" />
@@ -138,7 +158,14 @@ export default async function MaterialPage({ params }: MaterialPageProps) {
         </div>
       </section>
 
-      <section className="mx-auto grid max-w-7xl gap-8 px-6 pt-10 lg:grid-cols-[1fr_340px]">
+      <section
+        className={[
+          "mx-auto max-w-7xl px-6 pt-10",
+          material.tasks.length > 0
+            ? "grid gap-8 lg:grid-cols-[1fr_340px]"
+            : "",
+        ].join(" ")}
+      >
         <div className="space-y-8">
           <section className="rounded-[2rem] border border-[#e4d4bf] bg-white p-7 shadow-md md:p-8">
             <div className="mb-7">
@@ -227,24 +254,8 @@ export default async function MaterialPage({ params }: MaterialPageProps) {
 
         </div>
 
-        <aside className="space-y-6 lg:sticky lg:top-28 lg:self-start">
-          <section className="rounded-[2rem] border border-[#e4d4bf] bg-[#fbf7f1] p-6 shadow-md">
-            <p className="mb-2 text-sm font-black uppercase tracking-[0.2em] text-[#b46b1f]">
-              О материале
-            </p>
-
-            <h2 className="mb-5 text-2xl font-extrabold text-stone-950">
-              Основные сведения
-            </h2>
-
-            <div className="space-y-3">
-              <CompactInfo title="Регион" value={material.region.name} />
-              <CompactInfo title="Народ" value={material.people.name} />
-              <CompactInfo title="Жанр" value={material.genre.name} />
-            </div>
-          </section>
-
-          {material.tasks.length > 0 ? (
+        {material.tasks.length > 0 && (
+          <aside className="lg:sticky lg:top-28 lg:self-start">
             <section className="rounded-[2rem] border border-[#d8a342]/35 bg-[#fff4d8] p-6 shadow-md">
               <p className="mb-2 text-sm font-black uppercase tracking-[0.2em] text-[#b46b1f]">
                 Задание
@@ -266,8 +277,8 @@ export default async function MaterialPage({ params }: MaterialPageProps) {
                 Перейти к заданию
               </Link>
             </section>
-          ) : null}
-        </aside>
+          </aside>
+        )}
       </section>
     </main>
   );
@@ -321,12 +332,4 @@ function FavoriteIconButton({
   );
 }
 
-function CompactInfo({ title, value }: { title: string; value: string }) {
-  return (
-    <div className="rounded-2xl border border-[#eadbc7] bg-white p-4">
-      <p className="mb-1 text-sm font-semibold text-stone-500">{title}</p>
-      <p className="font-extrabold text-stone-950">{value}</p>
-    </div>
-  );
-}
 

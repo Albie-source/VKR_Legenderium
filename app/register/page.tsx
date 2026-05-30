@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { registerAction } from "./actions";
+import PasswordInput from "@/components/PasswordInput";
 
 type RegisterPageProps = {
   searchParams: Promise<{
@@ -79,14 +80,12 @@ export default async function RegisterPage({
                 Пароль
               </label>
 
-              <input
+              <PasswordInput
                 name="password"
-                type="password"
                 required
                 minLength={6}
                 autoComplete="new-password"
                 placeholder="Минимум 6 символов"
-                className="w-full rounded-2xl border border-[#dccab3] bg-white px-4 py-3 text-stone-900 outline-none transition placeholder:text-stone-400 focus:border-[#d8a342] focus:ring-2 focus:ring-[#f3dfb1]"
               />
             </div>
 
