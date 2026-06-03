@@ -1,7 +1,8 @@
 "use client";
 
 import Link from "next/link";
-import { useState, type ReactNode } from "react";
+import { useState, useTransition, type ReactNode } from "react";
+import { claimGoalRewardAction } from "@/app/goals/claimRewardAction";
 
 type HeaderUser = {
   name: string;
@@ -201,6 +202,31 @@ function GoalsPanel({
   onClose: () => void;
   goals: HeaderGoal[];
 }) {
+  const [claimedIds, setClaimedIds] = useState<Set<number>>(new Set());
+  const [flyingOutIds, setFlyingOutIds] = useState<Set<number>>(new Set());
+  const [, startTransition] = useTransition();
+
+  const visibleGoals = goals.filter(
+    (g) => !g.rewardReceived && !claimedIds.has(g.id)
+  );
+  const celebrationGoals = visibleGoals.filter((g) => g.isCompleted);
+  const activeGoals = visibleGoals.filter((g) => !g.isCompleted);
+
+  function handleClaimReward(goalId: number) {
+    setFlyingOutIds((prev) => new Set(prev).add(goalId));
+    setTimeout(() => {
+      setClaimedIds((prev) => new Set(prev).add(goalId));
+      setFlyingOutIds((prev) => {
+        const next = new Set(prev);
+        next.delete(goalId);
+        return next;
+      });
+    }, 480);
+    startTransition(() => {
+      claimGoalRewardAction(goalId);
+    });
+  }
+
   return (
     <div
       className={[
@@ -223,48 +249,80 @@ function GoalsPanel({
         ].join(" ")}
       >
         <div className="legendarium-ornament border-b border-white/10 bg-[#0b1f22] p-6">
-          <div className="relative">
-            <div className="mb-5 flex items-start justify-between gap-4">
-              <div>
-                <p className="mb-3 text-xs font-black uppercase tracking-[0.32em] text-[#d8a342]">
-                  Цели изучения
-                </p>
-
-                <h2 className="text-3xl font-extrabold leading-tight text-[#fff8e8]">
-                  Мой маршрут
-                </h2>
-              </div>
-
-              <button
-                type="button"
-                onClick={onClose}
-                className="rounded-2xl border border-white/10 bg-white/10 px-4 py-2 text-sm font-bold text-[#fff8e8] transition hover:bg-white/16"
-              >
-                Закрыть
-              </button>
+          <div className="mb-5 flex items-start justify-between gap-4">
+            <div>
+              <p className="mb-3 text-xs font-black uppercase tracking-[0.32em] text-[#d8a342]">
+                Цели изучения
+              </p>
+              <h2 className="text-3xl font-extrabold leading-tight text-[#fff8e8]">
+                Мой маршрут
+              </h2>
             </div>
-
-            <p className="leading-7 text-[#cbbba7]">
-              Здесь отображаются активные цели, прогресс изучения материалов и
-              коллекционные карточки.
-            </p>
+            <button
+              type="button"
+              onClick={onClose}
+              className="rounded-2xl border border-white/10 bg-white/10 px-4 py-2 text-sm font-bold text-[#fff8e8] transition hover:bg-white/16"
+            >
+              Закрыть
+            </button>
           </div>
+          <p className="leading-7 text-[#cbbba7]">
+            Выполняйте задания, чтобы продвигаться по целям и получать
+            коллекционные карточки.
+          </p>
         </div>
 
         <div className="flex-1 overflow-y-auto p-6">
-          {goals.length === 0 ? (
-            <div className="rounded-3xl border border-white/10 bg-white/8 p-5 text-[#cbbba7] shadow-sm">
-              Активные цели пока не добавлены.
+          {visibleGoals.length === 0 ? (
+            <div className="rounded-3xl border border-white/10 bg-white/8 p-5 text-[#cbbba7]">
+              {goals.every((g) => g.rewardReceived || claimedIds.has(g.id))
+                ? "Все цели выполнены! Проверьте коллекцию."
+                : "Активные цели пока не добавлены."}
             </div>
           ) : (
             <div className="space-y-4">
-              {goals.map((goal) => {
+              {celebrationGoals.map((goal) => (
+                <article
+                  key={goal.id}
+                  className={[
+                    "rounded-[1.8rem] border border-[#d8a342]/50 bg-gradient-to-b from-[#1a2f18] to-[#0f1e0d] p-5 shadow-lg shadow-[#d8a342]/10",
+                    flyingOutIds.has(goal.id) ? "goal-fly-out" : "goal-celebrate",
+                  ].join(" ")}
+                >
+                  <div className="mb-3 flex items-center gap-2">
+                    <span className="text-2xl">🎉</span>
+                    <span className="text-sm font-extrabold uppercase tracking-wider text-[#d8a342]">
+                      Цель выполнена!
+                    </span>
+                  </div>
+
+                  <h3 className="mb-2 text-xl font-extrabold leading-tight text-[#fff8e8]">
+                    {goal.title}
+                  </h3>
+
+                  <p className="mb-5 text-sm text-[#cbbba7]">
+                    Ваша награда:{" "}
+                    <span className="font-extrabold text-[#d8a342]">
+                      {goal.cardTitle}
+                    </span>
+                  </p>
+
+                  <button
+                    type="button"
+                    onClick={() => handleClaimReward(goal.id)}
+                    className="w-full rounded-2xl bg-[#d8a342] px-4 py-3 text-sm font-extrabold text-[#06151a] shadow-lg shadow-[#d8a342]/30 transition hover:bg-[#f0bd5b] active:scale-95"
+                  >
+                    Забрать награду ✨
+                  </button>
+                </article>
+              ))}
+
+              {activeGoals.map((goal) => {
                 const percent =
                   goal.requiredMaterialsCount > 0
                     ? Math.min(
                         Math.round(
-                          (goal.currentProgress / goal.requiredMaterialsCount) *
-                            100
+                          (goal.currentProgress / goal.requiredMaterialsCount) * 100
                         ),
                         100
                       )
@@ -282,10 +340,6 @@ function GoalsPanel({
                       {goal.topicNames.map((name) => (
                         <span key={name} className="badge-topic">{name}</span>
                       ))}
-
-                      {goal.isCompleted && (
-                        <span className="badge-success">Выполнена</span>
-                      )}
                     </div>
 
                     <h3 className="mb-3 text-xl font-extrabold leading-tight text-[#fff8e8]">
@@ -301,44 +355,24 @@ function GoalsPanel({
                     <div className="mb-4">
                       <div className="mb-2 flex justify-between text-sm font-bold text-[#cbbba7]">
                         <span>
-                          {goal.currentProgress} из{" "}
-                          {goal.requiredMaterialsCount}
+                          {goal.currentProgress} из {goal.requiredMaterialsCount}
                         </span>
                         <span>{percent}%</span>
                       </div>
-
                       <div className="h-3 overflow-hidden rounded-full bg-white/10">
                         <div
-                          className="h-full rounded-full bg-gradient-to-r from-[#2f8f63] to-[#d8a342]"
+                          className="h-full rounded-full bg-gradient-to-r from-[#2f8f63] to-[#d8a342] transition-all duration-700"
                           style={{ width: `${percent}%` }}
                         />
                       </div>
                     </div>
 
-                    <p className="mb-5 text-sm text-[#cbbba7]">
+                    <p className="text-sm text-[#cbbba7]">
                       Награда:{" "}
                       <span className="font-extrabold text-[#fff8e8]">
                         {goal.cardTitle}
                       </span>
                     </p>
-
-                    <div className="flex flex-wrap gap-2">
-                      <Link
-                        href="/profile/progress"
-                        onClick={onClose}
-                        className="rounded-2xl bg-[#d8a342] px-4 py-2 text-sm font-extrabold !text-[#06151a] shadow-md shadow-[#d8a342]/20 transition hover:bg-[#f0bd5b]"
-                      >
-                        Подробнее
-                      </Link>
-
-                      <Link
-                        href="/profile/collection"
-                        onClick={onClose}
-                        className="rounded-2xl border border-white/10 bg-white/10 px-4 py-2 text-sm font-extrabold !text-[#fff8e8] transition hover:bg-white/16"
-                      >
-                        Коллекция
-                      </Link>
-                    </div>
                   </article>
                 );
               })}
@@ -348,11 +382,11 @@ function GoalsPanel({
 
         <div className="border-t border-white/10 bg-[#0b1f22] p-6">
           <Link
-            href="/goals"
+            href="/profile/collection"
             onClick={onClose}
             className="block w-full rounded-2xl border border-white/10 bg-white/10 px-5 py-3 text-center font-extrabold !text-[#fff8e8] transition hover:bg-white/16"
           >
-            Открыть полную страницу целей
+            Моя коллекция →
           </Link>
         </div>
       </aside>

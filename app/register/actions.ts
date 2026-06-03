@@ -1,9 +1,11 @@
 "use server";
 
 import bcrypt from "bcryptjs";
+import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
 import { prisma } from "@/lib/prisma";
 import { registerSchema } from "@/lib/schemas";
+import { AUTH_COOKIE_NAME, signSession } from "@/lib/auth";
 
 export async function registerAction(formData: FormData) {
   const result = registerSchema.safeParse({
@@ -28,7 +30,7 @@ export async function registerAction(formData: FormData) {
 
   const passwordHash = await bcrypt.hash(password, 10);
 
-  await prisma.user.create({
+  const user = await prisma.user.create({
     data: {
       name,
       email: email.toLowerCase(),
@@ -37,5 +39,13 @@ export async function registerAction(formData: FormData) {
     },
   });
 
-  redirect("/login?registered=1");
+  const cookieStore = await cookies();
+  cookieStore.set(AUTH_COOKIE_NAME, signSession(user.id), {
+    httpOnly: true,
+    sameSite: "lax",
+    path: "/",
+    maxAge: 60 * 60 * 24 * 7,
+  });
+
+  redirect("/profile");
 }

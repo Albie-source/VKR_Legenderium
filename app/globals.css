@@ -447,3 +447,26 @@ select {
   0%, 100% { box-shadow: 0 0 0 6px rgba(216, 163, 66, 0.25), 0 0 20px rgba(216, 163, 66, 0.3); }
   50% { box-shadow: 0 0 0 10px rgba(216, 163, 66, 0.15), 0 0 30px rgba(216, 163, 66, 0.45); }
 }
+
+@keyframes goalCelebrate {
+  0%   { transform: scale(1); box-shadow: 0 0 0 0 rgba(216,163,66,0); }
+  30%  { transform: scale(1.03); box-shadow: 0 0 0 8px rgba(216,163,66,0.35); }
+  60%  { transform: scale(1.01); box-shadow: 0 0 0 16px rgba(216,163,66,0.12); }
+  100% { transform: scale(1); box-shadow: 0 0 0 0 rgba(216,163,66,0); }
+}
+
+@keyframes goalFlyOut {
+  0%   { opacity: 1; transform: scale(1) translateX(0); max-height: 400px; margin-bottom: 1rem; }
+  40%  { opacity: 0; transform: scale(0.92) translateX(40px); }
+  100% { opacity: 0; transform: scale(0.92) translateX(40px); max-height: 0; margin-bottom: 0; }
+}
+
+.goal-celebrate {
+  animation: goalCelebrate 0.7s ease-out both;
+}
+
+.goal-fly-out {
+  animation: goalFlyOut 0.5s ease-in both;
+  overflow: hidden;
+  pointer-events: none;
+}

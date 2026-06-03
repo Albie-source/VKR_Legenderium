@@ -194,7 +194,7 @@ export async function saveTaskResultAction(
         update: {
           currentProgress: newProgress,
           isCompleted: isGoalCompleted,
-          rewardReceived: isGoalCompleted,
+          rewardReceived: false,
           completedAt: isGoalCompleted ? new Date() : null,
         },
         create: {
@@ -202,7 +202,7 @@ export async function saveTaskResultAction(
           goalId: goal.id,
           currentProgress: newProgress,
           isCompleted: isGoalCompleted,
-          rewardReceived: isGoalCompleted,
+          rewardReceived: false,
           completedAt: isGoalCompleted ? new Date() : null,
         },
       });

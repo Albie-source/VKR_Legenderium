@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { Manrope, Playfair_Display } from "next/font/google";
 import Header from "@/components/Header";
+import Footer from "@/components/Footer";
 import OnboardingFlow from "@/components/OnboardingFlow";
 import PageTransition from "@/components/PageTransition";
 import "./globals.css";
@@ -29,10 +30,11 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="ru">
-      <body className={`${manrope.variable} ${playfair.variable}`}>
+      <body className={`${manrope.variable} ${playfair.variable} flex min-h-screen flex-col`}>
         <Header />
         <PageTransition>{children}</PageTransition>
         <OnboardingFlow />
+        <Footer />
       </body>
     </html>
   );

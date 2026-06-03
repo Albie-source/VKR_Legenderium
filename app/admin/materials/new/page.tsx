@@ -3,6 +3,7 @@ import { requireAdmin } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { createMaterialAction } from "./actions";
 import MediaUploadField from "@/app/admin/materials/MediaUploadField";
+import CoordPicker from "@/app/admin/materials/CoordPicker";
 
 export default async function NewMaterialPage() {
   await requireAdmin();
@@ -123,35 +124,7 @@ export default async function NewMaterialPage() {
             </div>
           </div>
 
-          <div className="grid gap-4 md:grid-cols-2">
-            <div>
-              <label className="mb-2 block text-sm font-medium text-stone-700">
-                Широта
-              </label>
-
-              <input
-                name="latitude"
-                type="number"
-                step="any"
-                placeholder="50.2907"
-                className="w-full rounded-xl border border-stone-300 px-4 py-3 outline-none transition focus:border-amber-700"
-              />
-            </div>
-
-            <div>
-              <label className="mb-2 block text-sm font-medium text-stone-700">
-                Долгота
-              </label>
-
-              <input
-                name="longitude"
-                type="number"
-                step="any"
-                placeholder="127.5272"
-                className="w-full rounded-xl border border-stone-300 px-4 py-3 outline-none transition focus:border-amber-700"
-              />
-            </div>
-          </div>
+          <CoordPicker />
 
           <div className="grid gap-4 md:grid-cols-3">
             <MediaUploadField
