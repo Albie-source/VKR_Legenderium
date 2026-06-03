@@ -50,11 +50,20 @@ export default function Footer() {
             <p className="mb-4 text-xs font-extrabold uppercase tracking-[0.2em] text-[#d8a342]">
               О проекте
             </p>
-            <p className="text-sm leading-7 text-[#cbbba7]">
+            <p className="mb-4 text-sm leading-7 text-[#cbbba7]">
               Проект создан в рамках выпускной квалификационной работы.
               Платформа объединяет академические материалы и современные
               интерактивные технологии для популяризации народного творчества.
             </p>
+            <p className="text-xs font-extrabold uppercase tracking-[0.2em] text-[#d8a342]">
+              Связь с администратором
+            </p>
+            <a
+              href="mailto:zagrevsckaya.albina@yandex.ru"
+              className="mt-2 block text-sm text-[#cbbba7] transition hover:text-[#d8a342]"
+            >
+              zagrevsckaya.albina@yandex.ru
+            </a>
           </div>
         </div>
 
