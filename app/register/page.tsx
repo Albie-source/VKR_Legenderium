@@ -16,9 +16,11 @@ export default async function RegisterPage({
   const errorMessage =
     params.error === "exists"
       ? "Пользователь с таким email уже существует."
-      : params.error === "1"
-        ? "Проверьте заполнение полей. Пароль должен быть не короче 6 символов."
-        : null;
+      : params.error === "consent"
+        ? "Необходимо принять политику конфиденциальности."
+        : params.error === "1"
+          ? "Проверьте заполнение полей. Пароль должен быть не короче 6 символов."
+          : null;
 
   return (
     <main className="min-h-screen overflow-hidden bg-[#07181c] text-[#fff8e8]">
@@ -88,6 +90,26 @@ export default async function RegisterPage({
                 placeholder="Минимум 6 символов"
               />
             </div>
+
+            <label className="flex items-start gap-3 cursor-pointer">
+              <input
+                name="consent"
+                type="checkbox"
+                required
+                className="mt-0.5 h-4 w-4 shrink-0 accent-[#d8a342]"
+              />
+              <span className="text-sm leading-6 text-stone-600">
+                Я принимаю{" "}
+                <Link
+                  href="/privacy"
+                  target="_blank"
+                  className="font-extrabold !text-[#8a5418] underline-offset-4 hover:underline"
+                >
+                  Политику конфиденциальности
+                </Link>{" "}
+                и даю согласие на обработку персональных данных
+              </span>
+            </label>
 
             <button
               type="submit"

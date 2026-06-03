@@ -58,8 +58,11 @@ export default function Footer() {
           </div>
         </div>
 
-        <div className="mt-10 border-t border-white/10 pt-6 text-center text-xs text-[#cbbba7]">
-          © {new Date().getFullYear()} Легендариум — Фольклор народов России
+        <div className="mt-10 flex flex-col items-center gap-2 border-t border-white/10 pt-6 text-center text-xs text-[#cbbba7]">
+          <Link href="/privacy" className="transition hover:text-[#d8a342]">
+            Политика конфиденциальности
+          </Link>
+          <span>© {new Date().getFullYear()} Легендариум — Фольклор народов России</span>
         </div>
       </div>
     </footer>

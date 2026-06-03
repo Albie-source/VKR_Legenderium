@@ -8,6 +8,11 @@ import { registerSchema } from "@/lib/schemas";
 import { AUTH_COOKIE_NAME, signSession } from "@/lib/auth";
 
 export async function registerAction(formData: FormData) {
+  const consent = formData.get("consent");
+  if (!consent) {
+    redirect("/register?error=consent");
+  }
+
   const result = registerSchema.safeParse({
     name: formData.get("name") ?? "",
     email: formData.get("email") ?? "",
