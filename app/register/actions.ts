@@ -47,5 +47,5 @@ export async function registerAction(formData: FormData) {
     maxAge: 60 * 60 * 24 * 7,
   });
 
-  redirect("/profile");
+  redirect("/");
 }
