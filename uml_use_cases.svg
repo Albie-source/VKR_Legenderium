@@ -1,0 +1,298 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1500 1080" font-family="Arial, sans-serif" font-size="11">
+  <rect width="1500" height="1080" fill="#fafaf8"/>
+
+  <!-- Title -->
+  <text x="750" y="32" text-anchor="middle" font-size="18" font-weight="bold" fill="#2c1a0e">Диаграмма вариантов использования — Легендариум</text>
+
+  <!-- ══════════════ SYSTEM BOUNDARY ══════════════ -->
+  <rect x="220" y="50" width="1060" height="1010" rx="8" fill="none" stroke="#8b6914" stroke-width="2" stroke-dasharray="8,4"/>
+  <text x="750" y="72" text-anchor="middle" font-size="13" font-weight="bold" fill="#8b6914">«система» Легендариум</text>
+
+  <!-- ══════════════ ACTORS ══════════════ -->
+  <!-- Гость -->
+  <g id="actor-guest">
+    <circle cx="80" cy="200" r="18" fill="none" stroke="#444" stroke-width="2"/>
+    <line x1="80" y1="218" x2="80" y2="270" stroke="#444" stroke-width="2"/>
+    <line x1="50" y1="240" x2="110" y2="240" stroke="#444" stroke-width="2"/>
+    <line x1="80" y1="270" x2="55" y2="305" stroke="#444" stroke-width="2"/>
+    <line x1="80" y1="270" x2="105" y2="305" stroke="#444" stroke-width="2"/>
+    <text x="80" y="322" text-anchor="middle" font-size="12" font-weight="bold" fill="#222">Гость</text>
+  </g>
+
+  <!-- Пользователь -->
+  <g id="actor-user">
+    <circle cx="80" cy="530" r="18" fill="none" stroke="#1a5c8a" stroke-width="2"/>
+    <line x1="80" y1="548" x2="80" y2="600" stroke="#1a5c8a" stroke-width="2"/>
+    <line x1="50" y1="570" x2="110" y2="570" stroke="#1a5c8a" stroke-width="2"/>
+    <line x1="80" y1="600" x2="55" y2="635" stroke="#1a5c8a" stroke-width="2"/>
+    <line x1="80" y1="600" x2="105" y2="635" stroke="#1a5c8a" stroke-width="2"/>
+    <text x="80" y="652" text-anchor="middle" font-size="12" font-weight="bold" fill="#1a5c8a">Пользователь</text>
+  </g>
+
+  <!-- Администратор -->
+  <g id="actor-admin">
+    <circle cx="80" cy="870" r="18" fill="none" stroke="#8b1a1a" stroke-width="2"/>
+    <line x1="80" y1="888" x2="80" y2="940" stroke="#8b1a1a" stroke-width="2"/>
+    <line x1="50" y1="910" x2="110" y2="910" stroke="#8b1a1a" stroke-width="2"/>
+    <line x1="80" y1="940" x2="55" y2="975" stroke="#8b1a1a" stroke-width="2"/>
+    <line x1="80" y1="940" x2="105" y2="975" stroke="#8b1a1a" stroke-width="2"/>
+    <text x="80" y="992" text-anchor="middle" font-size="12" font-weight="bold" fill="#8b1a1a">Администратор</text>
+  </g>
+
+  <!-- Actor inheritance arrows (hollow triangle, pointing UP) -->
+  <!-- Пользователь inherits Гость -->
+  <line x1="80" y1="512" x2="80" y2="330" stroke="#444" stroke-width="1.5" stroke-dasharray="none"/>
+  <polygon points="80,320 73,340 87,340" fill="white" stroke="#444" stroke-width="1.5"/>
+  <text x="92" y="425" font-size="9" fill="#666">расширяет</text>
+
+  <!-- Администратор inherits Пользователь -->
+  <line x1="80" y1="852" x2="80" y2="660" stroke="#1a5c8a" stroke-width="1.5"/>
+  <polygon points="80,650 73,670 87,670" fill="white" stroke="#1a5c8a" stroke-width="1.5"/>
+  <text x="92" y="758" font-size="9" fill="#666">расширяет</text>
+
+  <!-- ══════════════ GROUP BOXES ══════════════ -->
+  <!-- Просмотр контента -->
+  <rect x="235" y="85" width="310" height="310" rx="6" fill="#fff8e8" stroke="#d8a342" stroke-width="1.5"/>
+  <text x="390" y="102" text-anchor="middle" font-size="11" font-weight="bold" fill="#8b6914">Просмотр контента</text>
+
+  <!-- Поиск -->
+  <rect x="560" y="85" width="230" height="130" rx="6" fill="#f0f8ff" stroke="#4a90a4" stroke-width="1.5"/>
+  <text x="675" y="102" text-anchor="middle" font-size="11" font-weight="bold" fill="#2a607a">Поиск и навигация</text>
+
+  <!-- Аутентификация -->
+  <rect x="805" y="85" width="260" height="200" rx="6" fill="#fff0f0" stroke="#c0392b" stroke-width="1.5"/>
+  <text x="935" y="102" text-anchor="middle" font-size="11" font-weight="bold" fill="#8b1a1a">Аутентификация</text>
+
+  <!-- Задания -->
+  <rect x="235" y="415" width="310" height="200" rx="6" fill="#f0fff0" stroke="#2f8f63" stroke-width="1.5"/>
+  <text x="390" y="432" text-anchor="middle" font-size="11" font-weight="bold" fill="#1a5c3a">Задания</text>
+
+  <!-- Профиль и геймификация -->
+  <rect x="560" y="235" width="480" height="380" rx="6" fill="#f5f0ff" stroke="#7b52ab" stroke-width="1.5"/>
+  <text x="800" y="252" text-anchor="middle" font-size="11" font-weight="bold" fill="#4a2080">Профиль и геймификация</text>
+
+  <!-- Администрирование -->
+  <rect x="235" y="635" width="830" height="400" rx="6" fill="#fff5f0" stroke="#c0522b" stroke-width="1.5"/>
+  <text x="650" y="652" text-anchor="middle" font-size="11" font-weight="bold" fill="#8b2a0e">Администрирование</text>
+
+  <!-- ══════════════ USE CASES ══════════════ -->
+
+  <!-- КОНТЕНТ -->
+  <ellipse cx="390" cy="128" rx="90" ry="18" fill="white" stroke="#d8a342" stroke-width="1.5"/>
+  <text x="390" y="132" text-anchor="middle" font-size="10">Просмотр главной страницы</text>
+
+  <ellipse cx="390" cy="170" rx="90" ry="18" fill="white" stroke="#d8a342" stroke-width="1.5"/>
+  <text x="390" y="174" text-anchor="middle" font-size="10">Просмотр библиотеки</text>
+
+  <ellipse cx="390" cy="212" rx="90" ry="18" fill="white" stroke="#d8a342" stroke-width="1.5"/>
+  <text x="390" y="216" text-anchor="middle" font-size="10">Просмотр карточки материала</text>
+
+  <ellipse cx="390" cy="254" rx="90" ry="18" fill="white" stroke="#d8a342" stroke-width="1.5"/>
+  <text x="390" y="258" text-anchor="middle" font-size="10">Просмотр полного текста</text>
+
+  <ellipse cx="390" cy="296" rx="90" ry="18" fill="white" stroke="#d8a342" stroke-width="1.5"/>
+  <text x="390" y="300" text-anchor="middle" font-size="10">Просмотр мультимедиа</text>
+
+  <ellipse cx="390" cy="338" rx="90" ry="18" fill="white" stroke="#d8a342" stroke-width="1.5"/>
+  <text x="390" y="342" text-anchor="middle" font-size="10">Озвучка текста (TTS)</text>
+
+  <ellipse cx="390" cy="376" rx="90" ry="18" fill="white" stroke="#d8a342" stroke-width="1.5"/>
+  <text x="390" y="380" text-anchor="middle" font-size="10">Просмотр интерактивной карты</text>
+
+  <!-- ПОИСК -->
+  <ellipse cx="675" cy="128" rx="85" ry="18" fill="white" stroke="#4a90a4" stroke-width="1.5"/>
+  <text x="675" y="132" text-anchor="middle" font-size="10">Поиск материалов</text>
+
+  <ellipse cx="675" cy="170" rx="85" ry="18" fill="white" stroke="#4a90a4" stroke-width="1.5"/>
+  <text x="675" y="174" text-anchor="middle" font-size="10">Фильтрация материалов</text>
+
+  <!-- АУТЕНТИФИКАЦИЯ -->
+  <ellipse cx="935" cy="128" rx="100" ry="18" fill="white" stroke="#c0392b" stroke-width="1.5"/>
+  <text x="935" y="132" text-anchor="middle" font-size="10">Регистрация</text>
+
+  <ellipse cx="935" cy="158" rx="100" ry="18" fill="white" stroke="#c0392b" stroke-width="1.5"/>
+  <text x="935" y="162" text-anchor="middle" font-size="10">Вход в систему</text>
+
+  <ellipse cx="935" cy="188" rx="100" ry="18" fill="white" stroke="#c0392b" stroke-width="1.5"/>
+  <text x="935" y="192" text-anchor="middle" font-size="10">Выход из системы</text>
+
+  <ellipse cx="935" cy="218" rx="100" ry="18" fill="white" stroke="#c0392b" stroke-width="1.5"/>
+  <text x="935" y="222" text-anchor="middle" font-size="10">Онбординг / Веб-новелла</text>
+
+  <ellipse cx="935" cy="248" rx="100" ry="18" fill="white" stroke="#c0392b" stroke-width="1.5"/>
+  <text x="935" y="252" text-anchor="middle" font-size="10">Политика конфиденциальности</text>
+
+  <!-- ЗАДАНИЯ -->
+  <ellipse cx="390" cy="460" rx="95" ry="18" fill="white" stroke="#2f8f63" stroke-width="1.5"/>
+  <text x="390" y="464" text-anchor="middle" font-size="10">Просмотр списка заданий</text>
+
+  <ellipse cx="390" cy="500" rx="95" ry="18" fill="white" stroke="#2f8f63" stroke-width="1.5"/>
+  <text x="390" y="504" text-anchor="middle" font-size="10">Выполнение задания</text>
+
+  <ellipse cx="390" cy="540" rx="95" ry="18" fill="white" stroke="#2f8f63" stroke-width="1.5"/>
+  <text x="390" y="544" text-anchor="middle" font-size="10">Проверка результата</text>
+
+  <ellipse cx="390" cy="580" rx="95" ry="18" fill="white" stroke="#2f8f63" stroke-width="1.5"/>
+  <text x="390" y="584" text-anchor="middle" font-size="10">Сохранение результата</text>
+
+  <!-- ПРОФИЛЬ -->
+  <ellipse cx="690" cy="280" rx="95" ry="18" fill="white" stroke="#7b52ab" stroke-width="1.5"/>
+  <text x="690" y="284" text-anchor="middle" font-size="10">Просмотр профиля</text>
+
+  <ellipse cx="690" cy="318" rx="95" ry="18" fill="white" stroke="#7b52ab" stroke-width="1.5"/>
+  <text x="690" y="322" text-anchor="middle" font-size="10">Управление избранным</text>
+
+  <ellipse cx="690" cy="356" rx="95" ry="18" fill="white" stroke="#7b52ab" stroke-width="1.5"/>
+  <text x="690" y="360" text-anchor="middle" font-size="10">История попыток</text>
+
+  <ellipse cx="690" cy="394" rx="95" ry="18" fill="white" stroke="#7b52ab" stroke-width="1.5"/>
+  <text x="690" y="398" text-anchor="middle" font-size="10">Работа с целями</text>
+
+  <ellipse cx="690" cy="432" rx="95" ry="18" fill="white" stroke="#7b52ab" stroke-width="1.5"/>
+  <text x="690" y="436" text-anchor="middle" font-size="10">Просмотр коллекции карточек</text>
+
+  <ellipse cx="690" cy="470" rx="95" ry="18" fill="white" stroke="#7b52ab" stroke-width="1.5"/>
+  <text x="690" y="474" text-anchor="middle" font-size="10">Получение карточки-награды</text>
+
+  <ellipse cx="690" cy="508" rx="95" ry="18" fill="white" stroke="#7b52ab" stroke-width="1.5"/>
+  <text x="690" y="512" text-anchor="middle" font-size="10">Панель активных целей</text>
+
+  <ellipse cx="910" cy="356" rx="100" ry="18" fill="white" stroke="#7b52ab" stroke-width="1.5"/>
+  <text x="910" y="360" text-anchor="middle" font-size="10">Интерактивный тур по интерфейсу</text>
+
+  <!-- АДМИНИСТРИРОВАНИЕ -->
+  <ellipse cx="360" cy="690" rx="100" ry="18" fill="white" stroke="#c0522b" stroke-width="1.5"/>
+  <text x="360" y="694" text-anchor="middle" font-size="10">Панель администратора</text>
+
+  <ellipse cx="360" cy="740" rx="100" ry="18" fill="white" stroke="#c0522b" stroke-width="1.5"/>
+  <text x="360" y="744" text-anchor="middle" font-size="10">Управление материалами</text>
+
+  <ellipse cx="360" cy="790" rx="100" ry="18" fill="white" stroke="#c0522b" stroke-width="1.5"/>
+  <text x="360" y="794" text-anchor="middle" font-size="10">Загрузка медиафайлов</text>
+
+  <ellipse cx="360" cy="840" rx="100" ry="18" fill="white" stroke="#c0522b" stroke-width="1.5"/>
+  <text x="360" y="844" text-anchor="middle" font-size="10">Выбор координат на карте</text>
+
+  <ellipse cx="600" cy="690" rx="100" ry="18" fill="white" stroke="#c0522b" stroke-width="1.5"/>
+  <text x="600" y="694" text-anchor="middle" font-size="10">Управление заданиями</text>
+
+  <ellipse cx="600" cy="740" rx="100" ry="18" fill="white" stroke="#c0522b" stroke-width="1.5"/>
+  <text x="600" y="744" text-anchor="middle" font-size="10">Управление целями</text>
+
+  <ellipse cx="600" cy="790" rx="100" ry="18" fill="white" stroke="#c0522b" stroke-width="1.5"/>
+  <text x="600" y="794" text-anchor="middle" font-size="10">Управление карточками</text>
+
+  <ellipse cx="600" cy="840" rx="100" ry="18" fill="white" stroke="#c0522b" stroke-width="1.5"/>
+  <text x="600" y="844" text-anchor="middle" font-size="10">Управление справочниками</text>
+
+  <ellipse cx="870" cy="715" rx="110" ry="18" fill="white" stroke="#c0522b" stroke-width="1.5" stroke-dasharray="5,3"/>
+  <text x="870" y="712" text-anchor="middle" font-size="10">«include»</text>
+  <text x="870" y="723" text-anchor="middle" font-size="10">Загрузка файла при сохранении</text>
+
+  <!-- ══════════════ ACTOR → USE CASE LINES ══════════════ -->
+
+  <!-- ГОСТЬ → контент -->
+  <line x1="98" y1="210" x2="298" y2="128" stroke="#444" stroke-width="1"/>
+  <line x1="98" y1="215" x2="298" y2="170" stroke="#444" stroke-width="1"/>
+  <line x1="98" y1="218" x2="298" y2="212" stroke="#444" stroke-width="1"/>
+  <line x1="98" y1="220" x2="298" y2="254" stroke="#444" stroke-width="1"/>
+  <line x1="98" y1="222" x2="298" y2="296" stroke="#444" stroke-width="1"/>
+  <line x1="98" y1="224" x2="298" y2="338" stroke="#444" stroke-width="1"/>
+  <line x1="98" y1="226" x2="298" y2="376" stroke="#444" stroke-width="1"/>
+  <!-- ГОСТЬ → поиск -->
+  <line x1="98" y1="208" x2="588" y2="128" stroke="#444" stroke-width="1"/>
+  <line x1="98" y1="208" x2="588" y2="170" stroke="#444" stroke-width="1"/>
+  <!-- ГОСТЬ → аутентификация (только рег, вход, онб, полит) -->
+  <line x1="98" y1="206" x2="833" y2="128" stroke="#444" stroke-width="1"/>
+  <line x1="98" y1="206" x2="833" y2="158" stroke="#444" stroke-width="1"/>
+  <line x1="98" y1="205" x2="833" y2="218" stroke="#444" stroke-width="1"/>
+  <line x1="98" y1="205" x2="833" y2="248" stroke="#444" stroke-width="1"/>
+  <!-- ГОСТЬ → задания (просмотр + выполнение + проверка) -->
+  <line x1="98" y1="228" x2="293" y2="460" stroke="#444" stroke-width="1"/>
+  <line x1="98" y1="230" x2="293" y2="500" stroke="#444" stroke-width="1"/>
+  <line x1="98" y1="232" x2="293" y2="540" stroke="#444" stroke-width="1"/>
+
+  <!-- ПОЛЬЗОВАТЕЛЬ → выход -->
+  <line x1="98" y1="535" x2="833" y2="188" stroke="#1a5c8a" stroke-width="1"/>
+  <!-- ПОЛЬЗОВАТЕЛЬ → сохранение -->
+  <line x1="98" y1="545" x2="293" y2="580" stroke="#1a5c8a" stroke-width="1"/>
+  <!-- ПОЛЬЗОВАТЕЛЬ → профиль -->
+  <line x1="98" y1="540" x2="593" y2="280" stroke="#1a5c8a" stroke-width="1"/>
+  <line x1="98" y1="542" x2="593" y2="318" stroke="#1a5c8a" stroke-width="1"/>
+  <line x1="98" y1="544" x2="593" y2="356" stroke="#1a5c8a" stroke-width="1"/>
+  <line x1="98" y1="546" x2="593" y2="394" stroke="#1a5c8a" stroke-width="1"/>
+  <line x1="98" y1="548" x2="593" y2="432" stroke="#1a5c8a" stroke-width="1"/>
+  <line x1="98" y1="550" x2="593" y2="470" stroke="#1a5c8a" stroke-width="1"/>
+  <line x1="98" y1="552" x2="593" y2="508" stroke="#1a5c8a" stroke-width="1"/>
+  <line x1="98" y1="538" x2="808" y2="356" stroke="#1a5c8a" stroke-width="1"/>
+
+  <!-- АДМИНИСТРАТОР → admin group -->
+  <line x1="98" y1="875" x2="258" y2="690" stroke="#8b1a1a" stroke-width="1"/>
+  <line x1="98" y1="877" x2="258" y2="740" stroke="#8b1a1a" stroke-width="1"/>
+  <line x1="98" y1="879" x2="258" y2="790" stroke="#8b1a1a" stroke-width="1"/>
+  <line x1="98" y1="881" x2="258" y2="840" stroke="#8b1a1a" stroke-width="1"/>
+  <line x1="98" y1="883" x2="498" y2="690" stroke="#8b1a1a" stroke-width="1"/>
+  <line x1="98" y1="885" x2="498" y2="740" stroke="#8b1a1a" stroke-width="1"/>
+  <line x1="98" y1="887" x2="498" y2="790" stroke="#8b1a1a" stroke-width="1"/>
+  <line x1="98" y1="889" x2="498" y2="840" stroke="#8b1a1a" stroke-width="1"/>
+
+  <!-- include: Управление материалами → Загрузка медиафайлов -->
+  <line x1="460" y1="740" x2="760" y2="715" stroke="#555" stroke-width="1" stroke-dasharray="5,3"/>
+  <text x="600" y="726" text-anchor="middle" font-size="9" fill="#555">«include»</text>
+  <polygon points="760,715 748,710 748,720" fill="#555"/>
+
+  <!-- include: Управление материалами → Выбор координат -->
+  <line x1="360" y1="758" x2="360" y2="820" stroke="#555" stroke-width="1" stroke-dasharray="5,3"/>
+  <text x="378" y="792" font-size="9" fill="#555">«include»</text>
+  <polygon points="360,822 355,810 365,810" fill="#555"/>
+
+  <!-- extend: Выполнение → Сохранение -->
+  <line x1="390" y1="518" x2="390" y2="560" stroke="#2f8f63" stroke-width="1" stroke-dasharray="5,3"/>
+  <text x="408" y="542" font-size="9" fill="#2f8f63">«extend»</text>
+  <polygon points="390,562 385,550 395,550" fill="#2f8f63"/>
+
+  <!-- extend: Работа с целями → Получение карточки -->
+  <line x1="690" y1="412" x2="690" y2="450" stroke="#7b52ab" stroke-width="1" stroke-dasharray="5,3"/>
+  <polygon points="690,452 685,440 695,440" fill="#7b52ab"/>
+
+  <!-- ══════════════ LEGEND ══════════════ -->
+  <rect x="1090" y="85" width="195" height="200" rx="6" fill="white" stroke="#aaa" stroke-width="1"/>
+  <text x="1187" y="105" text-anchor="middle" font-size="11" font-weight="bold" fill="#333">Обозначения</text>
+
+  <line x1="1105" y1="125" x2="1160" y2="125" stroke="#444" stroke-width="1.5"/>
+  <text x="1168" y="129" font-size="10" fill="#333">Ассоциация</text>
+
+  <line x1="1105" y1="150" x2="1160" y2="150" stroke="#444" stroke-width="1.5" stroke-dasharray="5,3"/>
+  <polygon points="1160,150 1148,145 1148,155" fill="#444"/>
+  <text x="1168" y="154" font-size="10" fill="#333">«include»/«extend»</text>
+
+  <line x1="1130" y1="175" x2="1130" y2="195" stroke="#444" stroke-width="1.5"/>
+  <polygon points="1130,172 1123,188 1137,188" fill="white" stroke="#444" stroke-width="1.5"/>
+  <text x="1168" y="186" font-size="10" fill="#333">Наследование</text>
+
+  <ellipse cx="1133" cy="222" rx="28" ry="12" fill="white" stroke="#d8a342" stroke-width="1.5"/>
+  <text x="1133" y="226" text-anchor="middle" font-size="9">Вариант</text>
+  <text x="1175" y="226" font-size="10" fill="#333">Вариант использования</text>
+
+  <circle cx="1133" cy="258" r="13" fill="none" stroke="#444" stroke-width="1.5"/>
+  <line x1="1133" y1="271" x2="1133" y2="288" stroke="#444" stroke-width="1.5"/>
+  <line x1="1115" y1="278" x2="1151" y2="278" stroke="#444" stroke-width="1.5"/>
+  <text x="1175" y="263" font-size="10" fill="#333">Актор</text>
+
+  <!-- Color legend -->
+  <rect x="1090" y="310" width="195" height="160" rx="6" fill="white" stroke="#aaa" stroke-width="1"/>
+  <text x="1187" y="330" text-anchor="middle" font-size="11" font-weight="bold" fill="#333">Группы</text>
+  <rect x="1105" y="342" width="14" height="10" fill="#fff8e8" stroke="#d8a342"/>
+  <text x="1126" y="352" font-size="10" fill="#333">Просмотр контента</text>
+  <rect x="1105" y="362" width="14" height="10" fill="#f0f8ff" stroke="#4a90a4"/>
+  <text x="1126" y="372" font-size="10" fill="#333">Поиск и навигация</text>
+  <rect x="1105" y="382" width="14" height="10" fill="#fff0f0" stroke="#c0392b"/>
+  <text x="1126" y="392" font-size="10" fill="#333">Аутентификация</text>
+  <rect x="1105" y="402" width="14" height="10" fill="#f0fff0" stroke="#2f8f63"/>
+  <text x="1126" y="412" font-size="10" fill="#333">Задания</text>
+  <rect x="1105" y="422" width="14" height="10" fill="#f5f0ff" stroke="#7b52ab"/>
+  <text x="1126" y="432" font-size="10" fill="#333">Профиль / Геймификация</text>
+  <rect x="1105" y="442" width="14" height="10" fill="#fff5f0" stroke="#c0522b"/>
+  <text x="1126" y="452" font-size="10" fill="#333">Администрирование</text>
+
+</svg>
