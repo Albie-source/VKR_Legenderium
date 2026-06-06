@@ -2,19 +2,37 @@
 
 import { useEffect, useRef, useState } from "react";
 
+const AMBIENT_SRC = "/sounds/ambient-fire.mp3";
+const AMBIENT_VOLUME = 0.18;
+
 type State = "idle" | "loading" | "playing" | "paused" | "error";
 
 export default function TtsPlayer({ text }: { text: string }) {
   const [state, setState] = useState<State>("idle");
   const [progress, setProgress] = useState(0);
   const audioRef = useRef<HTMLAudioElement | null>(null);
+  const ambientRef = useRef<HTMLAudioElement | null>(null);
   const blobUrlRef = useRef<string | null>(null);
 
   useEffect(() => {
+    const ambient = new Audio(AMBIENT_SRC);
+    ambient.loop = true;
+    ambient.volume = AMBIENT_VOLUME;
+    ambientRef.current = ambient;
+
     return () => {
+      ambient.pause();
       if (blobUrlRef.current) URL.revokeObjectURL(blobUrlRef.current);
     };
   }, []);
+
+  function ambientPlay() {
+    ambientRef.current?.play().catch(() => {});
+  }
+
+  function ambientPause() {
+    ambientRef.current?.pause();
+  }
 
   async function loadAndPlay() {
     setState("loading");
@@ -39,13 +57,16 @@ export default function TtsPlayer({ text }: { text: string }) {
         if (audio.duration) setProgress(audio.currentTime / audio.duration);
       });
       audio.addEventListener("ended", () => {
+        ambientPause();
         setState("idle");
         setProgress(0);
       });
 
+      ambientPlay();
       await audio.play();
       setState("playing");
     } catch {
+      ambientPause();
       setState("error");
     }
   }
@@ -55,8 +76,10 @@ export default function TtsPlayer({ text }: { text: string }) {
     if (!audio) { loadAndPlay(); return; }
     if (state === "playing") {
       audio.pause();
+      ambientPause();
       setState("paused");
     } else {
+      ambientPlay();
       audio.play().then(() => setState("playing")).catch(() => setState("error"));
     }
   }
@@ -64,6 +87,7 @@ export default function TtsPlayer({ text }: { text: string }) {
   function stop() {
     const audio = audioRef.current;
     if (audio) { audio.pause(); audio.currentTime = 0; }
+    ambientPause();
     setState("idle");
     setProgress(0);
   }
