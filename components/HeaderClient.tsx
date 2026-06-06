@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { useState, useTransition, type ReactNode } from "react";
+import { usePathname } from "next/navigation";
 import { claimGoalRewardAction } from "@/app/goals/claimRewardAction";
 
 type HeaderUser = {
@@ -30,6 +31,8 @@ type HeaderClientProps = {
 
 export default function HeaderClient({ user, goals }: HeaderClientProps) {
   const [isGoalsOpen, setIsGoalsOpen] = useState(false);
+  const pathname = usePathname();
+  const loginHref = `/login?next=${encodeURIComponent(pathname)}`;
 
   return (
     <>
@@ -80,7 +83,7 @@ export default function HeaderClient({ user, goals }: HeaderClientProps) {
             </Link>
           ) : (
             <Link
-              href="/login"
+              href={loginHref}
               className="rounded-2xl bg-[#d8a342] px-5 py-3 text-sm font-extrabold !text-[#06151a] shadow-md transition hover:bg-[#f0bd5b]"
             >
               Войти
