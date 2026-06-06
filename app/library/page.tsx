@@ -7,7 +7,7 @@ import LibraryPagination from "./LibraryPagination";
 import MascotHint from "@/components/MascotHint";
 
 const PAGE_SIZE = 12;
-const TRGM_THRESHOLD = 0.15;
+const TRGM_THRESHOLD = 0.3;
 
 type LibraryPageProps = {
   searchParams: Promise<{
