@@ -7,6 +7,7 @@ import LibraryPagination from "./LibraryPagination";
 import MascotHint from "@/components/MascotHint";
 
 const PAGE_SIZE = 12;
+const TRGM_THRESHOLD = 0.15;
 
 type LibraryPageProps = {
   searchParams: Promise<{
@@ -19,6 +20,61 @@ type LibraryPageProps = {
   }>;
 };
 
+async function trigramSearch(
+  search: string,
+  regionId: number,
+  peopleId: number,
+  genreId: number,
+  topicId: number,
+): Promise<number[]> {
+  const conditions: Prisma.Sql[] = [
+    Prisma.sql`m.status = 'PUBLISHED'`,
+    Prisma.sql`(
+      word_similarity(${search}, m.title) > ${TRGM_THRESHOLD}
+      OR word_similarity(${search}, COALESCE(m."shortDescription", '')) > ${TRGM_THRESHOLD}
+      OR word_similarity(${search}, COALESCE(m."fullText", '')) > ${TRGM_THRESHOLD}
+      OR word_similarity(${search}, r.name) > ${TRGM_THRESHOLD}
+      OR word_similarity(${search}, p.name) > ${TRGM_THRESHOLD}
+      OR word_similarity(${search}, g.name) > ${TRGM_THRESHOLD}
+    )`,
+  ];
+
+  if (!Number.isNaN(regionId))
+    conditions.push(Prisma.sql`m."regionId" = ${regionId}`);
+  if (!Number.isNaN(peopleId))
+    conditions.push(Prisma.sql`m."peopleId" = ${peopleId}`);
+  if (!Number.isNaN(genreId))
+    conditions.push(Prisma.sql`m."genreId" = ${genreId}`);
+  if (!Number.isNaN(topicId))
+    conditions.push(
+      Prisma.sql`EXISTS (
+        SELECT 1 FROM material_topics mt
+        WHERE mt."materialId" = m.id AND mt."topicId" = ${topicId}
+      )`,
+    );
+
+  const rows = await prisma.$queryRaw<{ id: bigint }[]>(
+    Prisma.sql`
+      SELECT DISTINCT m.id,
+        GREATEST(
+          word_similarity(${search}, m.title),
+          word_similarity(${search}, COALESCE(m."shortDescription", '')),
+          word_similarity(${search}, r.name),
+          word_similarity(${search}, p.name),
+          word_similarity(${search}, g.name)
+        ) AS score
+      FROM materials m
+      JOIN regions r ON m."regionId" = r.id
+      JOIN peoples p ON m."peopleId" = p.id
+      JOIN genres  g ON m."genreId"  = g.id
+      WHERE ${Prisma.join(conditions, " AND ")}
+      ORDER BY score DESC
+    `,
+  );
+
+  return rows.map((r) => Number(r.id));
+}
+
 export default async function LibraryPage({ searchParams }: LibraryPageProps) {
   const params = await searchParams;
 
@@ -27,96 +83,73 @@ export default async function LibraryPage({ searchParams }: LibraryPageProps) {
   const peopleId = params.people ? Number(params.people) : NaN;
   const genreId = params.genre ? Number(params.genre) : NaN;
   const topicId = params.topic ? Number(params.topic) : NaN;
-
   const currentPage = Math.max(1, Number(params.page) || 1);
 
-  const where: Prisma.MaterialWhereInput = {
-    status: "PUBLISHED",
-  };
-
+  // --- Trigram search path ---
+  let trgmIds: number[] | null = null;
   if (search) {
-    where.OR = [
-      {
-        title: {
-          contains: search,
-          mode: "insensitive",
-        },
-      },
-      {
-        shortDescription: {
-          contains: search,
-          mode: "insensitive",
-        },
-      },
-      {
-        fullText: {
-          contains: search,
-          mode: "insensitive",
-        },
-      },
-    ];
+    trgmIds = await trigramSearch(search, regionId, peopleId, genreId, topicId);
   }
 
-  if (!Number.isNaN(regionId)) where.regionId = regionId;
-  if (!Number.isNaN(peopleId)) where.peopleId = peopleId;
-  if (!Number.isNaN(genreId)) where.genreId = genreId;
+  // --- Build Prisma where ---
+  const where: Prisma.MaterialWhereInput = { status: "PUBLISHED" };
 
-  if (!Number.isNaN(topicId)) {
-    where.topics = {
-      some: {
-        topicId,
-      },
-    };
+  if (trgmIds !== null) {
+    // Pagination is done by slicing the sorted ID array
+    const skip = (currentPage - 1) * PAGE_SIZE;
+    const pageIds = trgmIds.slice(skip, skip + PAGE_SIZE);
+    where.id = { in: pageIds };
+  } else {
+    if (!Number.isNaN(regionId)) where.regionId = regionId;
+    if (!Number.isNaN(peopleId)) where.peopleId = peopleId;
+    if (!Number.isNaN(genreId)) where.genreId = genreId;
+    if (!Number.isNaN(topicId)) where.topics = { some: { topicId } };
   }
 
-  const [materials, totalCount, regions, peoples, genres, topics] =
-    await Promise.all([
-      prisma.material.findMany({
+  const materialQuery = trgmIds !== null
+    ? prisma.material.findMany({
         where,
         include: {
           region: true,
           people: true,
           genre: true,
-          topics: {
-            include: {
-              topic: true,
-            },
-          },
+          topics: { include: { topic: true } },
         },
-        orderBy: {
-          createdAt: "desc",
+      })
+    : prisma.material.findMany({
+        where,
+        include: {
+          region: true,
+          people: true,
+          genre: true,
+          topics: { include: { topic: true } },
         },
+        orderBy: { createdAt: "desc" },
         take: PAGE_SIZE,
         skip: (currentPage - 1) * PAGE_SIZE,
-      }),
+      });
 
-      prisma.material.count({ where }),
-
-      prisma.region.findMany({
-        orderBy: {
-          name: "asc",
-        },
-      }),
-
-      prisma.people.findMany({
-        orderBy: {
-          name: "asc",
-        },
-      }),
-
-      prisma.genre.findMany({
-        orderBy: {
-          name: "asc",
-        },
-      }),
-
-      prisma.topic.findMany({
-        orderBy: {
-          name: "asc",
-        },
-      }),
+  const [materials, rawCount, regions, peoples, genres, topics] =
+    await Promise.all([
+      materialQuery,
+      trgmIds !== null
+        ? Promise.resolve(trgmIds.length)
+        : prisma.material.count({ where }),
+      prisma.region.findMany({ orderBy: { name: "asc" } }),
+      prisma.people.findMany({ orderBy: { name: "asc" } }),
+      prisma.genre.findMany({ orderBy: { name: "asc" } }),
+      prisma.topic.findMany({ orderBy: { name: "asc" } }),
     ]);
 
+  // Restore relevance order (Prisma doesn't guarantee IN-clause order)
+  if (trgmIds !== null) {
+    const skip = (currentPage - 1) * PAGE_SIZE;
+    const pageIds = trgmIds.slice(skip, skip + PAGE_SIZE);
+    const order = new Map(pageIds.map((id, i) => [id, i]));
+    materials.sort((a, b) => (order.get(a.id) ?? 999) - (order.get(b.id) ?? 999));
+  }
+
+  const totalCount = rawCount;
   const totalPages = Math.ceil(totalCount / PAGE_SIZE);
 
   const hasActiveFilters =
