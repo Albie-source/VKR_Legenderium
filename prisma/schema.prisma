@@ -262,6 +262,15 @@ model GoalMaterial {
   @@map("goal_materials")
 }
 
+model TtsCache {
+  id        Int      @id @default(autoincrement())
+  textHash  String   @unique
+  audio     Bytes
+  createdAt DateTime @default(now())
+
+  @@map("tts_cache")
+}
+
 model GoalProgress {
   id              Int       @id @default(autoincrement())
   userId          Int

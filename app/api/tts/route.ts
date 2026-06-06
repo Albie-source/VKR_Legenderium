@@ -1,4 +1,6 @@
+import crypto from "crypto";
 import { NextRequest, NextResponse } from "next/server";
+import { prisma } from "@/lib/prisma";
 
 const YANDEX_TTS_URL =
   "https://tts.api.cloud.yandex.net/speech/v1/tts:synthesize";
@@ -16,13 +18,25 @@ export async function POST(req: NextRequest) {
 
   // Yandex SpeechKit limits: 5000 chars per request
   const truncated = text.slice(0, 5000);
+  const textHash = crypto.createHash("sha256").update(truncated).digest("hex");
+
+  // Return cached audio if available
+  const cached = await prisma.ttsCache.findUnique({ where: { textHash } });
+  if (cached) {
+    return new NextResponse(cached.audio, {
+      headers: {
+        "Content-Type": "audio/mpeg",
+        "Cache-Control": "private, max-age=86400",
+      },
+    });
+  }
 
   const body = new URLSearchParams({
     text: truncated,
     lang: "ru-RU",
-    voice: "zahar",   // мужской, глубокий — подходит для сказаний
-    speed: "0.85",    // чуть медленнее для атмосферы
-    emotion: "good",  // тёплая интонация
+    voice: "zahar",
+    speed: "0.85",
+    emotion: "good",
     format: "mp3",
     sampleRateHertz: "48000",
   });
@@ -43,11 +57,17 @@ export async function POST(req: NextRequest) {
   }
 
   const audioBuffer = await response.arrayBuffer();
+  const audioBytes = Buffer.from(audioBuffer);
+
+  // Save to cache (fire-and-forget — don't block the response)
+  prisma.ttsCache.create({ data: { textHash, audio: audioBytes } }).catch(
+    (err) => console.error("TTS cache write failed:", err),
+  );
 
   return new NextResponse(audioBuffer, {
     headers: {
       "Content-Type": "audio/mpeg",
-      "Cache-Control": "private, max-age=3600",
+      "Cache-Control": "private, max-age=86400",
     },
   });
 }
