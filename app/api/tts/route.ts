@@ -101,9 +101,9 @@ async function synthesizeYandex(
   const body = new URLSearchParams({
     text,
     lang: "ru-RU",
-    voice: "zahar",
-    speed: "0.85",
-    emotion: "good",
+    voice: "alena",   // женский голос, наиболее естественный в v1
+    speed: "0.95",    // близко к натуральному темпу речи
+    emotion: "good",  // тёплая интонация, менее роботизированная чем neutral
     format: "mp3",
     sampleRateHertz: "48000",
   });
