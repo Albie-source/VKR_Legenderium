@@ -38,7 +38,7 @@ export default function LibraryPagination({
           "rounded-2xl border px-4 py-2 text-sm font-bold shadow-md transition",
           currentPage === 1
             ? "pointer-events-none border-[#d4c4ad] bg-[#ede3d4] text-stone-400"
-            : "border-[#c8a87a] bg-white text-stone-900 hover:border-[#d8a342] hover:text-[#9f661f]",
+            : "border-[#c8a87a] bg-white text-black hover:border-[#d8a342] hover:text-[#9f661f]",
         ].join(" ")}
       >
         ← Назад
@@ -61,7 +61,7 @@ export default function LibraryPagination({
                 "flex h-10 w-10 items-center justify-center rounded-2xl border text-sm font-extrabold shadow-md transition",
                 item === currentPage
                   ? "border-[#d8a342] bg-[#d8a342] text-[#06151a]"
-                  : "border-[#c8a87a] bg-white text-stone-900 hover:border-[#d8a342] hover:text-[#9f661f]",
+                  : "border-[#c8a87a] bg-white text-black hover:border-[#d8a342] hover:text-[#9f661f]",
               ].join(" ")}
             >
               {item}
@@ -77,7 +77,7 @@ export default function LibraryPagination({
           "rounded-2xl border px-4 py-2 text-sm font-bold shadow-md transition",
           currentPage === totalPages
             ? "pointer-events-none border-[#d4c4ad] bg-[#ede3d4] text-stone-400"
-            : "border-[#c8a87a] bg-white text-stone-900 hover:border-[#d8a342] hover:text-[#9f661f]",
+            : "border-[#c8a87a] bg-white text-black hover:border-[#d8a342] hover:text-[#9f661f]",
         ].join(" ")}
       >
         Вперёд →
