@@ -22,7 +22,7 @@ export default async function QuestPage({ params }: QuestPageProps) {
     where: {
       id: taskId,
       OR: [
-        { materialId: null },
+        { material: { is: null } },
         { material: { status: "PUBLISHED" } },
       ],
     },
