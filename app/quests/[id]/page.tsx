@@ -21,9 +21,10 @@ export default async function QuestPage({ params }: QuestPageProps) {
   const task = await prisma.interactiveTask.findFirst({
     where: {
       id: taskId,
-      material: {
-        status: "PUBLISHED",
-      },
+      OR: [
+        { materialId: null },
+        { material: { status: "PUBLISHED" } },
+      ],
     },
     include: {
       material: {
@@ -66,13 +67,17 @@ export default async function QuestPage({ params }: QuestPageProps) {
                     {formatTaskType(task.type)}
                   </span>
 
-                  <span className="rounded-full border border-[#3aa6a0]/35 bg-[#3aa6a0]/12 px-3 py-1 font-bold text-[#9ee8e2]">
-                    {task.material.region.name}
-                  </span>
+                  {task.material && (
+                    <span className="rounded-full border border-[#3aa6a0]/35 bg-[#3aa6a0]/12 px-3 py-1 font-bold text-[#9ee8e2]">
+                      {task.material.region.name}
+                    </span>
+                  )}
 
-                  <span className="rounded-full border border-white/10 bg-white/10 px-3 py-1 font-bold text-[#fff8e8]">
-                    {task.material.genre.name}
-                  </span>
+                  {task.material && (
+                    <span className="rounded-full border border-white/10 bg-white/10 px-3 py-1 font-bold text-[#fff8e8]">
+                      {task.material.genre.name}
+                    </span>
+                  )}
 
                   {task.difficulty && (
                     <span className="rounded-full border border-white/10 bg-white/10 px-3 py-1 font-bold text-[#fff8e8]">
@@ -93,7 +98,7 @@ export default async function QuestPage({ params }: QuestPageProps) {
               </div>
 
               <div className="overflow-hidden rounded-[2rem] border border-white/10 bg-[#06151a] shadow-2xl shadow-black/25">
-                {task.material.imageUrl ? (
+                {task.material?.imageUrl ? (
                   <img
                     src={task.material.imageUrl}
                     alt={task.material.title}
@@ -121,43 +126,45 @@ export default async function QuestPage({ params }: QuestPageProps) {
         </div>
 
         <aside className="space-y-6 lg:sticky lg:top-28 lg:self-start">
-          <section className="rounded-[2rem] border border-[#e4d4bf] bg-white p-6 shadow-md">
-            <p className="mb-2 text-sm font-black uppercase tracking-[0.2em] text-[#b46b1f]">
-              Материал
-            </p>
-
-            <h2 className="mb-3 text-2xl font-extrabold text-stone-950">
-              {task.material.title}
-            </h2>
-
-            {task.material.shortDescription && (
-              <p className="mb-5 line-clamp-5 leading-7 text-stone-700">
-                {task.material.shortDescription}
+          {task.material && (
+            <section className="rounded-[2rem] border border-[#e4d4bf] bg-white p-6 shadow-md">
+              <p className="mb-2 text-sm font-black uppercase tracking-[0.2em] text-[#b46b1f]">
+                Материал
               </p>
-            )}
 
-            <div className="mb-5 flex flex-wrap gap-2">
-              <span className="rounded-full border border-[#3aa6a0]/20 bg-[#e7f7f5] px-3 py-1 text-xs font-bold text-[#247670]">
-                {task.material.people.name}
-              </span>
+              <h2 className="mb-3 text-2xl font-extrabold text-stone-950">
+                {task.material.title}
+              </h2>
 
-              {task.material.topics.map(({ topic }) => (
-                <span
-                  key={topic.id}
-                  className="rounded-full border border-[#eadbc7] bg-[#faf4eb] px-3 py-1 text-xs font-semibold text-stone-600"
-                >
-                  {topic.name}
+              {task.material.shortDescription && (
+                <p className="mb-5 line-clamp-5 leading-7 text-stone-700">
+                  {task.material.shortDescription}
+                </p>
+              )}
+
+              <div className="mb-5 flex flex-wrap gap-2">
+                <span className="rounded-full border border-[#3aa6a0]/20 bg-[#e7f7f5] px-3 py-1 text-xs font-bold text-[#247670]">
+                  {task.material.people.name}
                 </span>
-              ))}
-            </div>
 
-            <Link
-              href={`/materials/${task.material.id}`}
-              className="inline-flex w-full justify-center rounded-2xl bg-[#d8a342] px-5 py-3 font-extrabold !text-[#06151a] shadow-md transition hover:-translate-y-0.5 hover:bg-[#f0bd5b]"
-            >
-              Открыть материал
-            </Link>
-          </section>
+                {task.material.topics.map(({ topic }) => (
+                  <span
+                    key={topic.id}
+                    className="rounded-full border border-[#eadbc7] bg-[#faf4eb] px-3 py-1 text-xs font-semibold text-stone-600"
+                  >
+                    {topic.name}
+                  </span>
+                ))}
+              </div>
+
+              <Link
+                href={`/materials/${task.material.id}`}
+                className="inline-flex w-full justify-center rounded-2xl bg-[#d8a342] px-5 py-3 font-extrabold !text-[#06151a] shadow-md transition hover:-translate-y-0.5 hover:bg-[#f0bd5b]"
+              >
+                Открыть материал
+              </Link>
+            </section>
+          )}
 
           <section className="rounded-[2rem] border border-[#d8a342]/35 bg-[#fff4d8] p-6 shadow-md">
             <p className="mb-2 text-sm font-black uppercase tracking-[0.2em] text-[#b46b1f]">

@@ -104,26 +104,32 @@ export default async function AdminTasksPage() {
                       </td>
 
                       <td className="px-5 py-4">
-                        <Link
-                          href={`/materials/${task.material.id}`}
-                          className="font-medium text-stone-900 underline-offset-4 hover:text-amber-800 hover:underline"
-                        >
-                          {task.material.title}
-                        </Link>
+                        {task.material ? (
+                          <>
+                            <Link
+                              href={`/materials/${task.material.id}`}
+                              className="font-medium text-stone-900 underline-offset-4 hover:text-amber-800 hover:underline"
+                            >
+                              {task.material.title}
+                            </Link>
 
-                        <div className="mt-2 flex flex-wrap gap-2 text-xs">
-                          <span className="rounded-full bg-amber-100 px-2 py-1 text-amber-800">
-                            {task.material.genre.name}
-                          </span>
+                            <div className="mt-2 flex flex-wrap gap-2 text-xs">
+                              <span className="rounded-full bg-amber-100 px-2 py-1 text-amber-800">
+                                {task.material.genre.name}
+                              </span>
 
-                          <span className="rounded-full bg-stone-100 px-2 py-1 text-stone-700">
-                            {task.material.region.name}
-                          </span>
+                              <span className="rounded-full bg-stone-100 px-2 py-1 text-stone-700">
+                                {task.material.region.name}
+                              </span>
 
-                          <span className="rounded-full bg-stone-100 px-2 py-1 text-stone-700">
-                            {task.material.people.name}
-                          </span>
-                        </div>
+                              <span className="rounded-full bg-stone-100 px-2 py-1 text-stone-700">
+                                {task.material.people.name}
+                              </span>
+                            </div>
+                          </>
+                        ) : (
+                          <span className="text-stone-400">Без материала</span>
+                        )}
                       </td>
 
                       <td className="px-5 py-4 text-sm">
@@ -158,12 +164,14 @@ export default async function AdminTasksPage() {
                             Редактировать
                           </Link>
 
-                          <Link
-                            href={`/materials/${task.material.id}`}
-                            className="rounded-xl border border-stone-300 px-3 py-2 text-sm font-medium text-stone-700 transition hover:bg-stone-100"
-                          >
-                            Материал
-                          </Link>
+                          {task.material && (
+                            <Link
+                              href={`/materials/${task.material.id}`}
+                              className="rounded-xl border border-stone-300 px-3 py-2 text-sm font-medium text-stone-700 transition hover:bg-stone-100"
+                            >
+                              Материал
+                            </Link>
+                          )}
 
                           <form action={deleteTaskAction}>
                             <input type="hidden" name="taskId" value={task.id} />

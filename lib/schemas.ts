@@ -48,7 +48,10 @@ export const materialSchema = z.object({
 });
 
 export const taskSchema = z.object({
-  materialId: coerceId(),
+  materialId: z.preprocess(
+    (v) => (String(v ?? "").trim() === "" ? null : Number(v)),
+    z.number().int().positive().nullable().optional()
+  ),
   title: z.string().min(1).max(500),
   description: optionalStr(),
   question: z.string().min(1).max(2000),

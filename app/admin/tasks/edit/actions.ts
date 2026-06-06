@@ -23,7 +23,8 @@ export async function updateTaskAction(taskId: number, formData: FormData) {
     difficulty: formData.get("difficulty") ?? "",
   });
 
-  if (!result.success || Number.isNaN(taskId)) return;
+  if (Number.isNaN(taskId)) throw new Error("Некорректный идентификатор задания");
+  if (!result.success) throw new Error("Проверьте заполненность обязательных полей");
 
   const data = result.data;
 
@@ -31,7 +32,8 @@ export async function updateTaskAction(taskId: number, formData: FormData) {
     (o): o is string => o != null && o.length > 0
   );
 
-  if (options.length < 2 || !options.includes(data.correctAnswer)) return;
+  if (options.length < 2 || !options.includes(data.correctAnswer))
+    throw new Error("Нужно минимум 2 варианта, и правильный ответ должен совпадать с одним из них");
 
   await prisma.interactiveTask.update({
     where: { id: taskId },

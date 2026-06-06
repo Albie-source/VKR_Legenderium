@@ -158,14 +158,14 @@ model Favorite {
 
 model InteractiveTask {
   id          Int     @id @default(autoincrement())
-  materialId  Int
+  materialId  Int?
   title       String
   description String?
   type        String
   config      Json
   difficulty  String?
 
-  material Material      @relation(fields: [materialId], references: [id], onDelete: Cascade)
+  material Material?     @relation(fields: [materialId], references: [id], onDelete: SetNull)
   attempts TaskAttempt[]
 
   createdAt DateTime @default(now())

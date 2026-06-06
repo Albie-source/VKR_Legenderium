@@ -78,10 +78,9 @@ export default function HiddenObjectsEditor({ materials }: { materials: Material
 
       {/* Material */}
       <div>
-        <label className="mb-2 block text-sm font-medium text-stone-700">Материал *</label>
+        <label className="mb-2 block text-sm font-medium text-stone-700">Материал</label>
         <select
           name="materialId"
-          required
           className="w-full rounded-xl border border-stone-300 px-4 py-3 outline-none transition focus:border-amber-700"
         >
           <option value="">Выберите материал</option>

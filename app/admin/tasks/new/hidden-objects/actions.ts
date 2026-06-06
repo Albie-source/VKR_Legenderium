@@ -9,7 +9,8 @@ import { prisma } from "@/lib/prisma";
 export async function createHiddenObjectsTaskAction(formData: FormData) {
   await requireAdmin();
 
-  const materialId = parseInt(formData.get("materialId") as string);
+  const materialIdRaw = (formData.get("materialId") as string)?.trim();
+  const materialId = materialIdRaw ? parseInt(materialIdRaw) : null;
   const title = (formData.get("title") as string)?.trim();
   const description = (formData.get("description") as string)?.trim() || null;
   const question = (formData.get("question") as string)?.trim();
@@ -18,7 +19,7 @@ export async function createHiddenObjectsTaskAction(formData: FormData) {
   const objectsJson = formData.get("objectsJson") as string;
   const imageFile = formData.get("imageFile") as File | null;
 
-  if (!materialId || !title || !question) throw new Error("Проверьте заполненность обязательных полей");
+  if (!title || !question) throw new Error("Заполните название и текст задания");
   if (!imageFile || imageFile.size === 0) throw new Error("Изображение обязательно");
 
   let objects: unknown;

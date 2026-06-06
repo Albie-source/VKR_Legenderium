@@ -22,7 +22,7 @@ export async function createTaskAction(formData: FormData) {
     difficulty: formData.get("difficulty") ?? "",
   });
 
-  if (!result.success) throw new Error("Проверьте заполненность обязательных полей");
+  if (!result.success) throw new Error("Проверьте заполненность обязательных полей (title, question, варианты ответа)");
 
   const data = result.data;
 

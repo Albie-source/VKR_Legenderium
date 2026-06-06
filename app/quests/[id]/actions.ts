@@ -136,7 +136,7 @@ export async function saveTaskResultAction(
       };
     }
 
-    const materialTopicIds = task.material.topics.map((topic) => topic.topicId);
+    const materialTopicIds = task.material?.topics.map((topic) => topic.topicId) ?? [];
 
     const activeGoals = await prisma.goal.findMany({
       where: { isActive: true },
@@ -149,13 +149,14 @@ export async function saveTaskResultAction(
 
     const matchingGoals = activeGoals.filter((goal) => {
       if (goal.pinnedMaterials.length > 0) {
+        if (task.materialId === null) return false;
         return goal.pinnedMaterials.some(
           (pm) => pm.materialId === task.materialId
         );
       }
       if (
         goal.genres.length > 0 &&
-        !goal.genres.some((g) => g.genreId === task.material.genreId)
+        !goal.genres.some((g) => g.genreId === task.material?.genreId)
       ) {
         return false;
       }
@@ -165,7 +166,7 @@ export async function saveTaskResultAction(
       ) {
         return false;
       }
-      if (goal.regionId && goal.regionId !== task.material.regionId) {
+      if (goal.regionId && goal.regionId !== task.material?.regionId) {
         return false;
       }
       return true;
