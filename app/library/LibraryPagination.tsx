@@ -34,11 +34,12 @@ export default function LibraryPagination({
       <Link
         href={buildPageUrl(currentPage - 1)}
         aria-disabled={currentPage === 1}
+        style={currentPage === 1 ? {} : { backgroundColor: "#ffffff" }}
         className={[
-          "rounded-2xl border px-4 py-2 text-sm font-bold shadow-md transition",
+          "rounded-2xl border px-4 py-2 text-sm font-bold shadow-lg transition",
           currentPage === 1
-            ? "pointer-events-none border-[#d4c4ad] bg-[#ede3d4] text-stone-400"
-            : "border-[#c8a87a] bg-white text-black hover:border-[#d8a342] hover:text-[#9f661f]",
+            ? "pointer-events-none border-[#d4c4ad] bg-[#e8ddd0] text-stone-400"
+            : "border-[#a8854a] text-stone-900 hover:border-[#d8a342] hover:text-[#9f661f]",
         ].join(" ")}
       >
         ← Назад
@@ -49,7 +50,7 @@ export default function LibraryPagination({
           item === "..." ? (
             <span
               key={`ellipsis-${i}`}
-              className="w-8 text-center text-sm font-bold text-stone-500"
+              className="w-8 text-center text-sm font-bold text-stone-600"
             >
               …
             </span>
@@ -57,11 +58,12 @@ export default function LibraryPagination({
             <Link
               key={item}
               href={buildPageUrl(item)}
+              style={item === currentPage ? {} : { backgroundColor: "#ffffff" }}
               className={[
-                "flex h-10 w-10 items-center justify-center rounded-2xl border text-sm font-extrabold shadow-md transition",
+                "flex h-10 w-10 items-center justify-center rounded-2xl border text-sm font-extrabold shadow-lg transition",
                 item === currentPage
                   ? "border-[#d8a342] bg-[#d8a342] text-[#06151a]"
-                  : "border-[#c8a87a] bg-white text-black hover:border-[#d8a342] hover:text-[#9f661f]",
+                  : "border-[#a8854a] text-stone-900 hover:border-[#d8a342] hover:text-[#9f661f]",
               ].join(" ")}
             >
               {item}
@@ -73,11 +75,12 @@ export default function LibraryPagination({
       <Link
         href={buildPageUrl(currentPage + 1)}
         aria-disabled={currentPage === totalPages}
+        style={currentPage === totalPages ? {} : { backgroundColor: "#ffffff" }}
         className={[
-          "rounded-2xl border px-4 py-2 text-sm font-bold shadow-md transition",
+          "rounded-2xl border px-4 py-2 text-sm font-bold shadow-lg transition",
           currentPage === totalPages
-            ? "pointer-events-none border-[#d4c4ad] bg-[#ede3d4] text-stone-400"
-            : "border-[#c8a87a] bg-white text-black hover:border-[#d8a342] hover:text-[#9f661f]",
+            ? "pointer-events-none border-[#d4c4ad] bg-[#e8ddd0] text-stone-400"
+            : "border-[#a8854a] text-stone-900 hover:border-[#d8a342] hover:text-[#9f661f]",
         ].join(" ")}
       >
         Вперёд →

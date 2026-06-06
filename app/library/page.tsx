@@ -32,7 +32,6 @@ async function trigramSearch(
     Prisma.sql`(
       word_similarity(${search}, m.title) > ${TRGM_THRESHOLD}
       OR word_similarity(${search}, COALESCE(m."shortDescription", '')) > ${TRGM_THRESHOLD}
-      OR word_similarity(${search}, COALESCE(m."fullText", '')) > ${TRGM_THRESHOLD}
       OR word_similarity(${search}, r.name) > ${TRGM_THRESHOLD}
       OR word_similarity(${search}, p.name) > ${TRGM_THRESHOLD}
       OR word_similarity(${search}, g.name) > ${TRGM_THRESHOLD}
