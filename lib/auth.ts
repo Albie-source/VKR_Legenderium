@@ -1,6 +1,6 @@
 import { cache } from "react";
 import { createHmac, timingSafeEqual } from "crypto";
-import { cookies } from "next/headers";
+import { cookies, headers } from "next/headers";
 import { redirect } from "next/navigation";
 import { prisma } from "@/lib/prisma";
 
@@ -67,7 +67,7 @@ export async function requireUser() {
   const user = await getCurrentUser();
 
   if (!user) {
-    redirect("/login");
+    redirect(`/login${await makeNextParam()}`);
   }
 
   return user;
@@ -87,8 +87,21 @@ export async function requireAdmin() {
   const admin = await getAdminUser();
 
   if (!admin) {
-    redirect("/login");
+    redirect(`/login${await makeNextParam()}`);
   }
 
   return admin;
+}
+
+async function makeNextParam(): Promise<string> {
+  try {
+    const headersList = await headers();
+    const pathname = headersList.get("x-pathname") ?? "";
+    if (pathname && pathname !== "/" && !pathname.startsWith("/login") && !pathname.startsWith("/register")) {
+      return `?next=${encodeURIComponent(pathname)}`;
+    }
+  } catch {
+    // headers() недоступен вне запроса
+  }
+  return "";
 }

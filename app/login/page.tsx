@@ -123,7 +123,7 @@ export default async function LoginPage({ searchParams }: LoginPageProps) {
           <p className="mt-6 text-center text-sm text-stone-600">
             Нет аккаунта?{" "}
             <Link
-              href="/register"
+              href={next ? `/register?next=${encodeURIComponent(next)}` : "/register"}
               className="font-extrabold !text-[#8a5418] underline-offset-4 hover:underline"
             >
               Зарегистрироваться

@@ -8,9 +8,12 @@ import { registerSchema } from "@/lib/schemas";
 import { AUTH_COOKIE_NAME, signSession } from "@/lib/auth";
 
 export async function registerAction(formData: FormData) {
+  const next = String(formData.get("next") ?? "").trim();
+  const nextParam = isSafeInternalPath(next) ? `&next=${encodeURIComponent(next)}` : "";
+
   const consent = formData.get("consent");
   if (!consent) {
-    redirect("/register?error=consent");
+    redirect(`/register?error=consent${nextParam}`);
   }
 
   const result = registerSchema.safeParse({
@@ -20,7 +23,7 @@ export async function registerAction(formData: FormData) {
   });
 
   if (!result.success) {
-    redirect("/register?error=1");
+    redirect(`/register?error=1${nextParam}`);
   }
 
   const { name, email, password } = result.data;
@@ -30,7 +33,7 @@ export async function registerAction(formData: FormData) {
   });
 
   if (existingUser) {
-    redirect("/register?error=exists");
+    redirect(`/register?error=exists${nextParam}`);
   }
 
   const passwordHash = await bcrypt.hash(password, 10);
@@ -52,5 +55,9 @@ export async function registerAction(formData: FormData) {
     maxAge: 60 * 60 * 24 * 7,
   });
 
-  redirect("/");
+  redirect(isSafeInternalPath(next) ? next : "/");
+}
+
+function isSafeInternalPath(value: string) {
+  return value.startsWith("/") && !value.startsWith("//");
 }

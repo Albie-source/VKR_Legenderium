@@ -5,6 +5,7 @@ import PasswordInput from "@/components/PasswordInput";
 type RegisterPageProps = {
   searchParams: Promise<{
     error?: string;
+    next?: string;
   }>;
 };
 
@@ -12,6 +13,7 @@ export default async function RegisterPage({
   searchParams,
 }: RegisterPageProps) {
   const params = await searchParams;
+  const next = params.next ?? "";
 
   const errorMessage =
     params.error === "exists"
@@ -48,6 +50,7 @@ export default async function RegisterPage({
             autoComplete="off"
             className="space-y-4"
           >
+            {next && <input type="hidden" name="next" value={next} />}
             <div>
               <label className="mb-2 block text-sm font-bold text-stone-800">
                 Имя
@@ -122,7 +125,7 @@ export default async function RegisterPage({
           <p className="mt-6 text-center text-sm text-stone-600">
             Уже есть аккаунт?{" "}
             <Link
-              href="/login"
+              href={next ? `/login?next=${encodeURIComponent(next)}` : "/login"}
               className="font-extrabold !text-[#8a5418] underline-offset-4 hover:underline"
             >
               Войти
