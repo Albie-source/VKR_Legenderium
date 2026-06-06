@@ -35,10 +35,10 @@ export default function LibraryPagination({
         href={buildPageUrl(currentPage - 1)}
         aria-disabled={currentPage === 1}
         className={[
-          "rounded-2xl border px-4 py-2 text-sm font-bold transition",
+          "rounded-2xl border px-4 py-2 text-sm font-bold shadow-sm transition",
           currentPage === 1
-            ? "pointer-events-none border-stone-300 bg-stone-100 text-stone-400"
-            : "border-[#dccab3] bg-white text-stone-700 hover:border-[#d8a342] hover:text-[#9f661f]",
+            ? "pointer-events-none border-stone-200 bg-stone-100 text-stone-400"
+            : "border-stone-300 bg-white text-stone-800 hover:border-[#d8a342] hover:text-[#9f661f]",
         ].join(" ")}
       >
         ← Назад
@@ -49,7 +49,7 @@ export default function LibraryPagination({
           item === "..." ? (
             <span
               key={`ellipsis-${i}`}
-              className="w-10 text-center text-sm font-bold text-stone-400"
+              className="w-10 text-center text-sm font-bold text-stone-500"
             >
               …
             </span>
@@ -58,10 +58,10 @@ export default function LibraryPagination({
               key={item}
               href={buildPageUrl(item)}
               className={[
-                "flex h-10 w-10 items-center justify-center rounded-2xl border text-sm font-extrabold transition",
+                "flex h-10 w-10 items-center justify-center rounded-2xl border text-sm font-extrabold shadow-sm transition",
                 item === currentPage
                   ? "border-[#d8a342] bg-[#d8a342] text-[#06151a]"
-                  : "border-[#dccab3] bg-white text-stone-700 hover:border-[#d8a342] hover:text-[#9f661f]",
+                  : "border-stone-300 bg-white text-stone-800 hover:border-[#d8a342] hover:text-[#9f661f]",
               ].join(" ")}
             >
               {item}
@@ -74,10 +74,10 @@ export default function LibraryPagination({
         href={buildPageUrl(currentPage + 1)}
         aria-disabled={currentPage === totalPages}
         className={[
-          "rounded-2xl border px-4 py-2 text-sm font-bold transition",
+          "rounded-2xl border px-4 py-2 text-sm font-bold shadow-sm transition",
           currentPage === totalPages
-            ? "pointer-events-none border-stone-300 bg-stone-100 text-stone-400"
-            : "border-[#dccab3] bg-white text-stone-700 hover:border-[#d8a342] hover:text-[#9f661f]",
+            ? "pointer-events-none border-stone-200 bg-stone-100 text-stone-400"
+            : "border-stone-300 bg-white text-stone-800 hover:border-[#d8a342] hover:text-[#9f661f]",
         ].join(" ")}
       >
         Вперёд →

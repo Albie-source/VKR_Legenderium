@@ -1,7 +1,7 @@
 "use client";
 
 import { useRouter, useSearchParams } from "next/navigation";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
 type FilterItem = {
   id: number;
@@ -25,33 +25,40 @@ export default function LibraryFilters({
   const searchParams = useSearchParams();
 
   const [search, setSearch] = useState(searchParams.get("search") ?? "");
-  const [regionId, setRegionId] = useState(searchParams.get("region") ?? "");
-  const [peopleId, setPeopleId] = useState(searchParams.get("people") ?? "");
-  const [genreId, setGenreId] = useState(searchParams.get("genre") ?? "");
-  const [topicId, setTopicId] = useState(searchParams.get("topic") ?? "");
 
-  function applyFilters() {
+  // Sync search input when URL changes (e.g. browser back/forward)
+  useEffect(() => {
+    setSearch(searchParams.get("search") ?? "");
+  }, [searchParams]);
+
+  function buildUrl(overrides: Record<string, string>) {
     const params = new URLSearchParams();
 
-    if (search.trim()) params.set("search", search.trim());
-    if (regionId) params.set("region", regionId);
-    if (peopleId) params.set("people", peopleId);
-    if (genreId) params.set("genre", genreId);
-    if (topicId) params.set("topic", topicId);
-    // reset to page 1 when filters change
+    const s = "search" in overrides ? overrides.search : search.trim();
+    if (s) params.set("search", s);
 
-    const queryString = params.toString();
+    const r = "region" in overrides ? overrides.region : (searchParams.get("region") ?? "");
+    if (r) params.set("region", r);
 
-    router.push(queryString ? `/library?${queryString}` : "/library");
+    const p = "people" in overrides ? overrides.people : (searchParams.get("people") ?? "");
+    if (p) params.set("people", p);
+
+    const g = "genre" in overrides ? overrides.genre : (searchParams.get("genre") ?? "");
+    if (g) params.set("genre", g);
+
+    const t = "topic" in overrides ? overrides.topic : (searchParams.get("topic") ?? "");
+    if (t) params.set("topic", t);
+
+    const qs = params.toString();
+    return qs ? `/library?${qs}` : "/library";
+  }
+
+  function applySearch() {
+    router.push(buildUrl({}));
   }
 
   function resetFilters() {
     setSearch("");
-    setRegionId("");
-    setPeopleId("");
-    setGenreId("");
-    setTopicId("");
-
     router.push("/library");
   }
 
@@ -78,61 +85,61 @@ export default function LibraryFilters({
       </div>
 
       <div className="grid gap-4 lg:grid-cols-[1.4fr_1fr_1fr_1fr_1fr]">
+        {/* Search — apply on Enter or button click */}
         <div>
           <label className="mb-2 block text-sm font-bold text-stone-800">
             Поиск
           </label>
 
-          <input
-            value={search}
-            onChange={(event) => setSearch(event.target.value)}
-            onKeyDown={(event) => {
-              if (event.key === "Enter") {
-                applyFilters();
-              }
-            }}
-            placeholder="Например: дух, огонь, охотник"
-            className="w-full rounded-2xl border border-[#dccab3] bg-white px-4 py-3 text-stone-800 outline-none transition placeholder:text-stone-400 focus:border-[#d8a342] focus:ring-2 focus:ring-[#f3dfb1]"
-          />
+          <div className="flex gap-2">
+            <input
+              value={search}
+              onChange={(e) => setSearch(e.target.value)}
+              onKeyDown={(e) => {
+                if (e.key === "Enter") applySearch();
+              }}
+              placeholder="Например: дух, огонь, охотник"
+              className="min-w-0 flex-1 rounded-2xl border border-[#dccab3] bg-white px-4 py-3 text-stone-800 outline-none transition placeholder:text-stone-400 focus:border-[#d8a342] focus:ring-2 focus:ring-[#f3dfb1]"
+            />
+            <button
+              type="button"
+              onClick={applySearch}
+              className="rounded-2xl border border-[#dccab3] bg-white px-4 py-3 text-stone-600 transition hover:border-[#d8a342] hover:text-[#9f661f]"
+              aria-label="Найти"
+            >
+              ↵
+            </button>
+          </div>
         </div>
 
+        {/* Dropdowns — auto-apply on change */}
         <FilterSelect
           label="Регион"
-          value={regionId}
-          onChange={setRegionId}
+          value={searchParams.get("region") ?? ""}
+          onChange={(v) => router.push(buildUrl({ region: v }))}
           items={regions}
         />
 
         <FilterSelect
           label="Народ"
-          value={peopleId}
-          onChange={setPeopleId}
+          value={searchParams.get("people") ?? ""}
+          onChange={(v) => router.push(buildUrl({ people: v }))}
           items={peoples}
         />
 
         <FilterSelect
           label="Жанр"
-          value={genreId}
-          onChange={setGenreId}
+          value={searchParams.get("genre") ?? ""}
+          onChange={(v) => router.push(buildUrl({ genre: v }))}
           items={genres}
         />
 
         <FilterSelect
           label="Тематика"
-          value={topicId}
-          onChange={setTopicId}
+          value={searchParams.get("topic") ?? ""}
+          onChange={(v) => router.push(buildUrl({ topic: v }))}
           items={topics}
         />
-      </div>
-
-      <div className="mt-6">
-        <button
-          type="button"
-          onClick={applyFilters}
-          className="rounded-2xl bg-[#d8a342] px-6 py-3 font-extrabold text-[#06151a] shadow-md transition hover:-translate-y-0.5 hover:bg-[#f0bd5b]"
-        >
-          Применить фильтры
-        </button>
       </div>
     </section>
   );
@@ -157,7 +164,7 @@ function FilterSelect({
 
       <select
         value={value}
-        onChange={(event) => onChange(event.target.value)}
+        onChange={(e) => onChange(e.target.value)}
         className="w-full rounded-2xl border border-[#dccab3] bg-white px-4 py-3 text-stone-800 outline-none transition focus:border-[#d8a342] focus:ring-2 focus:ring-[#f3dfb1]"
       >
         <option value="">Все</option>
