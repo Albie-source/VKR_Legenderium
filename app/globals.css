@@ -470,3 +470,71 @@ select {
   overflow: hidden;
   pointer-events: none;
 }
+
+/* ───────────────────────── Book page flip ───────────────────────── */
+
+@keyframes pageFlipOutNext {
+  from { transform: perspective(1300px) rotateY(0deg); opacity: 1; }
+  to   { transform: perspective(1300px) rotateY(-90deg); opacity: 0.4; }
+}
+
+@keyframes pageFlipInNext {
+  from { transform: perspective(1300px) rotateY(90deg); opacity: 0.4; }
+  to   { transform: perspective(1300px) rotateY(0deg); opacity: 1; }
+}
+
+@keyframes pageFlipOutPrev {
+  from { transform: perspective(1300px) rotateY(0deg); opacity: 1; }
+  to   { transform: perspective(1300px) rotateY(90deg); opacity: 0.4; }
+}
+
+@keyframes pageFlipInPrev {
+  from { transform: perspective(1300px) rotateY(-90deg); opacity: 0.4; }
+  to   { transform: perspective(1300px) rotateY(0deg); opacity: 1; }
+}
+
+.page-flip-out-next { animation: pageFlipOutNext 0.24s ease-in  forwards; }
+.page-flip-in-next  { animation: pageFlipInNext  0.24s ease-out forwards; }
+.page-flip-out-prev { animation: pageFlipOutPrev 0.24s ease-in  forwards; }
+.page-flip-in-prev  { animation: pageFlipInPrev  0.24s ease-out forwards; }
+
+/* Parchment page surface */
+.book-page-surface {
+  position: relative;
+  background:
+    repeating-linear-gradient(
+      0deg,
+      transparent,
+      transparent 35px,
+      rgba(180, 140, 60, 0.08) 35px,
+      rgba(180, 140, 60, 0.08) 36px
+    ),
+    linear-gradient(160deg, #fefcf4 0%, #fdf8e8 45%, #faf2d6 100%);
+  border: 1px solid #d4b06a;
+  border-left: 3px solid #c8964a;
+  border-radius: 2px 20px 20px 2px;
+  box-shadow:
+    inset 0 0 40px rgba(200, 150, 50, 0.06),
+    inset -3px 0 8px rgba(0, 0, 0, 0.04),
+    4px 4px 14px rgba(0, 0, 0, 0.09),
+    1px 1px 3px rgba(0, 0, 0, 0.05);
+  padding: 2.5rem 2.5rem 2rem 3rem;
+  min-height: 340px;
+  overflow: hidden;
+}
+
+/* Page corner curl hint */
+.book-page-surface::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  right: 0;
+  width: 36px;
+  height: 36px;
+  background: linear-gradient(
+    135deg,
+    transparent 50%,
+    rgba(180, 140, 60, 0.14) 50%
+  );
+  border-top-left-radius: 6px;
+}

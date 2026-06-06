@@ -8,6 +8,8 @@ import {
   requireLoginForFavoriteAction,
 } from "./actions";
 import TtsPlayer from "./TtsPlayer";
+import BookReader from "./BookReader";
+import AudioPlayer from "./AudioPlayer";
 
 type MaterialPageProps = {
   params: Promise<{
@@ -184,9 +186,7 @@ export default async function MaterialPage({ params }: MaterialPageProps) {
             )}
 
             {material.fullText ? (
-              <p className="whitespace-pre-line text-lg leading-9 text-stone-800">
-                {material.fullText}
-              </p>
+              <BookReader text={material.fullText} />
             ) : (
               <p className="rounded-2xl border border-[#eadbc7] bg-[#fbf7f1] p-5 text-stone-700">
                 Полный текст пока не добавлен.
@@ -229,16 +229,7 @@ export default async function MaterialPage({ params }: MaterialPageProps) {
 
               <div className="space-y-6">
                 {material.audioUrl && (
-                  <div className="rounded-2xl border border-[#eadbc7] bg-[#fbf7f1] p-5">
-                    <p className="mb-3 text-sm font-bold text-stone-800">
-                      Аудиозапись
-                    </p>
-
-                    <audio controls className="w-full">
-                      <source src={material.audioUrl} />
-                      Ваш браузер не поддерживает аудио.
-                    </audio>
-                  </div>
+                  <AudioPlayer src={material.audioUrl} />
                 )}
 
                 {material.videoUrl && (
