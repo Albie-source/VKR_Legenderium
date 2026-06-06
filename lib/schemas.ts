@@ -31,6 +31,15 @@ export const registerSchema = z.object({
   password: z.string().min(6).max(1024),
 });
 
+export const forgotPasswordSchema = z.object({
+  email: z.string().email().max(254),
+});
+
+export const resetPasswordSchema = z.object({
+  token: z.string().min(1).max(500),
+  password: z.string().min(6).max(1024),
+});
+
 export const materialSchema = z.object({
   title: z.string().min(1).max(500),
   shortDescription: optionalStr(),

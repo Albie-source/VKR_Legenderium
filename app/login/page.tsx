@@ -6,6 +6,7 @@ type LoginPageProps = {
   searchParams: Promise<{
     error?: string;
     registered?: string;
+    reset?: string;
     next?: string;
   }>;
 };
@@ -15,6 +16,7 @@ export default async function LoginPage({ searchParams }: LoginPageProps) {
 
   const hasError = params.error === "1";
   const isRegistered = params.registered === "1";
+  const isReset = params.reset === "1";
   const next = params.next ?? "";
 
   return (
@@ -41,6 +43,12 @@ export default async function LoginPage({ searchParams }: LoginPageProps) {
           {isRegistered && (
             <div className="mb-5 rounded-2xl border border-emerald-200 bg-emerald-50 p-4 text-sm font-medium text-emerald-800">
               Аккаунт создан. Теперь можно войти.
+            </div>
+          )}
+
+          {isReset && (
+            <div className="mb-5 rounded-2xl border border-emerald-200 bg-emerald-50 p-4 text-sm font-medium text-emerald-800">
+              Пароль успешно изменён. Войдите с новым паролем.
             </div>
           )}
 
@@ -84,9 +92,17 @@ export default async function LoginPage({ searchParams }: LoginPageProps) {
             </div>
 
             <div>
-              <label className="mb-2 block text-sm font-bold text-stone-800">
-                Пароль
-              </label>
+              <div className="mb-2 flex items-center justify-between">
+                <label className="text-sm font-bold text-stone-800">
+                  Пароль
+                </label>
+                <Link
+                  href="/forgot-password"
+                  className="text-xs font-semibold !text-[#8a5418] underline-offset-4 hover:underline"
+                >
+                  Забыли пароль?
+                </Link>
+              </div>
 
               <PasswordInput
                 name="password"
