@@ -60,8 +60,7 @@ export default function TtsPlayer({ text }: { text: string }) {
       audio.pause();
       setState("paused");
     } else {
-      audio.play();
-      setState("playing");
+      audio.play().then(() => setState("playing")).catch(() => setState("error"));
     }
   }
 

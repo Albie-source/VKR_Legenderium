@@ -29,7 +29,7 @@ export async function createMaterialAction(formData: FormData) {
     status: formData.get("status") ?? "DRAFT",
   });
 
-  if (!result.success) return;
+  if (!result.success) throw new Error("Проверьте заполненность обязательных полей");
 
   const data = result.data;
 

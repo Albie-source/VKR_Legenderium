@@ -47,10 +47,14 @@ export async function POST(request: NextRequest) {
   const filename = `${Date.now()}-${Math.random().toString(36).slice(2)}${safeExt}`;
 
   const uploadDir = path.join(process.cwd(), "public", "uploads");
-  await mkdir(uploadDir, { recursive: true });
-
-  const buffer = Buffer.from(await file.arrayBuffer());
-  await writeFile(path.join(uploadDir, filename), buffer);
+  try {
+    await mkdir(uploadDir, { recursive: true });
+    const buffer = Buffer.from(await file.arrayBuffer());
+    await writeFile(path.join(uploadDir, filename), buffer);
+  } catch (err) {
+    console.error("File upload error:", err);
+    return NextResponse.json({ error: "Не удалось сохранить файл" }, { status: 500 });
+  }
 
   return NextResponse.json({ url: `/uploads/${filename}` });
 }

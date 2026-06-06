@@ -18,24 +18,29 @@ export async function createHiddenObjectsTaskAction(formData: FormData) {
   const objectsJson = formData.get("objectsJson") as string;
   const imageFile = formData.get("imageFile") as File | null;
 
-  if (!materialId || !title || !question) return;
-  if (!imageFile || imageFile.size === 0) return;
+  if (!materialId || !title || !question) throw new Error("Проверьте заполненность обязательных полей");
+  if (!imageFile || imageFile.size === 0) throw new Error("Изображение обязательно");
 
   let objects: unknown;
   try {
     objects = JSON.parse(objectsJson);
   } catch {
-    return;
+    throw new Error("Не удалось обработать расположение объектов");
   }
-  if (!Array.isArray(objects) || objects.length === 0) return;
+  if (!Array.isArray(objects) || objects.length === 0)
+    throw new Error("Добавьте хотя бы один объект на картинку");
 
-  // Save image to public/images/uploads/
   const ext = path.extname(imageFile.name) || ".jpg";
   const filename = `hidden-${Date.now()}${ext}`;
   const uploadsDir = path.join(process.cwd(), "public", "images", "uploads");
-  await fs.mkdir(uploadsDir, { recursive: true });
-  const buffer = Buffer.from(await imageFile.arrayBuffer());
-  await fs.writeFile(path.join(uploadsDir, filename), buffer);
+  try {
+    await fs.mkdir(uploadsDir, { recursive: true });
+    const buffer = Buffer.from(await imageFile.arrayBuffer());
+    await fs.writeFile(path.join(uploadsDir, filename), buffer);
+  } catch (err) {
+    console.error("Failed to save task image:", err);
+    throw new Error("Не удалось сохранить изображение. Попробуйте снова.");
+  }
   const imageUrl = `/images/uploads/${filename}`;
 
   const task = await prisma.interactiveTask.create({

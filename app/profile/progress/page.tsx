@@ -117,7 +117,7 @@ export default async function ProgressPage() {
 
                   <div className="mt-5 flex flex-wrap gap-3">
                     <Link
-                      href={`/library${goal.genres[0]?.genreId ? `?genre=${goal.genres[0].genreId}` : ""}`}
+                      href={`/library${goal.genres[0]?.genreId ? `?genre=${goal.genres[0]?.genreId}` : ""}`}
                       className="rounded-xl bg-amber-700 px-5 py-3 text-sm font-medium text-white transition hover:bg-amber-800"
                     >
                       Перейти к материалам
