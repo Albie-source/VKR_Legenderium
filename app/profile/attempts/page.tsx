@@ -89,32 +89,38 @@ export default async function AttemptsPage() {
                       <div className="mb-3 flex flex-wrap gap-2 text-xs">
                         <StatusBadge isCompleted={attempt.isCompleted} />
 
-                        <span className="rounded-full bg-amber-100 px-3 py-1 font-medium text-amber-800">
-                          {attempt.task.material.genre.name}
-                        </span>
+                        {attempt.task.material && (
+                          <>
+                            <span className="rounded-full bg-amber-100 px-3 py-1 font-medium text-amber-800">
+                              {attempt.task.material.genre.name}
+                            </span>
 
-                        <span className="rounded-full bg-stone-100 px-3 py-1 text-stone-700">
-                          {attempt.task.material.region.name}
-                        </span>
+                            <span className="rounded-full bg-stone-100 px-3 py-1 text-stone-700">
+                              {attempt.task.material.region.name}
+                            </span>
 
-                        <span className="rounded-full bg-stone-100 px-3 py-1 text-stone-700">
-                          {attempt.task.material.people.name}
-                        </span>
+                            <span className="rounded-full bg-stone-100 px-3 py-1 text-stone-700">
+                              {attempt.task.material.people.name}
+                            </span>
+                          </>
+                        )}
                       </div>
 
                       <h3 className="mb-2 text-2xl font-semibold">
                         {attempt.task.title}
                       </h3>
 
-                      <p className="mb-3 text-stone-700">
-                        Материал:{" "}
-                        <Link
-                          href={`/materials/${attempt.task.material.id}`}
-                          className="font-medium text-amber-800 underline-offset-4 hover:underline"
-                        >
-                          {attempt.task.material.title}
-                        </Link>
-                      </p>
+                      {attempt.task.material && (
+                        <p className="mb-3 text-stone-700">
+                          Материал:{" "}
+                          <Link
+                            href={`/materials/${attempt.task.material.id}`}
+                            className="font-medium text-amber-800 underline-offset-4 hover:underline"
+                          >
+                            {attempt.task.material.title}
+                          </Link>
+                        </p>
+                      )}
 
                       <p className="text-sm text-stone-500">
                         Дата прохождения:{" "}
@@ -144,12 +150,14 @@ export default async function AttemptsPage() {
                       Пройти ещё раз
                     </Link>
 
-                    <Link
-                      href={`/materials/${attempt.task.material.id}`}
-                      className="rounded-xl border border-stone-300 px-4 py-2 text-sm font-medium text-stone-700 transition hover:bg-stone-100"
-                    >
-                      Открыть материал
-                    </Link>
+                    {attempt.task.material && (
+                      <Link
+                        href={`/materials/${attempt.task.material.id}`}
+                        className="rounded-xl border border-stone-300 px-4 py-2 text-sm font-medium text-stone-700 transition hover:bg-stone-100"
+                      >
+                        Открыть материал
+                      </Link>
+                    )}
                   </div>
                 </article>
               ))}

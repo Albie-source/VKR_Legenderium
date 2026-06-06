@@ -279,7 +279,7 @@ function SelectField({
     name?: string;
     title?: string;
   }[];
-  defaultValue: number;
+  defaultValue: number | null;
 }) {
   return (
     <div>
@@ -290,7 +290,7 @@ function SelectField({
       <select
         name={name}
         required
-        defaultValue={defaultValue}
+        defaultValue={defaultValue ?? ""}
         className="w-full rounded-xl border border-stone-300 px-4 py-3 outline-none transition focus:border-amber-700"
       >
         <option value="">Выберите значение</option>

@@ -94,7 +94,7 @@ export default async function GoalPage({ params }: GoalPageProps) {
 
     tasks
       .filter((t) => t.attempts.length > 0)
-      .forEach((t) => completedMaterialIds.add(t.materialId));
+      .forEach((t) => { if (t.materialId !== null) completedMaterialIds.add(t.materialId); });
   }
 
   const stops: RouteStop[] = ordered.map((material, index) => ({

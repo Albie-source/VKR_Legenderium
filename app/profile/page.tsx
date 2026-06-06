@@ -418,7 +418,7 @@ function AttemptsHoverCard({
         genre: {
           name: string;
         };
-      };
+      } | null;
     };
   }[];
 }) {
@@ -451,9 +451,11 @@ function AttemptsHoverCard({
                   <div className="mb-2 flex flex-wrap gap-2 text-xs">
                     <StatusBadge isCompleted={attempt.isCompleted} />
 
-                    <span className="rounded-full border border-stone-200 bg-white px-3 py-1 font-bold text-stone-700">
-                      {attempt.task.material.genre.name}
-                    </span>
+                    {attempt.task.material && (
+                      <span className="rounded-full border border-stone-200 bg-white px-3 py-1 font-bold text-stone-700">
+                        {attempt.task.material.genre.name}
+                      </span>
+                    )}
                   </div>
 
                   <p className="line-clamp-2 text-sm font-extrabold text-stone-950">

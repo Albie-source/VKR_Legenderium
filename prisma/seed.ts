@@ -716,6 +716,7 @@ async function main() {
     title: string;
     genre: string;
     topics: string[];
+    imageUrl: string | null;
   }[] = [];
 
   for (const [index, material] of materials.entries()) {
@@ -780,6 +781,7 @@ async function main() {
       title: createdMaterial.title,
       genre: material.genre,
       topics: material.topics,
+      imageUrl: createdMaterial.imageUrl,
     });
   }
 
@@ -814,6 +816,7 @@ async function createDemoTasks(
     title: string;
     genre: string;
     topics: string[];
+    imageUrl: string | null;
   }[]
 ) {
   const taskMaterials = createdMaterials.slice(0, 8);
