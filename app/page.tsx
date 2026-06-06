@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { prisma } from "@/lib/prisma";
+import HomeStoryButton from "@/components/HomeStoryButton";
 
 export default async function HomePage() {
   const [materialsCount, peoplesCount, tasksCount] = await Promise.all([
@@ -63,6 +64,8 @@ export default async function HomePage() {
                 >
                   Задания
                 </Link>
+
+                <HomeStoryButton />
               </div>
 
               <div className="animate-fade-in-up delay-300 grid max-w-2xl gap-4 sm:grid-cols-3">
