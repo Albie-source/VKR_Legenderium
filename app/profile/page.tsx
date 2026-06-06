@@ -4,7 +4,6 @@ import { requireUser } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { logoutAction } from "../login/actions";
 import MascotHint from "@/components/MascotHint";
-import RewatchStoryButton from "@/components/RewatchStoryButton";
 
 export default async function ProfilePage() {
   const user = await requireUser();
@@ -122,7 +121,6 @@ export default async function ProfilePage() {
               </p>
 
               <div className="mt-5 flex flex-wrap gap-3">
-                <RewatchStoryButton />
                 <form action={logoutAction}>
                   <button
                     type="submit"

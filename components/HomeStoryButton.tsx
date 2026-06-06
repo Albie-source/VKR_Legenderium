@@ -26,7 +26,7 @@ export default function HomeStoryButton() {
       onClick={handleClick}
       className="rounded-2xl border border-[#d8a342]/40 bg-[#d8a342]/12 px-5 py-3 text-sm font-extrabold text-[#f0bd5b] backdrop-blur transition hover:bg-[#d8a342]/22 hover:-translate-y-0.5"
     >
-      {seen ? "📜 Пересмотреть историю" : "📜 Узнать историю"}
+      📜 Пролог
     </button>
   );
 }
