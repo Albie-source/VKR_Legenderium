@@ -23,10 +23,10 @@ export default async function LibraryPage({ searchParams }: LibraryPageProps) {
   const params = await searchParams;
 
   const search = params.search?.trim() ?? "";
-  const regionId = Number(params.region);
-  const peopleId = Number(params.people);
-  const genreId = Number(params.genre);
-  const topicId = Number(params.topic);
+  const regionId = params.region ? Number(params.region) : NaN;
+  const peopleId = params.people ? Number(params.people) : NaN;
+  const genreId = params.genre ? Number(params.genre) : NaN;
+  const topicId = params.topic ? Number(params.topic) : NaN;
 
   const currentPage = Math.max(1, Number(params.page) || 1);
 

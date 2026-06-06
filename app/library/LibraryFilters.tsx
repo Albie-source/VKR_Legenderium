@@ -1,12 +1,9 @@
 "use client";
 
+import { useRef } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
-import { useEffect, useState } from "react";
 
-type FilterItem = {
-  id: number;
-  name: string;
-};
+type FilterItem = { id: number; name: string };
 
 type LibraryFiltersProps = {
   regions: FilterItem[];
@@ -23,19 +20,16 @@ export default function LibraryFilters({
 }: LibraryFiltersProps) {
   const router = useRouter();
   const searchParams = useSearchParams();
+  const inputRef = useRef<HTMLInputElement>(null);
 
-  const [search, setSearch] = useState(searchParams.get("search") ?? "");
-
-  // Sync search input when URL changes (e.g. browser back/forward)
-  useEffect(() => {
-    setSearch(searchParams.get("search") ?? "");
-  }, [searchParams]);
-
+  // Build URL preserving all active params, overriding specified keys
   function buildUrl(overrides: Record<string, string>) {
     const params = new URLSearchParams();
 
-    const s = "search" in overrides ? overrides.search : search.trim();
-    if (s) params.set("search", s);
+    const s = "search" in overrides
+      ? overrides.search
+      : (searchParams.get("search") ?? "");
+    if (s.trim()) params.set("search", s.trim());
 
     const r = "region" in overrides ? overrides.region : (searchParams.get("region") ?? "");
     if (r) params.set("region", r);
@@ -54,86 +48,67 @@ export default function LibraryFilters({
   }
 
   function applySearch() {
-    router.push(buildUrl({}));
+    const val = inputRef.current?.value ?? "";
+    router.push(buildUrl({ search: val }));
   }
 
-  function resetFilters() {
-    setSearch("");
-    router.push("/library");
-  }
+  const hasFilters =
+    Boolean(searchParams.get("search")) ||
+    Boolean(searchParams.get("region")) ||
+    Boolean(searchParams.get("people")) ||
+    Boolean(searchParams.get("genre")) ||
+    Boolean(searchParams.get("topic"));
 
   return (
-    <section className="rounded-[2rem] border border-[#e4d4bf] bg-[#fbf7f1] p-6 shadow-md md:p-7">
-      <div className="mb-6 flex flex-wrap items-start justify-between gap-4">
-        <div>
-          <h2 className="text-2xl font-extrabold text-stone-900">
-            Поиск и фильтрация
-          </h2>
-
-          <p className="mt-2 text-sm leading-6 text-stone-600">
-            Найдите материал по названию, региону, народу, жанру или тематике.
-          </p>
-        </div>
-
+    <div className="space-y-3">
+      {/* ── Search bar ── */}
+      <div className="flex gap-2">
+        <input
+          ref={inputRef}
+          key={searchParams.get("search") ?? ""}
+          defaultValue={searchParams.get("search") ?? ""}
+          onKeyDown={(e) => { if (e.key === "Enter") applySearch(); }}
+          placeholder="Поиск по названию, описанию или тексту..."
+          className="min-w-0 flex-1 rounded-2xl border border-[#dccab3] bg-white px-5 py-3.5 text-stone-800 shadow-sm outline-none transition placeholder:text-stone-400 focus:border-[#d8a342] focus:ring-2 focus:ring-[#f3dfb1]"
+        />
         <button
           type="button"
-          onClick={resetFilters}
-          className="rounded-2xl border border-stone-300 bg-white px-4 py-2 text-sm font-bold text-stone-700 transition hover:bg-stone-50"
+          onClick={applySearch}
+          className="rounded-2xl bg-[#d8a342] px-6 py-3.5 font-extrabold text-[#06151a] shadow-md transition hover:-translate-y-0.5 hover:bg-[#f0bd5b]"
         >
-          Сбросить
+          Найти
         </button>
+        {hasFilters && (
+          <button
+            type="button"
+            onClick={() => router.push("/library")}
+            className="rounded-2xl border border-stone-300 bg-white px-4 py-3.5 text-sm font-bold text-stone-600 shadow-sm transition hover:bg-stone-50"
+          >
+            Сбросить
+          </button>
+        )}
       </div>
 
-      <div className="grid gap-4 lg:grid-cols-[1.4fr_1fr_1fr_1fr_1fr]">
-        {/* Search — apply on Enter or button click */}
-        <div>
-          <label className="mb-2 block text-sm font-bold text-stone-800">
-            Поиск
-          </label>
-
-          <div className="flex gap-2">
-            <input
-              value={search}
-              onChange={(e) => setSearch(e.target.value)}
-              onKeyDown={(e) => {
-                if (e.key === "Enter") applySearch();
-              }}
-              placeholder="Например: дух, огонь, охотник"
-              className="min-w-0 flex-1 rounded-2xl border border-[#dccab3] bg-white px-4 py-3 text-stone-800 outline-none transition placeholder:text-stone-400 focus:border-[#d8a342] focus:ring-2 focus:ring-[#f3dfb1]"
-            />
-            <button
-              type="button"
-              onClick={applySearch}
-              className="rounded-2xl border border-[#dccab3] bg-white px-4 py-3 text-stone-600 transition hover:border-[#d8a342] hover:text-[#9f661f]"
-              aria-label="Найти"
-            >
-              ↵
-            </button>
-          </div>
-        </div>
-
-        {/* Dropdowns — auto-apply on change */}
+      {/* ── Filter dropdowns ── */}
+      <div className="grid grid-cols-2 gap-3 md:grid-cols-4">
         <FilterSelect
           label="Регион"
           value={searchParams.get("region") ?? ""}
           onChange={(v) => router.push(buildUrl({ region: v }))}
           items={regions}
         />
-
         <FilterSelect
           label="Народ"
           value={searchParams.get("people") ?? ""}
           onChange={(v) => router.push(buildUrl({ people: v }))}
           items={peoples}
         />
-
         <FilterSelect
           label="Жанр"
           value={searchParams.get("genre") ?? ""}
           onChange={(v) => router.push(buildUrl({ genre: v }))}
           items={genres}
         />
-
         <FilterSelect
           label="Тематика"
           value={searchParams.get("topic") ?? ""}
@@ -141,7 +116,7 @@ export default function LibraryFilters({
           items={topics}
         />
       </div>
-    </section>
+    </div>
   );
 }
 
@@ -158,17 +133,15 @@ function FilterSelect({
 }) {
   return (
     <div>
-      <label className="mb-2 block text-sm font-bold text-stone-800">
+      <label className="mb-1.5 block text-xs font-bold uppercase tracking-[0.15em] text-stone-500">
         {label}
       </label>
-
       <select
         value={value}
         onChange={(e) => onChange(e.target.value)}
-        className="w-full rounded-2xl border border-[#dccab3] bg-white px-4 py-3 text-stone-800 outline-none transition focus:border-[#d8a342] focus:ring-2 focus:ring-[#f3dfb1]"
+        className="w-full rounded-2xl border border-[#dccab3] bg-white px-4 py-2.5 text-sm text-stone-800 shadow-sm outline-none transition focus:border-[#d8a342] focus:ring-2 focus:ring-[#f3dfb1]"
       >
         <option value="">Все</option>
-
         {items.map((item) => (
           <option key={item.id} value={item.id}>
             {item.name}
