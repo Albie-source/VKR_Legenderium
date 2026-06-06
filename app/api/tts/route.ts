@@ -20,8 +20,9 @@ export async function POST(req: NextRequest) {
   const body = new URLSearchParams({
     text: truncated,
     lang: "ru-RU",
-    voice: "alena",
-    speed: "0.9",
+    voice: "zahar",   // мужской, глубокий — подходит для сказаний
+    speed: "0.85",    // чуть медленнее для атмосферы
+    emotion: "good",  // тёплая интонация
     format: "mp3",
     sampleRateHertz: "48000",
   });

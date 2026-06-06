@@ -52,10 +52,7 @@ export default function TtsPlayer({ text }: { text: string }) {
 
   function togglePlay() {
     const audio = audioRef.current;
-    if (!audio) {
-      loadAndPlay();
-      return;
-    }
+    if (!audio) { loadAndPlay(); return; }
     if (state === "playing") {
       audio.pause();
       setState("paused");
@@ -66,78 +63,91 @@ export default function TtsPlayer({ text }: { text: string }) {
 
   function stop() {
     const audio = audioRef.current;
-    if (audio) {
-      audio.pause();
-      audio.currentTime = 0;
-    }
+    if (audio) { audio.pause(); audio.currentTime = 0; }
     setState("idle");
     setProgress(0);
   }
 
+  function seek(e: React.MouseEvent<HTMLDivElement>) {
+    const audio = audioRef.current;
+    if (!audio?.duration) return;
+    const rect = e.currentTarget.getBoundingClientRect();
+    audio.currentTime = ((e.clientX - rect.left) / rect.width) * audio.duration;
+  }
+
+  const isPlaying = state === "playing";
   const isLoading = state === "loading";
+  const isActive = state === "playing" || state === "paused";
 
   return (
-    <div className="mt-6 flex items-center gap-4 rounded-2xl border border-[#d8a342]/30 bg-[#07181c] px-5 py-4">
-      {/* Icon */}
-      <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl border border-[#d8a342]/25 bg-[#d8a342]/10 text-[#d8a342]">
-        <svg viewBox="0 0 24 24" fill="currentColor" className="h-5 w-5">
-          <path d="M12 3a9 9 0 0 1 9 9 9 9 0 0 1-9 9 9 9 0 0 1-9-9 9 9 0 0 1 9-9Zm0 1.5a7.5 7.5 0 1 0 0 15 7.5 7.5 0 0 0 0-15Zm-1 4a.75.75 0 0 1 .375.102l4 2.5a.75.75 0 0 1 0 1.296l-4 2.5A.75.75 0 0 1 10 14.25v-5a.75.75 0 0 1 .75-.75Z" />
-        </svg>
-      </div>
-
-      {/* Label + progress bar */}
-      <div className="min-w-0 flex-1">
-        <p className="mb-1.5 text-xs font-bold uppercase tracking-[0.18em] text-[#d8a342]">
-          Аудио-прочтение
-        </p>
-        <div className="relative h-1.5 overflow-hidden rounded-full bg-white/10">
-          <div
-            className="absolute inset-y-0 left-0 rounded-full bg-[#d8a342] transition-all duration-300"
-            style={{ width: `${Math.round(progress * 100)}%` }}
-          />
+    <div className="mb-6 overflow-hidden rounded-2xl border border-[#d8a342]/30 bg-[#07181c]">
+      {/* Header row */}
+      <div className="flex items-center gap-3 px-5 py-3.5">
+        {/* Sound bars */}
+        <div className={`sound-bars text-[#d8a342] ${isPlaying ? "playing" : ""}`}>
+          <div className="sound-bar" />
+          <div className="sound-bar" />
+          <div className="sound-bar" />
+          <div className="sound-bar" />
+          <div className="sound-bar" />
         </div>
+
+        <span className="flex-1 text-xs font-black uppercase tracking-[0.2em] text-[#d8a342]">
+          Озвучка текста
+        </span>
+
+        {state === "error" && (
+          <span className="text-xs text-red-400">Ошибка озвучки</span>
+        )}
+
+        {/* Stop */}
+        {isActive && (
+          <button
+            onClick={stop}
+            title="Стоп"
+            className="flex h-8 w-8 items-center justify-center rounded-xl border border-white/10 bg-white/8 text-white/60 transition hover:border-red-500/40 hover:bg-red-500/10 hover:text-red-400"
+          >
+            <svg viewBox="0 0 24 24" fill="currentColor" className="h-3.5 w-3.5">
+              <rect x="5" y="5" width="14" height="14" rx="2" />
+            </svg>
+          </button>
+        )}
+
+        {/* Play / Pause */}
+        <button
+          onClick={togglePlay}
+          disabled={isLoading}
+          title={isPlaying ? "Пауза" : "Слушать"}
+          className="flex h-9 w-9 items-center justify-center rounded-xl bg-[#d8a342] text-[#06151a] shadow-md transition hover:bg-[#f0bd5b] active:scale-95 disabled:opacity-50"
+        >
+          {isLoading ? (
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2} className="h-4 w-4 animate-spin">
+              <circle cx="12" cy="12" r="10" strokeOpacity={0.25} />
+              <path d="M12 2a10 10 0 0 1 10 10" strokeLinecap="round" />
+            </svg>
+          ) : isPlaying ? (
+            <svg viewBox="0 0 24 24" fill="currentColor" className="h-4 w-4">
+              <rect x="6" y="5" width="4" height="14" rx="1" />
+              <rect x="14" y="5" width="4" height="14" rx="1" />
+            </svg>
+          ) : (
+            <svg viewBox="0 0 24 24" fill="currentColor" className="h-4 w-4">
+              <path d="M8 5.14v14l11-7-11-7Z" />
+            </svg>
+          )}
+        </button>
       </div>
 
-      {/* Play / Pause */}
-      <button
-        onClick={togglePlay}
-        disabled={isLoading}
-        title={state === "playing" ? "Пауза" : "Слушать"}
-        className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl border border-white/10 bg-white/8 text-[#fff8e8] transition hover:border-[#d8a342]/50 hover:bg-[#d8a342]/15 disabled:opacity-50"
+      {/* Progress bar */}
+      <div
+        className="group relative h-1 cursor-pointer bg-white/8 transition-all hover:h-2"
+        onClick={seek}
       >
-        {isLoading ? (
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2} className="h-5 w-5 animate-spin">
-            <circle cx="12" cy="12" r="10" strokeOpacity={0.25} />
-            <path d="M12 2a10 10 0 0 1 10 10" strokeLinecap="round" />
-          </svg>
-        ) : state === "playing" ? (
-          <svg viewBox="0 0 24 24" fill="currentColor" className="h-5 w-5">
-            <rect x="6" y="5" width="4" height="14" rx="1" />
-            <rect x="14" y="5" width="4" height="14" rx="1" />
-          </svg>
-        ) : (
-          <svg viewBox="0 0 24 24" fill="currentColor" className="h-5 w-5">
-            <path d="M8 5.14v14l11-7-11-7Z" />
-          </svg>
-        )}
-      </button>
-
-      {/* Stop */}
-      {(state === "playing" || state === "paused") && (
-        <button
-          onClick={stop}
-          title="Стоп"
-          className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl border border-white/10 bg-white/8 text-[#fff8e8] transition hover:border-red-500/40 hover:bg-red-500/10"
-        >
-          <svg viewBox="0 0 24 24" fill="currentColor" className="h-5 w-5">
-            <rect x="5" y="5" width="14" height="14" rx="2" />
-          </svg>
-        </button>
-      )}
-
-      {state === "error" && (
-        <span className="text-xs text-red-400">Ошибка озвучки</span>
-      )}
+        <div
+          className="h-full bg-gradient-to-r from-[#d8a342] to-[#f0bd5b] transition-all duration-300"
+          style={{ width: `${Math.round(progress * 100)}%` }}
+        />
+      </div>
     </div>
   );
 }

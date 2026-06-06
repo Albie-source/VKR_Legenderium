@@ -498,6 +498,35 @@ select {
 .page-flip-out-prev { animation: pageFlipOutPrev 0.24s ease-in  forwards; }
 .page-flip-in-prev  { animation: pageFlipInPrev  0.24s ease-out forwards; }
 
+/* ───────────────────────── Sound bars animation ───────────────────────── */
+
+@keyframes soundBar {
+  0%, 100% { transform: scaleY(0.3); }
+  50%       { transform: scaleY(1); }
+}
+
+.sound-bars {
+  display: flex;
+  align-items: center;
+  gap: 2px;
+  height: 18px;
+}
+
+.sound-bar {
+  width: 3px;
+  height: 100%;
+  border-radius: 2px;
+  background: currentColor;
+  transform-origin: bottom;
+  transform: scaleY(0.3);
+}
+
+.sound-bars.playing .sound-bar:nth-child(1) { animation: soundBar 0.7s ease-in-out 0.0s infinite; }
+.sound-bars.playing .sound-bar:nth-child(2) { animation: soundBar 0.7s ease-in-out 0.1s infinite; }
+.sound-bars.playing .sound-bar:nth-child(3) { animation: soundBar 0.7s ease-in-out 0.2s infinite; }
+.sound-bars.playing .sound-bar:nth-child(4) { animation: soundBar 0.7s ease-in-out 0.3s infinite; }
+.sound-bars.playing .sound-bar:nth-child(5) { animation: soundBar 0.7s ease-in-out 0.15s infinite; }
+
 /* Parchment page surface */
 .book-page-surface {
   position: relative;
