@@ -2,6 +2,7 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { prisma } from "@/lib/prisma";
 import { getCurrentUser } from "@/lib/auth";
+import { markMaterialDiscovered, statusFromProgress } from "@/lib/materialProgress";
 import {
   addToFavoritesAction,
   removeFromFavoritesAction,
@@ -63,6 +64,19 @@ export default async function MaterialPage({ params }: MaterialPageProps) {
 
   const isFavorite = Boolean(favorite);
 
+  let materialStatus: ReturnType<typeof statusFromProgress> = "undiscovered";
+
+  if (user) {
+    await markMaterialDiscovered(user.id, material.id);
+
+    const progress = await prisma.materialProgress.findUnique({
+      where: { userId_materialId: { userId: user.id, materialId: material.id } },
+      select: { discoveredAt: true, restoredAt: true },
+    });
+
+    materialStatus = statusFromProgress(progress);
+  }
+
   const sourceLabel = material.source
     ? [
         material.source.author && `${material.source.author}.`,
@@ -114,6 +128,18 @@ export default async function MaterialPage({ params }: MaterialPageProps) {
                 <span className="rounded-full border border-white/10 bg-white/8 px-3 py-1 font-bold text-[#d6c8b6]">
                   {material.region.name} · {material.people.name}
                 </span>
+
+                {materialStatus === "restored" && (
+                  <span className="rounded-full border border-[#6fcf97]/40 bg-[#6fcf97]/12 px-3 py-1 font-black uppercase tracking-[0.12em] text-[#9ee8c0]">
+                    ✓ Фрагмент восстановлен
+                  </span>
+                )}
+
+                {materialStatus === "discovered" && (
+                  <span className="rounded-full border border-white/10 bg-white/8 px-3 py-1 font-black uppercase tracking-[0.12em] text-[#d6c8b6]">
+                    Фрагмент найден · ожидает восстановления
+                  </span>
+                )}
               </div>
 
               <h1 className="mb-3 max-w-4xl text-4xl font-extrabold leading-tight tracking-tight text-[#fff8e8] md:text-5xl">
@@ -143,11 +169,14 @@ export default async function MaterialPage({ params }: MaterialPageProps) {
               <section className="flex flex-col gap-5 rounded-[1.75rem] border border-[#d8a342]/35 bg-[#0e2227] p-6 shadow-md sm:flex-row sm:items-center sm:justify-between">
                 <div>
                   <h2 className="mb-1 text-xl font-extrabold text-[#fff8e8]">
-                    Проверьте свои знания
+                    {materialStatus === "restored"
+                      ? "Проверка Архивариуса пройдена"
+                      : "Проверка Архивариуса"}
                   </h2>
                   <p className="text-sm leading-6 text-[#d6c8b6]">
-                    Пройдите интерактивное задание по этому материалу и
-                    закрепите полученные знания.
+                    {materialStatus === "restored"
+                      ? "Ты прошёл проверку — фрагмент полностью восстановлен и занял своё место в архиве."
+                      : "Ты нашёл фрагмент. Пройди задание Архивариуса, чтобы он считался по-настоящему восстановленным и занял своё место в архиве."}
                   </p>
                 </div>
 
@@ -155,7 +184,7 @@ export default async function MaterialPage({ params }: MaterialPageProps) {
                   href={`/quests/${material.tasks[0].id}`}
                   className="inline-flex shrink-0 items-center justify-center gap-2 rounded-2xl bg-[#d8a342] px-5 py-3 font-extrabold text-[#06151a] shadow-md transition hover:-translate-y-0.5 hover:bg-[#f0bd5b]"
                 >
-                  Перейти к заданию
+                  {materialStatus === "restored" ? "Пройти ещё раз" : "Пройти проверку"}
                   <span aria-hidden>→</span>
                 </Link>
               </section>

@@ -93,6 +93,8 @@ type SaveTaskResult = {
   isCorrect: boolean;
   progressUpdated: boolean;
   completedGoals: { id: number; title: string; cardTitle: string }[];
+  fragmentRestored: boolean;
+  fragmentTitle: string | null;
 };
 
 type TaskClientProps = {
@@ -977,13 +979,28 @@ function AssembleOutfitTask({
 
 // ─── Miron celebration popup ──────────────────────────────────────────────────
 
-function MironCelebration({ goals }: { goals: { id: number; title: string; cardTitle: string }[] }) {
+function MironCelebration({
+  goals,
+  fragmentRestored,
+  fragmentTitle,
+}: {
+  goals: { id: number; title: string; cardTitle: string }[];
+  fragmentRestored: boolean;
+  fragmentTitle: string | null;
+}) {
   const [visible, setVisible] = useState(true);
 
   useEffect(() => {
     const t = setTimeout(() => setVisible(false), 5500);
     return () => clearTimeout(t);
   }, []);
+
+  const message =
+    goals.length > 0
+      ? `Превосходно! Свиток «${goals[0].cardTitle}» восстановлен для архива!`
+      : fragmentRestored
+        ? `Фрагмент${fragmentTitle ? ` «${fragmentTitle}»` : ""} восстановлен и занял своё место в архиве!`
+        : "Превосходно! Архив пополнен ещё одной страницей!";
 
   return (
     <div
@@ -1001,11 +1018,7 @@ function MironCelebration({ goals }: { goals: { id: number; title: string; cardT
         <p className="mb-1 text-[10px] font-black uppercase tracking-[0.24em] text-[#d8a342]">
           Архивариус Мирон
         </p>
-        <p className="text-sm font-semibold leading-6 text-[#fff8e8]">
-          {goals.length > 0
-            ? `Превосходно! Свиток «${goals[0].cardTitle}» восстановлен для архива!`
-            : "Превосходно! Архив пополнен ещё одной страницей!"}
-        </p>
+        <p className="text-sm font-semibold leading-6 text-[#fff8e8]">{message}</p>
         <button
           type="button"
           onClick={() => setVisible(false)}
@@ -1037,9 +1050,15 @@ function ResultBlock({
 }) {
   return (
     <div className="space-y-5">
-      {serverResult?.isAuthenticated && serverResult.isCorrect && serverResult.progressUpdated && (
-        <MironCelebration goals={serverResult.completedGoals} />
-      )}
+      {serverResult?.isAuthenticated &&
+        serverResult.isCorrect &&
+        (serverResult.progressUpdated || serverResult.fragmentRestored) && (
+          <MironCelebration
+            goals={serverResult.completedGoals}
+            fragmentRestored={serverResult.fragmentRestored}
+            fragmentTitle={serverResult.fragmentTitle}
+          />
+        )}
       <div className={["rounded-[1.5rem] border p-6 shadow-sm", isCorrect ? "border-emerald-300 bg-emerald-50 text-emerald-950" : "border-red-300 bg-red-50 text-red-950"].join(" ")}>
         <p className="mb-2 text-sm font-black uppercase tracking-[0.2em]">Результат</p>
         <h3 className="mb-3 text-2xl font-extrabold">{isCorrect ? "Верно!" : "Ответ неверный"}</h3>

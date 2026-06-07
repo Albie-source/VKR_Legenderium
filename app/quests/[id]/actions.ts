@@ -2,6 +2,7 @@
 
 import { getCurrentUser } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
+import { markMaterialRestored } from "@/lib/materialProgress";
 
 type SingleChoiceConfig = {
   question: string;
@@ -28,6 +29,8 @@ type SaveTaskResult = {
     title: string;
     cardTitle: string;
   }[];
+  fragmentRestored: boolean;
+  fragmentTitle: string | null;
   error?: string;
 };
 
@@ -87,6 +90,8 @@ export async function saveTaskResultAction(
         isCorrect: false,
         progressUpdated: false,
         completedGoals: [],
+        fragmentRestored: false,
+        fragmentTitle: null,
       };
     }
 
@@ -102,6 +107,8 @@ export async function saveTaskResultAction(
         isCorrect: false,
         progressUpdated: false,
         completedGoals: [],
+        fragmentRestored: false,
+        fragmentTitle: null,
       };
     }
 
@@ -111,6 +118,8 @@ export async function saveTaskResultAction(
         isCorrect,
         progressUpdated: false,
         completedGoals: [],
+        fragmentRestored: false,
+        fragmentTitle: null,
       };
     }
 
@@ -127,12 +136,20 @@ export async function saveTaskResultAction(
       },
     });
 
+    const fragmentRestored = isCorrect && task.materialId !== null && !previousSuccessfulAttempt;
+
+    if (isCorrect && task.materialId !== null) {
+      await markMaterialRestored(user.id, task.materialId);
+    }
+
     if (!isCorrect || previousSuccessfulAttempt) {
       return {
         isAuthenticated: true,
         isCorrect,
         progressUpdated: false,
         completedGoals: [],
+        fragmentRestored: false,
+        fragmentTitle: null,
       };
     }
 
@@ -222,6 +239,8 @@ export async function saveTaskResultAction(
       isCorrect,
       progressUpdated: matchingGoals.length > 0,
       completedGoals,
+      fragmentRestored,
+      fragmentTitle: fragmentRestored ? task.material?.title ?? null : null,
     };
   } catch (err) {
     console.error("saveTaskResultAction error:", err);
@@ -230,6 +249,8 @@ export async function saveTaskResultAction(
       isCorrect: false,
       progressUpdated: false,
       completedGoals: [],
+      fragmentRestored: false,
+      fragmentTitle: null,
       error: "Произошла ошибка при сохранении результата. Попробуйте снова.",
     };
   }
