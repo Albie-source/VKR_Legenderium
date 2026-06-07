@@ -603,3 +603,60 @@ select {
 .sound-bars.playing .sound-bar:nth-child(3) { animation: soundBar 0.7s ease-in-out 0.2s infinite; }
 .sound-bars.playing .sound-bar:nth-child(4) { animation: soundBar 0.7s ease-in-out 0.3s infinite; }
 .sound-bars.playing .sound-bar:nth-child(5) { animation: soundBar 0.7s ease-in-out 0.15s infinite; }
+
+/* ───────────────────────── TTS player "screen" ───────────────────────── */
+
+.tts-screen {
+  position: relative;
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  gap: 5px;
+  overflow: hidden;
+  border-radius: 14px;
+  border: 1px solid rgba(216, 163, 66, 0.22);
+  background: radial-gradient(circle at 50% 115%, rgba(216, 163, 66, 0.12), transparent 62%), #040f12;
+  box-shadow: inset 0 2px 12px rgba(0, 0, 0, 0.55), inset 0 0 26px rgba(216, 163, 66, 0.05);
+}
+
+.tts-screen::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: repeating-linear-gradient(
+    180deg,
+    rgba(255, 255, 255, 0.025) 0px, rgba(255, 255, 255, 0.025) 1px,
+    transparent 1px, transparent 3px
+  );
+  pointer-events: none;
+}
+
+.tts-vis-bar {
+  position: relative;
+  width: 5px;
+  height: 16%;
+  border-radius: 3px;
+  background: linear-gradient(to top, #b46b1f, #f0bd5b);
+  box-shadow: 0 0 8px rgba(240, 189, 91, 0.45);
+  transform-origin: bottom;
+  transition: height 0.3s ease;
+}
+
+@keyframes ttsVisBar {
+  0%, 100% { height: 18%; }
+  50%       { height: 88%; }
+}
+
+.tts-screen.playing .tts-vis-bar {
+  animation-name: ttsVisBar;
+  animation-timing-function: ease-in-out;
+  animation-iteration-count: infinite;
+}
+
+.tts-screen.playing .tts-vis-bar:nth-child(1) { animation-duration: 0.9s;  animation-delay: 0s; }
+.tts-screen.playing .tts-vis-bar:nth-child(2) { animation-duration: 0.7s;  animation-delay: 0.18s; }
+.tts-screen.playing .tts-vis-bar:nth-child(3) { animation-duration: 1.1s;  animation-delay: 0.05s; }
+.tts-screen.playing .tts-vis-bar:nth-child(4) { animation-duration: 0.8s;  animation-delay: 0.28s; }
+.tts-screen.playing .tts-vis-bar:nth-child(5) { animation-duration: 1.0s;  animation-delay: 0.1s; }
+.tts-screen.playing .tts-vis-bar:nth-child(6) { animation-duration: 0.75s; animation-delay: 0.32s; }
+.tts-screen.playing .tts-vis-bar:nth-child(7) { animation-duration: 0.95s; animation-delay: 0.2s; }

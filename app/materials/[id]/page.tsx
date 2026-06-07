@@ -171,12 +171,18 @@ export default async function MaterialPage({ params }: MaterialPageProps) {
       >
         <div className="space-y-8">
           <section className="rounded-[2rem] border border-[#e4d4bf] bg-white p-7 shadow-md md:p-8">
-            {process.env.YANDEX_TTS_API_KEY && material.fullText && (
-              <TtsPlayer text={material.fullText} />
-            )}
-
             {material.fullText ? (
-              <ManuscriptReader text={material.fullText} />
+              <div className="flex flex-col gap-6 lg:flex-row lg:items-start">
+                <div className="min-w-0 flex-1">
+                  <ManuscriptReader text={material.fullText} />
+                </div>
+
+                {process.env.YANDEX_TTS_API_KEY && (
+                  <div className="lg:w-[230px] lg:shrink-0">
+                    <TtsPlayer text={material.fullText} />
+                  </div>
+                )}
+              </div>
             ) : (
               <p className="rounded-2xl border border-[#eadbc7] bg-[#fbf7f1] p-5 text-stone-700">
                 Полный текст пока не добавлен.
