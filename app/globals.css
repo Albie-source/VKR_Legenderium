@@ -473,31 +473,17 @@ select {
 
 /* ───────────────────────── Manuscript Reader ───────────────────────── */
 
-.manuscript-reader {
+.manuscript-book {
   position: relative;
 }
 
-.manuscript-progress-track {
-  position: sticky;
-  top: 0;
-  z-index: 5;
-  height: 3px;
-  background: rgba(180, 140, 60, 0.16);
-  border-radius: 999px;
-  overflow: hidden;
-  margin-bottom: 1.5rem;
-}
-
-.manuscript-progress-fill {
-  height: 100%;
-  background: linear-gradient(90deg, #d8a342, #f0bd5b);
-  transition: width 0.15s ease-out;
-}
-
-.manuscript-page {
+/* Fixed-size leaf — identical footprint on every material page */
+.manuscript-leaf {
   position: relative;
-  border-radius: 28px;
+  height: 560px;
+  border-radius: 6px 28px 28px 6px;
   border: 1px solid #d4b06a;
+  border-left: 4px solid #c8964a;
   background:
     radial-gradient(circle at 18% 12%, rgba(200, 150, 50, 0.07), transparent 35%),
     radial-gradient(circle at 85% 85%, rgba(180, 110, 40, 0.05), transparent 40%),
@@ -509,7 +495,23 @@ select {
   box-shadow:
     0 30px 80px rgba(0, 0, 0, 0.14),
     inset 0 0 60px rgba(200, 150, 50, 0.05);
-  padding: 3rem 3.25rem;
+  padding: 2.75rem 3rem 3.25rem;
+  overflow-y: auto;
+  transform-origin: left center;
+}
+
+.manuscript-leaf-inner {
+  position: relative;
+}
+
+.manuscript-page-number {
+  position: absolute;
+  bottom: 14px;
+  right: 28px;
+  font-size: 11px;
+  font-weight: 900;
+  letter-spacing: 0.25em;
+  color: rgba(180, 107, 31, 0.5);
 }
 
 .manuscript-paragraph {
@@ -524,11 +526,10 @@ select {
 .manuscript-drop-cap {
   float: left;
   font-family: var(--font-heading), serif;
-  font-size: 4.4rem;
-  line-height: 0.82;
+  font-size: 4.2rem;
+  line-height: 1;
   font-weight: 800;
-  padding: 0.1rem 0.18rem 0 0;
-  margin-top: 0.18rem;
+  margin: -0.06em 0.18rem -0.1em 0;
   color: #b46b1f;
   text-shadow: 2px 2px 0 rgba(216, 163, 66, 0.18);
 }
@@ -537,7 +538,7 @@ select {
   display: flex;
   align-items: center;
   gap: 14px;
-  margin: 2rem 0;
+  margin: 1.75rem 0;
 }
 
 .manuscript-divider-line {
@@ -551,14 +552,42 @@ select {
   color: rgba(180, 107, 31, 0.55);
 }
 
+/* ── Page-flip animations (single leaf) ── */
+
+@keyframes manuscriptFlipOutNext {
+  0%   { transform: perspective(1800px) rotateY(0deg);   opacity: 1; }
+  100% { transform: perspective(1800px) rotateY(-92deg); opacity: 0.25; }
+}
+
+@keyframes manuscriptFlipInNext {
+  0%   { transform: perspective(1800px) rotateY(92deg);  opacity: 0.25; }
+  100% { transform: perspective(1800px) rotateY(0deg);   opacity: 1; }
+}
+
+@keyframes manuscriptFlipOutPrev {
+  0%   { transform: perspective(1800px) rotateY(0deg);  opacity: 1; }
+  100% { transform: perspective(1800px) rotateY(92deg); opacity: 0.25; }
+}
+
+@keyframes manuscriptFlipInPrev {
+  0%   { transform: perspective(1800px) rotateY(-92deg); opacity: 0.25; }
+  100% { transform: perspective(1800px) rotateY(0deg);   opacity: 1; }
+}
+
+.manuscript-flip-out-next { animation: manuscriptFlipOutNext 0.28s ease-in  forwards; }
+.manuscript-flip-in-next  { animation: manuscriptFlipInNext  0.28s ease-out forwards; }
+.manuscript-flip-out-prev { animation: manuscriptFlipOutPrev 0.28s ease-in  forwards; }
+.manuscript-flip-in-prev  { animation: manuscriptFlipInPrev  0.28s ease-out forwards; }
+
 @media (max-width: 640px) {
-  .manuscript-page {
-    padding: 2rem 1.5rem;
-    border-radius: 20px;
+  .manuscript-leaf {
+    height: 480px;
+    padding: 2rem 1.5rem 2.5rem;
+    border-radius: 18px;
   }
 
   .manuscript-drop-cap {
-    font-size: 3.4rem;
+    font-size: 3.2rem;
   }
 }
 
