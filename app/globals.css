@@ -505,11 +505,22 @@ select {
     0 30px 80px rgba(0, 0, 0, 0.14),
     inset 0 0 60px rgba(200, 150, 50, 0.06);
   padding: 2.75rem 3rem 3.25rem;
-  overflow-y: auto;
+  overflow: hidden;
 }
 
 .manuscript-leaf-inner {
   position: relative;
+}
+
+/* Off-screen clone used only to measure rendered paragraph heights so
+   pagination can be computed from real layout instead of a char-count guess. */
+.manuscript-measure {
+  position: absolute;
+  visibility: hidden;
+  pointer-events: none;
+  height: auto;
+  left: -9999px;
+  top: 0;
 }
 
 .manuscript-page-number {
