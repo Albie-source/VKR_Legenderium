@@ -3,6 +3,7 @@ import { Suspense } from "react";
 import { Prisma } from "@prisma/client";
 import { prisma } from "@/lib/prisma";
 import LibraryFilters from "./LibraryFilters";
+import LibraryResults from "./LibraryResults";
 import LibraryPagination from "./LibraryPagination";
 import MascotHint from "@/components/MascotHint";
 
@@ -16,8 +17,14 @@ type LibraryPageProps = {
     people?: string;
     genre?: string;
     topic?: string;
+    sort?: string;
     page?: string;
   }>;
+};
+
+const ORDER_BY: Record<string, Prisma.MaterialOrderByWithRelationInput> = {
+  title_asc: { title: "asc" },
+  title_desc: { title: "desc" },
 };
 
 async function trigramSearch(
@@ -82,7 +89,10 @@ export default async function LibraryPage({ searchParams }: LibraryPageProps) {
   const peopleId = params.people ? Number(params.people) : NaN;
   const genreId = params.genre ? Number(params.genre) : NaN;
   const topicId = params.topic ? Number(params.topic) : NaN;
+  const sort = params.sort ?? "";
   const currentPage = Math.max(1, Number(params.page) || 1);
+
+  const orderBy = ORDER_BY[sort] ?? { createdAt: "desc" as const };
 
   // --- Trigram search path ---
   let trgmIds: number[] | null = null;
@@ -123,7 +133,7 @@ export default async function LibraryPage({ searchParams }: LibraryPageProps) {
           genre: true,
           topics: { include: { topic: true } },
         },
-        orderBy: { createdAt: "desc" },
+        orderBy,
         take: PAGE_SIZE,
         skip: (currentPage - 1) * PAGE_SIZE,
       });
@@ -151,13 +161,6 @@ export default async function LibraryPage({ searchParams }: LibraryPageProps) {
   const totalCount = rawCount;
   const totalPages = Math.ceil(totalCount / PAGE_SIZE);
 
-  const hasActiveFilters =
-    Boolean(search) ||
-    !Number.isNaN(regionId) ||
-    !Number.isNaN(peopleId) ||
-    !Number.isNaN(genreId) ||
-    !Number.isNaN(topicId);
-
   return (
     <main className="overflow-hidden bg-[#f4ecdf] pb-20">
       <MascotHint
@@ -165,25 +168,33 @@ export default async function LibraryPage({ searchParams }: LibraryPageProps) {
         message="Используй фильтры сверху, чтобы найти легенды нужного народа или региона. Каждый прочитанный материал приближает нас к восстановлению архива!"
         mood="thinking"
       />
+
       <section className="border-b border-white/10 bg-[radial-gradient(circle_at_18%_12%,rgba(58,166,160,0.16),transparent_28%),radial-gradient(circle_at_82%_8%,rgba(216,163,66,0.12),transparent_24%),linear-gradient(180deg,#07181c_0%,#0b2428_100%)]">
-        <div className="mx-auto max-w-7xl px-6 py-12">
-          <div className="relative overflow-hidden rounded-[2.5rem] border border-white/10 bg-[#0b1f22] px-8 py-10 shadow-2xl shadow-black/25 md:px-10 md:py-12">
+        <div className="mx-auto max-w-7xl px-6 py-8">
+          <nav className="mb-4 flex flex-wrap items-center gap-1.5 text-sm font-semibold">
+            <Link href="/" className="text-[#d6c8b6]/60 transition hover:text-[#fff8e8]">
+              Главная
+            </Link>
+            <span className="text-[#d6c8b6]/30">›</span>
+            <span className="text-[#fff8e8]">Библиотека</span>
+          </nav>
+
+          <div className="relative overflow-hidden rounded-[2rem] border border-white/10 bg-[#0b1f22] px-7 py-7 shadow-xl shadow-black/20 md:px-9 md:py-8">
             <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_12%_18%,rgba(58,166,160,0.16),transparent_28%),radial-gradient(circle_at_82%_20%,rgba(216,163,66,0.14),transparent_24%),radial-gradient(circle_at_70%_88%,rgba(47,143,99,0.10),transparent_28%)]" />
 
-            <div className="relative max-w-4xl">
-              <p className="mb-4 inline-flex rounded-full border border-[#d8a342]/35 bg-[#d8a342]/10 px-4 py-2 text-xs font-black uppercase tracking-[0.28em] text-[#f0bd5b]">
+            <div className="relative max-w-3xl">
+              <p className="mb-3 inline-flex rounded-full border border-[#d8a342]/35 bg-[#d8a342]/10 px-4 py-1.5 text-xs font-black uppercase tracking-[0.28em] text-[#f0bd5b]">
                 Библиотека
               </p>
 
-              <h1 className="mb-5 text-5xl font-extrabold leading-tight tracking-tight text-[#fff8e8] md:text-6xl">
+              <h1 className="mb-3 text-3xl font-extrabold leading-tight tracking-tight text-[#fff8e8] md:text-4xl">
                 Фольклорные материалы
               </h1>
 
-              <p className="max-w-3xl text-lg leading-8 text-[#d6c8b6]">
-                В библиотеке собраны легенды, сказки, мифы и другие материалы,
-                связанные с фольклором народов России. Используйте поиск и
-                фильтры, чтобы изучать материалы по региону, народу, жанру и
-                тематике.
+              <p className="max-w-2xl text-base leading-7 text-[#d6c8b6]">
+                Легенды, сказки, мифы и другие материалы, связанные с
+                фольклором народов России. Используйте поиск и фильтры слева,
+                чтобы изучать материалы по региону, народу, жанру и тематике.
               </p>
             </div>
           </div>
@@ -191,106 +202,20 @@ export default async function LibraryPage({ searchParams }: LibraryPageProps) {
       </section>
 
       <section className="mx-auto max-w-7xl px-6 pt-10">
-        <Suspense fallback={null}>
-          <LibraryFilters
-            regions={regions}
-            peoples={peoples}
-            genres={genres}
-            topics={topics}
-          />
-        </Suspense>
+        <div className="grid gap-8 lg:grid-cols-[300px_1fr] lg:items-start">
+          <Suspense fallback={null}>
+            <LibraryFilters
+              regions={regions}
+              peoples={peoples}
+              genres={genres}
+              topics={topics}
+            />
+          </Suspense>
 
-        <div className="mb-6 mt-10 flex flex-wrap items-center justify-between gap-4">
-          <div>
-            <h2 className="text-3xl font-extrabold text-stone-950">
-              Материалы
-            </h2>
-
-            <p className="mt-2 text-sm leading-6 text-stone-600">
-              {hasActiveFilters
-                ? "Показаны материалы, соответствующие выбранным параметрам."
-                : "Показаны все опубликованные материалы платформы."}
-            </p>
-          </div>
-
-          <span className="rounded-full border border-[#d8c3a5] bg-white px-4 py-2 text-sm font-bold text-stone-700 shadow-sm">
-            Всего: {totalCount}
-          </span>
-        </div>
-
-        {materials.length === 0 ? (
-          <EmptyState />
-        ) : (
-          <>
-            <div className="grid gap-6 md:grid-cols-2 xl:grid-cols-3">
-              {materials.map((material, index) => (
-                <article
-                  key={material.id}
-                  style={{ animationDelay: `${index * 0.06}s` }}
-                  className="animate-fade-in-up group flex min-h-[460px] flex-col overflow-hidden rounded-[2rem] border border-[#e4d4bf] bg-white shadow-md transition hover:-translate-y-1 hover:shadow-xl"
-                >
-                  <div className="relative h-52 overflow-hidden bg-[#eadfce]">
-                    {material.imageUrl ? (
-                      <img
-                        src={material.imageUrl}
-                        alt={material.title}
-                        className="h-full w-full object-cover object-[center_42%] transition duration-500 group-hover:scale-105"
-                      />
-                    ) : (
-                      <div className="flex h-full items-center justify-center bg-[radial-gradient(circle_at_35%_25%,rgba(216,163,66,0.18),transparent_28%),linear-gradient(135deg,#efe4d3,#e5d4bd)] px-6 text-center text-sm font-semibold text-stone-600">
-                        Изображение не добавлено
-                      </div>
-                    )}
-
-                    <div className="absolute inset-0 bg-gradient-to-t from-black/35 via-transparent to-transparent" />
-
-                    <div className="absolute left-4 top-4 rounded-full border border-[#d8a342]/30 bg-[#fff8e8]/90 px-3 py-1 text-xs font-extrabold text-[#9f661f] shadow-sm backdrop-blur">
-                      {material.genre.name}
-                    </div>
-                  </div>
-
-                  <div className="flex flex-1 flex-col p-5">
-                    <div className="mb-3 flex flex-wrap gap-2 text-xs">
-                      <span className="rounded-full border border-[#3aa6a0]/20 bg-[#e7f7f5] px-3 py-1 font-bold text-[#247670]">
-                        {material.region.name}
-                      </span>
-
-                      <span className="rounded-full border border-stone-200 bg-stone-100 px-3 py-1 font-bold text-stone-700">
-                        {material.people.name}
-                      </span>
-                    </div>
-
-                    <h3 className="mb-3 text-2xl font-extrabold leading-tight text-stone-950">
-                      {material.title}
-                    </h3>
-
-                    <p className="mb-4 line-clamp-4 flex-1 text-sm leading-6 text-stone-600">
-                      {material.shortDescription}
-                    </p>
-
-                    {material.topics.length > 0 && (
-                      <div className="mb-5 flex flex-wrap gap-2">
-                        {material.topics.map(({ topic }) => (
-                          <span
-                            key={topic.id}
-                            className="rounded-full border border-[#eadbc7] bg-[#faf4eb] px-3 py-1 text-xs font-semibold text-stone-600"
-                          >
-                            {topic.name}
-                          </span>
-                        ))}
-                      </div>
-                    )}
-
-                    <Link
-                      href={`/materials/${material.id}`}
-                      className="mt-auto rounded-2xl bg-[#d8a342] px-4 py-3 text-center text-sm font-extrabold text-[#06151a] shadow-md transition hover:-translate-y-0.5 hover:bg-[#f0bd5b]"
-                    >
-                      Открыть материал
-                    </Link>
-                  </div>
-                </article>
-              ))}
-            </div>
+          <div className="min-w-0">
+            <Suspense fallback={null}>
+              <LibraryResults materials={materials} totalCount={totalCount} />
+            </Suspense>
 
             <Suspense fallback={null}>
               <LibraryPagination
@@ -298,35 +223,9 @@ export default async function LibraryPage({ searchParams }: LibraryPageProps) {
                 totalPages={totalPages}
               />
             </Suspense>
-          </>
-        )}
+          </div>
+        </div>
       </section>
     </main>
-  );
-}
-
-function EmptyState() {
-  return (
-    <div className="rounded-[2rem] border border-[#e4d4bf] bg-white p-10 text-center shadow-md">
-      <div className="mx-auto mb-5 flex h-16 w-16 items-center justify-center rounded-3xl border border-[#d8a342]/30 bg-[#fff5dc] text-2xl text-[#c78a24]">
-        ?
-      </div>
-
-      <h3 className="mb-3 text-2xl font-extrabold text-stone-950">
-        Материалы не найдены
-      </h3>
-
-      <p className="mx-auto mb-6 max-w-xl leading-7 text-stone-600">
-        По выбранным параметрам нет опубликованных материалов. Попробуйте
-        изменить фильтры или сбросить поиск.
-      </p>
-
-      <Link
-        href="/library"
-        className="inline-flex rounded-2xl bg-[#d8a342] px-5 py-3 font-extrabold text-[#06151a] shadow-md transition hover:bg-[#f0bd5b]"
-      >
-        Сбросить фильтры
-      </Link>
-    </div>
   );
 }
