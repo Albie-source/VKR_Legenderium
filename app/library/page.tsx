@@ -55,19 +55,19 @@ async function trigramSearch(
   const rows = await prisma.$queryRaw<{ id: bigint }[]>(
     Prisma.sql`
       SELECT DISTINCT m.id,
+        word_similarity(${search}, m.title) AS title_score,
         GREATEST(
-          word_similarity(${search}, m.title),
           word_similarity(${search}, COALESCE(m."shortDescription", '')),
           word_similarity(${search}, r.name),
           word_similarity(${search}, p.name),
           word_similarity(${search}, g.name)
-        ) AS score
+        ) AS other_score
       FROM materials m
       JOIN regions r ON m."regionId" = r.id
       JOIN peoples p ON m."peopleId" = p.id
       JOIN genres  g ON m."genreId"  = g.id
       WHERE ${Prisma.join(conditions, " AND ")}
-      ORDER BY score DESC
+      ORDER BY title_score DESC, other_score DESC
     `,
   );
 
