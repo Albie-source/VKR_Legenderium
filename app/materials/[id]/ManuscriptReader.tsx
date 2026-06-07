@@ -3,7 +3,7 @@
 import React, { useEffect, useRef, useState } from "react";
 import HTMLFlipBook from "react-pageflip";
 
-const CHARS_PER_PAGE = 620;
+const CHARS_PER_PAGE = 460;
 
 function splitIntoPages(text: string): string[] {
   const paragraphs = text.split(/\n{2,}/).map((p) => p.trim()).filter(Boolean);
@@ -109,40 +109,42 @@ export default function ManuscriptReader({ text }: { text: string }) {
 
   return (
     <div className="manuscript-book">
-      <FlipBook
-        width={440}
-        height={600}
-        size="stretch"
-        minWidth={300}
-        maxWidth={520}
-        minHeight={420}
-        maxHeight={680}
-        showCover={false}
-        usePortrait
-        drawShadow
-        flippingTime={650}
-        maxShadowOpacity={0.35}
-        startZIndex={10}
-        autoSize
-        startPage={0}
-        mobileScrollSupport
-        clickEventForward
-        useMouseEvents
-        swipeDistance={30}
-        showPageCorners
-        disableFlipByClick={false}
-        className="manuscript-flipbook"
-        style={{}}
-        renderOnlyPageLengthChange={false}
-        ref={bookRef}
-        onFlip={(e: { data: number }) => setIndex(e.data)}
-      >
-        {pages.map((page, i) => (
-          <Leaf key={i} pageIndex={i} total={total}>
-            <PageContent page={page} isFirstPage={i === 0} />
-          </Leaf>
-        ))}
-      </FlipBook>
+      <div className="manuscript-flip-wrap">
+        <FlipBook
+          width={420}
+          height={580}
+          size="stretch"
+          minWidth={280}
+          maxWidth={480}
+          minHeight={386}
+          maxHeight={662}
+          showCover={false}
+          usePortrait
+          drawShadow
+          flippingTime={650}
+          maxShadowOpacity={0.35}
+          startZIndex={10}
+          autoSize
+          startPage={0}
+          mobileScrollSupport
+          clickEventForward
+          useMouseEvents
+          swipeDistance={30}
+          showPageCorners
+          disableFlipByClick={false}
+          className="manuscript-flipbook"
+          style={{}}
+          renderOnlyPageLengthChange={false}
+          ref={bookRef}
+          onFlip={(e: { data: number }) => setIndex(e.data)}
+        >
+          {pages.map((page, i) => (
+            <Leaf key={i} pageIndex={i} total={total}>
+              <PageContent page={page} isFirstPage={i === 0} />
+            </Leaf>
+          ))}
+        </FlipBook>
+      </div>
 
       {total > 1 && (
         <div className="mt-6 flex items-center justify-between gap-4">
