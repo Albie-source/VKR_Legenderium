@@ -655,7 +655,7 @@ select {
   flex: 1;
   min-width: 2px;
   border-radius: 2px;
-  background: rgba(255, 255, 255, 0.12);
+  background: rgba(255, 248, 232, 0.22);
   transform-origin: center;
   transition: background 0.3s ease, transform 0.3s ease;
 }

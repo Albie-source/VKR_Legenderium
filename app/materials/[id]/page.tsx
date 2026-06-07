@@ -124,7 +124,7 @@ export default async function MaterialPage({ params }: MaterialPageProps) {
         )}
 
         {process.env.YANDEX_TTS_API_KEY && material.fullText && (
-          <div className="mb-8">
+          <div className="mb-8 grid gap-8 lg:grid-cols-[1fr_320px]">
             <TtsPlayer text={material.fullText} />
           </div>
         )}
