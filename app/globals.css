@@ -186,6 +186,7 @@ select {
   border: none !important;
   background: transparent !important;
   box-shadow: none !important;
+  white-space: normal !important;
 }
 
 .legendarium-material-tooltip::before {
