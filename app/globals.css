@@ -475,27 +475,16 @@ select {
 
 .manuscript-book {
   position: relative;
-}
-
-/* Constrains the book to roughly one page's width so react-pageflip
-   never has room for a two-page spread — only single-leaf flipping. */
-.manuscript-flip-wrap {
   display: flex;
   justify-content: center;
-  width: 100%;
-  max-width: 480px;
-  margin: 0 auto;
 }
 
-.manuscript-flipbook {
-  filter: drop-shadow(0 30px 60px rgba(0, 0, 0, 0.18));
-}
-
-/* Each flip-book page — identical footprint on every material page */
+/* Fixed-size leaf — identical footprint on every material page, regardless of text length */
 .manuscript-leaf {
   position: relative;
   width: 100%;
-  height: 100%;
+  max-width: 640px;
+  height: 560px;
   border-radius: 6px 28px 28px 6px;
   border: 1px solid #d4b06a;
   border-left: 4px solid #c8964a;
@@ -507,9 +496,11 @@ select {
       rgba(180, 140, 60, 0.05) 35px, rgba(180, 140, 60, 0.05) 36px
     ),
     linear-gradient(170deg, #fefdf6 0%, #fdf8e8 45%, #f8f0d4 100%);
-  box-shadow: inset 0 0 60px rgba(200, 150, 50, 0.06);
+  box-shadow:
+    0 30px 80px rgba(0, 0, 0, 0.14),
+    inset 0 0 60px rgba(200, 150, 50, 0.06);
   padding: 2.75rem 3rem 3.25rem;
-  overflow: hidden;
+  overflow-y: auto;
 }
 
 .manuscript-leaf-inner {
@@ -525,6 +516,24 @@ select {
   letter-spacing: 0.25em;
   color: rgba(180, 107, 31, 0.5);
 }
+
+/* ── Fragment restoration transition: the current piece dissolves into
+   golden light and the next one materializes out of it — fits the
+   "recovering scattered legends from the archive" narrative better
+   than a literal book-page flip. ── */
+
+@keyframes fragmentDissolve {
+  0%   { opacity: 1; filter: blur(0) brightness(1);   transform: scale(1); }
+  100% { opacity: 0; filter: blur(11px) brightness(1.5); transform: scale(0.96); }
+}
+
+@keyframes fragmentMaterialize {
+  0%   { opacity: 0; filter: blur(11px) brightness(1.5); transform: scale(1.04); }
+  100% { opacity: 1; filter: blur(0) brightness(1);   transform: scale(1); }
+}
+
+.manuscript-fragment-out { animation: fragmentDissolve 0.4s ease-in forwards; }
+.manuscript-fragment-in  { animation: fragmentMaterialize 0.4s ease-out forwards; }
 
 .manuscript-paragraph {
   font-size: 1.08rem;
@@ -566,6 +575,7 @@ select {
 
 @media (max-width: 640px) {
   .manuscript-leaf {
+    height: 480px;
     padding: 2rem 1.5rem 2.5rem;
     border-radius: 18px;
   }
