@@ -475,6 +475,11 @@ select {
 
 .manuscript-book {
   position: relative;
+}
+
+/* Centers the leaf alone — kept separate from .manuscript-book so the
+   nav row below isn't pulled into the same flex row as the leaf. */
+.manuscript-leaf-frame {
   display: flex;
   justify-content: center;
 }

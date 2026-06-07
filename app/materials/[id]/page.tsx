@@ -170,48 +170,46 @@ export default async function MaterialPage({ params }: MaterialPageProps) {
         ].join(" ")}
       >
         <div className="space-y-8">
-          <section className="rounded-[2rem] border border-[#e4d4bf] bg-white p-7 shadow-md md:p-8">
-            {material.fullText ? (
-              <div className="flex flex-col gap-6 lg:flex-row lg:items-start">
-                <div className="min-w-0 flex-1">
-                  <ManuscriptReader text={material.fullText} />
-                </div>
+          <div className="flex flex-col gap-8 lg:flex-row lg:items-start">
+            <section className="min-w-0 flex-1 rounded-[2rem] border border-[#e4d4bf] bg-white p-7 shadow-md md:p-8">
+              {material.fullText ? (
+                <ManuscriptReader text={material.fullText} />
+              ) : (
+                <p className="rounded-2xl border border-[#eadbc7] bg-[#fbf7f1] p-5 text-stone-700">
+                  Полный текст пока не добавлен.
+                </p>
+              )}
 
-                {process.env.YANDEX_TTS_API_KEY && (
-                  <div className="lg:w-[230px] lg:shrink-0">
-                    <TtsPlayer text={material.fullText} />
-                  </div>
-                )}
+              {material.source && (
+                <p className="mt-6 border-t border-[#eadbc7] pt-4 text-sm text-stone-500">
+                  <span className="font-semibold text-stone-700">Источник: </span>
+                  {material.source.author && `${material.source.author}. `}
+                  {material.source.title}
+                  {material.source.year && `, ${material.source.year}`}
+                  {material.source.type && ` (${material.source.type})`}
+                  {material.source.url && (
+                    <>
+                      {" · "}
+                      <Link
+                        href={material.source.url}
+                        target="_blank"
+                        rel="noreferrer"
+                        className="text-[#b46b1f] underline underline-offset-2 transition hover:text-[#9f661f]"
+                      >
+                        Открыть
+                      </Link>
+                    </>
+                  )}
+                </p>
+              )}
+            </section>
+
+            {process.env.YANDEX_TTS_API_KEY && material.fullText && (
+              <div className="lg:w-[230px] lg:shrink-0">
+                <TtsPlayer text={material.fullText} />
               </div>
-            ) : (
-              <p className="rounded-2xl border border-[#eadbc7] bg-[#fbf7f1] p-5 text-stone-700">
-                Полный текст пока не добавлен.
-              </p>
             )}
-
-            {material.source && (
-              <p className="mt-6 border-t border-[#eadbc7] pt-4 text-sm text-stone-500">
-                <span className="font-semibold text-stone-700">Источник: </span>
-                {material.source.author && `${material.source.author}. `}
-                {material.source.title}
-                {material.source.year && `, ${material.source.year}`}
-                {material.source.type && ` (${material.source.type})`}
-                {material.source.url && (
-                  <>
-                    {" · "}
-                    <Link
-                      href={material.source.url}
-                      target="_blank"
-                      rel="noreferrer"
-                      className="text-[#b46b1f] underline underline-offset-2 transition hover:text-[#9f661f]"
-                    >
-                      Открыть
-                    </Link>
-                  </>
-                )}
-              </p>
-            )}
-          </section>
+          </div>
 
           {(material.audioUrl || material.videoUrl) && (
             <section className="rounded-[2rem] border border-[#e4d4bf] bg-white p-7 shadow-md md:p-8">

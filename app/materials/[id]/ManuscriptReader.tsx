@@ -73,30 +73,32 @@ export default function ManuscriptReader({ text }: { text: string }) {
 
   return (
     <div className="manuscript-book">
-      <div className={`manuscript-leaf ${fragmentClass}`}>
-        <div className="manuscript-leaf-inner">
-          {isFirstPage ? (
-            <p className="manuscript-paragraph">
-              <span className="manuscript-drop-cap">{first.charAt(0)}</span>
-              {first.slice(1)}
-            </p>
-          ) : (
-            <p className="manuscript-paragraph">{first}</p>
-          )}
+      <div className="manuscript-leaf-frame">
+        <div className={`manuscript-leaf ${fragmentClass}`}>
+          <div className="manuscript-leaf-inner">
+            {isFirstPage ? (
+              <p className="manuscript-paragraph">
+                <span className="manuscript-drop-cap">{first.charAt(0)}</span>
+                {first.slice(1)}
+              </p>
+            ) : (
+              <p className="manuscript-paragraph">{first}</p>
+            )}
 
-          {rest.map((para, i) => (
-            <div key={i}>
-              <div className="manuscript-divider" aria-hidden>
-                <span className="manuscript-divider-line" />
-                <span className="manuscript-divider-glyph">❦</span>
-                <span className="manuscript-divider-line" />
+            {rest.map((para, i) => (
+              <div key={i}>
+                <div className="manuscript-divider" aria-hidden>
+                  <span className="manuscript-divider-line" />
+                  <span className="manuscript-divider-glyph">❦</span>
+                  <span className="manuscript-divider-line" />
+                </div>
+                <p className="manuscript-paragraph">{para}</p>
               </div>
-              <p className="manuscript-paragraph">{para}</p>
-            </div>
-          ))}
-        </div>
+            ))}
+          </div>
 
-        {total > 1 && <div className="manuscript-page-number">{index + 1} / {total}</div>}
+          {total > 1 && <div className="manuscript-page-number">{index + 1} / {total}</div>}
+        </div>
       </div>
 
       {total > 1 && (
