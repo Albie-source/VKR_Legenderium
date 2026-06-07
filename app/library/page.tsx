@@ -162,7 +162,7 @@ export default async function LibraryPage({ searchParams }: LibraryPageProps) {
   const totalPages = Math.ceil(totalCount / PAGE_SIZE);
 
   return (
-    <main className="overflow-hidden bg-[#f4ecdf] pb-20">
+    <main className="overflow-hidden bg-[#0b1f22] pb-20">
       <MascotHint
         storageKey="hint_library"
         message="Используй фильтры сверху, чтобы найти легенды нужного народа или региона. Каждый прочитанный материал приближает нас к восстановлению архива!"
@@ -170,7 +170,7 @@ export default async function LibraryPage({ searchParams }: LibraryPageProps) {
       />
 
       <section className="border-b border-white/10 bg-[radial-gradient(circle_at_18%_12%,rgba(58,166,160,0.16),transparent_28%),radial-gradient(circle_at_82%_8%,rgba(216,163,66,0.12),transparent_24%),linear-gradient(180deg,#07181c_0%,#0b2428_100%)]">
-        <div className="mx-auto max-w-7xl px-6 py-8">
+        <div className="mx-auto max-w-[96rem] px-6 py-8">
           <nav className="mb-4 flex flex-wrap items-center gap-1.5 text-sm font-semibold">
             <Link href="/" className="text-[#d6c8b6]/60 transition hover:text-[#fff8e8]">
               Главная
@@ -201,7 +201,7 @@ export default async function LibraryPage({ searchParams }: LibraryPageProps) {
         </div>
       </section>
 
-      <section className="mx-auto max-w-7xl px-6 pt-10">
+      <section className="mx-auto max-w-[96rem] px-6 pt-10">
         <div className="grid gap-8 lg:grid-cols-[300px_1fr] lg:items-start">
           <Suspense fallback={null}>
             <LibraryFilters

@@ -13,11 +13,58 @@ type LibraryFiltersProps = {
   topics: FilterItem[];
 };
 
-const GROUPS: { key: FilterKey; label: string; icon: string }[] = [
-  { key: "region", label: "Регион", icon: "📍" },
-  { key: "people", label: "Народ", icon: "👤" },
-  { key: "genre", label: "Жанр", icon: "📖" },
-  { key: "topic", label: "Тематика", icon: "✦" },
+function SearchIcon() {
+  return (
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.5} className="h-4 w-4">
+      <circle cx="11" cy="11" r="6.5" />
+      <path d="m20 20-3.2-3.2" strokeLinecap="round" />
+    </svg>
+  );
+}
+
+function PinIcon() {
+  return (
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.5} className="h-4 w-4">
+      <path d="M12 21s-7-7.5-7-12a7 7 0 1 1 14 0c0 4.5-7 12-7 12Z" />
+      <circle cx="12" cy="9" r="2.4" />
+    </svg>
+  );
+}
+
+function PeopleIcon() {
+  return (
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.5} className="h-4 w-4">
+      <circle cx="9" cy="8" r="3" />
+      <path d="M3.5 20c0-3 2.5-5 5.5-5s5.5 2 5.5 5" />
+      <circle cx="17" cy="9" r="2.4" />
+      <path d="M15.5 12.2c2.4.4 4 2 4 4.8" />
+    </svg>
+  );
+}
+
+function BookIcon() {
+  return (
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.5} className="h-4 w-4">
+      <path d="M4 5.5c0-.8.7-1.5 1.5-1.5H12v16H5.5A1.5 1.5 0 0 1 4 18.5v-13Z" />
+      <path d="M20 5.5c0-.8-.7-1.5-1.5-1.5H12v16h6.5a1.5 1.5 0 0 0 1.5-1.5v-13Z" />
+    </svg>
+  );
+}
+
+function TopicIcon() {
+  return (
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.5} className="h-4 w-4">
+      <path d="M11.5 4h6a2.5 2.5 0 0 1 2.5 2.5v6L9.5 22 2 14.5 11.5 4Z" strokeLinejoin="round" />
+      <circle cx="15.5" cy="8.5" r="1.4" />
+    </svg>
+  );
+}
+
+const GROUPS: { key: FilterKey; label: string; icon: React.ReactNode }[] = [
+  { key: "region", label: "Регион", icon: <PinIcon /> },
+  { key: "people", label: "Народ", icon: <PeopleIcon /> },
+  { key: "genre", label: "Жанр", icon: <BookIcon /> },
+  { key: "topic", label: "Тематика", icon: <TopicIcon /> },
 ];
 
 export default function LibraryFilters({
@@ -77,7 +124,7 @@ export default function LibraryFilters({
     <div className="space-y-5 rounded-[1.75rem] border border-[#e4d4bf] bg-[#f8f0df] p-6 shadow-md">
       <div className="relative">
         <span className="pointer-events-none absolute left-4 top-1/2 -translate-y-1/2 text-stone-400">
-          🔍
+          <SearchIcon />
         </span>
         <input
           ref={inputRef}
@@ -94,7 +141,7 @@ export default function LibraryFilters({
         return (
           <div key={key}>
             <label className="mb-2 flex items-center gap-2 text-sm font-bold text-stone-800">
-              <span aria-hidden>{icon}</span>
+              <span aria-hidden className="text-[#9f661f]">{icon}</span>
               {label}
             </label>
 

@@ -127,9 +127,9 @@ function GridCard({ material, delay }: { material: MaterialCard; delay: number }
   return (
     <article
       style={{ animationDelay: `${delay}s` }}
-      className="animate-fade-in-up group flex min-h-[460px] flex-col overflow-hidden rounded-[2rem] border border-[#e4d4bf] bg-white shadow-md transition hover:-translate-y-1 hover:shadow-xl"
+      className="animate-fade-in-up group flex min-h-[400px] flex-col overflow-hidden rounded-[2rem] border border-[#e4d4bf] bg-white shadow-md transition hover:-translate-y-1 hover:shadow-xl"
     >
-      <div className="relative h-52 overflow-hidden bg-[#eadfce]">
+      <div className="relative h-44 overflow-hidden bg-[#eadfce]">
         {material.imageUrl ? (
           <img
             src={material.imageUrl}
@@ -149,31 +149,31 @@ function GridCard({ material, delay }: { material: MaterialCard; delay: number }
         </div>
       </div>
 
-      <div className="flex flex-1 flex-col p-5">
-        <div className="mb-3 flex flex-wrap gap-2 text-xs">
-          <span className="rounded-full border border-[#3aa6a0]/20 bg-[#e7f7f5] px-3 py-1 font-bold text-[#247670]">
+      <div className="flex flex-1 flex-col p-4">
+        <div className="mb-2.5 flex flex-wrap gap-1.5 text-xs">
+          <span className="rounded-full border border-[#3aa6a0]/20 bg-[#e7f7f5] px-2.5 py-1 font-bold text-[#247670]">
             {material.region.name}
           </span>
 
-          <span className="rounded-full border border-stone-200 bg-stone-100 px-3 py-1 font-bold text-stone-700">
+          <span className="rounded-full border border-stone-200 bg-stone-100 px-2.5 py-1 font-bold text-stone-700">
             {material.people.name}
           </span>
         </div>
 
-        <h3 className="mb-3 text-2xl font-extrabold leading-tight text-stone-950">
+        <h3 className="mb-2 text-lg font-extrabold leading-tight text-stone-950">
           {material.title}
         </h3>
 
-        <p className="mb-4 line-clamp-4 flex-1 text-sm leading-6 text-stone-600">
+        <p className="mb-3 line-clamp-3 flex-1 text-sm leading-6 text-stone-600">
           {material.shortDescription}
         </p>
 
         {material.topics.length > 0 && (
-          <div className="mb-5 flex flex-wrap gap-2">
-            {material.topics.map(({ topic }) => (
+          <div className="mb-4 flex flex-wrap gap-1.5">
+            {material.topics.slice(0, 3).map(({ topic }) => (
               <span
                 key={topic.id}
-                className="rounded-full border border-[#eadbc7] bg-[#faf4eb] px-3 py-1 text-xs font-semibold text-stone-600"
+                className="rounded-full border border-[#eadbc7] bg-[#faf4eb] px-2.5 py-1 text-xs font-semibold text-stone-600"
               >
                 {topic.name}
               </span>
@@ -183,7 +183,7 @@ function GridCard({ material, delay }: { material: MaterialCard; delay: number }
 
         <Link
           href={`/materials/${material.id}`}
-          className="mt-auto rounded-2xl bg-[#d8a342] px-4 py-3 text-center text-sm font-extrabold text-[#06151a] shadow-md transition hover:-translate-y-0.5 hover:bg-[#f0bd5b]"
+          className="mt-auto rounded-2xl bg-[#d8a342] px-4 py-2.5 text-center text-sm font-extrabold text-[#06151a] shadow-md transition hover:-translate-y-0.5 hover:bg-[#f0bd5b]"
         >
           Открыть материал
         </Link>
