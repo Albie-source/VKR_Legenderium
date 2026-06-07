@@ -488,7 +488,7 @@ select {
 .manuscript-leaf {
   position: relative;
   width: 100%;
-  max-width: 640px;
+  max-width: 800px;
   height: 560px;
   border-radius: 6px 28px 28px 6px;
   border: 1px solid #d4b06a;
@@ -521,6 +521,14 @@ select {
   height: auto;
   left: -9999px;
   top: 0;
+}
+
+.manuscript-source {
+  color: #9c8568;
+}
+
+.manuscript-source span {
+  color: #7c6a52;
 }
 
 .manuscript-page-number {
