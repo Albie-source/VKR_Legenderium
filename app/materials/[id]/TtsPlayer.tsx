@@ -21,6 +21,7 @@ export default function TtsPlayer({ text }: { text: string }) {
     ambientRef.current = ambient;
 
     return () => {
+      audioRef.current?.pause();
       ambient.pause();
       if (blobUrlRef.current) URL.revokeObjectURL(blobUrlRef.current);
     };

@@ -3,7 +3,7 @@
 import { useEffect, useRef, useState } from "react";
 
 function splitParagraphs(text: string): string[] {
-  return text.split(/\n+/).map((p) => p.trim()).filter(Boolean);
+  return text.split(/\n{2,}/).map((p) => p.trim()).filter(Boolean);
 }
 
 export default function ManuscriptReader({ text }: { text: string }) {
