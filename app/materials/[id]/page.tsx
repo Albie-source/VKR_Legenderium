@@ -77,60 +77,60 @@ export default async function MaterialPage({ params }: MaterialPageProps) {
   return (
     <main className="bg-[#0b1f22] pb-20">
       <section className="mx-auto max-w-7xl px-6 pt-10">
-        <nav className="mb-6 flex flex-wrap items-center gap-1.5 text-sm font-semibold">
-          <Link
-            href="/"
-            className="text-[#d6c8b6]/60 transition hover:text-[#fff8e8]"
-          >
-            Главная
-          </Link>
-          <span className="text-[#d6c8b6]/30">›</span>
-          <Link
-            href="/library"
-            className="text-[#d6c8b6]/60 transition hover:text-[#fff8e8]"
-          >
-            Библиотека
-          </Link>
-          <span className="text-[#d6c8b6]/30">›</span>
-          <Link
-            href={`/library?genre=${material.genreId}`}
-            className="text-[#d6c8b6]/60 transition hover:text-[#fff8e8]"
-          >
-            {material.genre.name}
-          </Link>
-          <span className="text-[#d6c8b6]/30">›</span>
-          <span className="max-w-[220px] truncate text-[#fff8e8]">
-            {material.title}
-          </span>
-        </nav>
-
-        <div className="mb-4 flex flex-wrap items-center gap-2 text-xs">
-          <span className="rounded-full border border-[#d8a342]/35 bg-[#d8a342]/12 px-3 py-1 font-black uppercase tracking-[0.12em] text-[#f0bd5b]">
-            {material.genre.name}
-          </span>
-          <span className="rounded-full border border-white/10 bg-white/8 px-3 py-1 font-bold text-[#d6c8b6]">
-            {material.region.name} · {material.people.name}
-          </span>
-        </div>
-
-        <h1 className="mb-3 max-w-4xl text-4xl font-extrabold leading-tight tracking-tight text-[#fff8e8] md:text-5xl">
-          {material.title}
-        </h1>
-
-        {material.shortDescription && (
-          <p className="mb-8 max-w-3xl text-lg leading-8 text-[#d6c8b6]">
-            {material.shortDescription}
-          </p>
-        )}
-
-        {process.env.YANDEX_TTS_API_KEY && material.fullText && (
-          <div className="mb-8 grid gap-8 lg:grid-cols-[1fr_320px]">
-            <TtsPlayer text={material.fullText} />
-          </div>
-        )}
-
         <div className="grid gap-8 lg:grid-cols-[1fr_320px] lg:items-start">
           <div className="min-w-0 space-y-8">
+            <div>
+              <nav className="mb-6 flex flex-wrap items-center gap-1.5 text-sm font-semibold">
+                <Link
+                  href="/"
+                  className="text-[#d6c8b6]/60 transition hover:text-[#fff8e8]"
+                >
+                  Главная
+                </Link>
+                <span className="text-[#d6c8b6]/30">›</span>
+                <Link
+                  href="/library"
+                  className="text-[#d6c8b6]/60 transition hover:text-[#fff8e8]"
+                >
+                  Библиотека
+                </Link>
+                <span className="text-[#d6c8b6]/30">›</span>
+                <Link
+                  href={`/library?genre=${material.genreId}`}
+                  className="text-[#d6c8b6]/60 transition hover:text-[#fff8e8]"
+                >
+                  {material.genre.name}
+                </Link>
+                <span className="text-[#d6c8b6]/30">›</span>
+                <span className="max-w-[220px] truncate text-[#fff8e8]">
+                  {material.title}
+                </span>
+              </nav>
+
+              <div className="mb-4 flex flex-wrap items-center gap-2 text-xs">
+                <span className="rounded-full border border-[#d8a342]/35 bg-[#d8a342]/12 px-3 py-1 font-black uppercase tracking-[0.12em] text-[#f0bd5b]">
+                  {material.genre.name}
+                </span>
+                <span className="rounded-full border border-white/10 bg-white/8 px-3 py-1 font-bold text-[#d6c8b6]">
+                  {material.region.name} · {material.people.name}
+                </span>
+              </div>
+
+              <h1 className="mb-3 max-w-4xl text-4xl font-extrabold leading-tight tracking-tight text-[#fff8e8] md:text-5xl">
+                {material.title}
+              </h1>
+
+              {material.shortDescription && (
+                <p className="max-w-3xl text-lg leading-8 text-[#d6c8b6]">
+                  {material.shortDescription}
+                </p>
+              )}
+            </div>
+
+            {process.env.YANDEX_TTS_API_KEY && material.fullText && (
+              <TtsPlayer text={material.fullText} />
+            )}
+
             {material.fullText ? (
               <ManuscriptReader text={material.fullText} />
             ) : (
@@ -199,10 +199,10 @@ export default async function MaterialPage({ params }: MaterialPageProps) {
                 <img
                   src={material.imageUrl}
                   alt={material.title}
-                  className="h-[230px] w-full object-cover"
+                  className="h-[420px] w-full object-cover lg:h-[520px]"
                 />
               ) : (
-                <div className="flex h-[230px] items-center justify-center bg-[radial-gradient(circle_at_35%_25%,rgba(216,163,66,0.18),transparent_28%),linear-gradient(135deg,#10272b,#06151a)] px-6 text-center text-sm font-semibold text-[#cbbba7]">
+                <div className="flex h-[420px] items-center justify-center bg-[radial-gradient(circle_at_35%_25%,rgba(216,163,66,0.18),transparent_28%),linear-gradient(135deg,#10272b,#06151a)] px-6 text-center text-sm font-semibold text-[#cbbba7] lg:h-[520px]">
                   Изображение не добавлено
                 </div>
               )}
