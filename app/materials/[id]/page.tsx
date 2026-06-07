@@ -171,16 +171,6 @@ export default async function MaterialPage({ params }: MaterialPageProps) {
       >
         <div className="space-y-8">
           <section className="rounded-[2rem] border border-[#e4d4bf] bg-white p-7 shadow-md md:p-8">
-            <div className="mb-7">
-              <p className="mb-2 text-sm font-black uppercase tracking-[0.25em] text-[#b46b1f]">
-                Текст
-              </p>
-
-              <h2 className="text-3xl font-extrabold text-stone-950">
-                Содержание материала
-              </h2>
-            </div>
-
             {process.env.YANDEX_TTS_API_KEY && material.fullText && (
               <TtsPlayer text={material.fullText} />
             )}
