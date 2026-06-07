@@ -8,7 +8,7 @@ import {
   requireLoginForFavoriteAction,
 } from "./actions";
 import TtsPlayer from "./TtsPlayer";
-import BookReader from "./BookReader";
+import ManuscriptReader from "./ManuscriptReader";
 import AudioPlayer from "./AudioPlayer";
 
 type MaterialPageProps = {
@@ -186,7 +186,7 @@ export default async function MaterialPage({ params }: MaterialPageProps) {
             )}
 
             {material.fullText ? (
-              <BookReader text={material.fullText} />
+              <ManuscriptReader text={material.fullText} />
             ) : (
               <p className="rounded-2xl border border-[#eadbc7] bg-[#fbf7f1] p-5 text-stone-700">
                 Полный текст пока не добавлен.

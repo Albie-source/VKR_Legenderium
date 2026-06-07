@@ -471,240 +471,95 @@ select {
   pointer-events: none;
 }
 
-/* ───────────────────────── Open Book Reader ───────────────────────── */
+/* ───────────────────────── Manuscript Reader ───────────────────────── */
 
-.book-reader-root {
+.manuscript-reader {
   position: relative;
-  user-select: none;
 }
 
-/* The open book spread */
-.book-spread {
-  display: flex;
-  align-items: stretch;
-  border-radius: 6px 24px 24px 6px;
-  box-shadow:
-    0 30px 80px rgba(0, 0, 0, 0.18),
-    0 8px 20px rgba(0, 0, 0, 0.10),
-    0 2px 6px rgba(0, 0, 0, 0.06);
-  position: relative;
-  transform-style: preserve-3d;
-}
-
-/* Individual page */
-.book-page {
-  flex: 1;
-  position: relative;
-  min-height: 460px;
-  padding: 2.5rem 2.75rem 2.25rem;
-  background:
-    linear-gradient(170deg, #fefdf6 0%, #fdf9eb 40%, #f9f1d8 100%);
+.manuscript-progress-track {
+  position: sticky;
+  top: 0;
+  z-index: 5;
+  height: 3px;
+  background: rgba(180, 140, 60, 0.16);
+  border-radius: 999px;
   overflow: hidden;
+  margin-bottom: 1.5rem;
 }
 
-.book-page-left {
-  border-radius: 6px 0 0 6px;
-  border: 1px solid #d4b06a;
-  border-right: none;
-  box-shadow: inset -8px 0 18px rgba(0, 0, 0, 0.05);
-}
-
-.book-page-right {
-  border-radius: 0 24px 24px 0;
-  border: 1px solid #d4b06a;
-  border-left: none;
-  box-shadow: inset 8px 0 18px rgba(0, 0, 0, 0.04);
-}
-
-/* Horizontal ruled lines */
-.book-lines-overlay {
-  position: absolute;
-  inset: 0;
-  background-image: repeating-linear-gradient(
-    0deg,
-    transparent,
-    transparent 35px,
-    rgba(180, 140, 60, 0.07) 35px,
-    rgba(180, 140, 60, 0.07) 36px
-  );
-  pointer-events: none;
-}
-
-/* Left-page inner shadow near spine */
-.book-page-shadow-right {
-  position: absolute;
-  top: 0; right: 0; bottom: 0;
-  width: 28px;
-  background: linear-gradient(to right, transparent, rgba(0, 0, 0, 0.04));
-  pointer-events: none;
-}
-
-/* Right-page inner shadow near spine */
-.book-page-shadow-left {
-  position: absolute;
-  top: 0; left: 0; bottom: 0;
-  width: 28px;
-  background: linear-gradient(to left, transparent, rgba(0, 0, 0, 0.04));
-  pointer-events: none;
-}
-
-/* Book spine */
-.book-spine {
-  width: 18px;
-  flex-shrink: 0;
-  background: linear-gradient(
-    90deg,
-    #7a5c10 0%,
-    #c8964a 40%,
-    #e8b866 55%,
-    #c8964a 70%,
-    #7a5c10 100%
-  );
-  position: relative;
-  z-index: 2;
-  box-shadow:
-    inset 2px 0 4px rgba(255, 255, 255, 0.12),
-    inset -2px 0 4px rgba(0, 0, 0, 0.25);
-}
-
-.book-spine-inner {
-  position: absolute;
-  inset: 0;
-  background: repeating-linear-gradient(
-    180deg,
-    transparent,
-    transparent 24px,
-    rgba(0, 0, 0, 0.06) 24px,
-    rgba(0, 0, 0, 0.06) 25px
-  );
-}
-
-/* Page text */
-.book-page-text {
-  white-space: pre-line;
-  font-size: 0.97rem;
-  line-height: 2;
-  color: #292524;
-  position: relative;
-  z-index: 1;
-}
-
-/* Blank right page placeholder */
-.book-page-blank {
+.manuscript-progress-fill {
   height: 100%;
+  background: linear-gradient(90deg, #d8a342, #f0bd5b);
+  transition: width 0.15s ease-out;
+}
+
+.manuscript-page {
+  position: relative;
+  border-radius: 28px;
+  border: 1px solid #d4b06a;
+  background:
+    radial-gradient(circle at 18% 12%, rgba(200, 150, 50, 0.07), transparent 35%),
+    radial-gradient(circle at 85% 85%, rgba(180, 110, 40, 0.05), transparent 40%),
+    repeating-linear-gradient(
+      0deg, transparent, transparent 35px,
+      rgba(180, 140, 60, 0.05) 35px, rgba(180, 140, 60, 0.05) 36px
+    ),
+    linear-gradient(170deg, #fefdf6 0%, #fdf8e8 45%, #f8f0d4 100%);
+  box-shadow:
+    0 30px 80px rgba(0, 0, 0, 0.14),
+    inset 0 0 60px rgba(200, 150, 50, 0.05);
+  padding: 3rem 3.25rem;
+}
+
+.manuscript-paragraph {
+  font-size: 1.08rem;
+  line-height: 2.05;
+  color: #2b2620;
+  white-space: pre-line;
+  text-align: justify;
+  margin: 0;
+}
+
+.manuscript-drop-cap {
+  float: left;
+  font-family: var(--font-heading), serif;
+  font-size: 4.4rem;
+  line-height: 0.82;
+  font-weight: 800;
+  padding: 0.1rem 0.18rem 0 0;
+  margin-top: 0.18rem;
+  color: #b46b1f;
+  text-shadow: 2px 2px 0 rgba(216, 163, 66, 0.18);
+}
+
+.manuscript-divider {
   display: flex;
   align-items: center;
-  justify-content: center;
-  opacity: 0.5;
+  gap: 14px;
+  margin: 2rem 0;
 }
 
-/* Corner curl hint */
-.book-corner-hint {
-  position: absolute;
-  bottom: 48px;
-  right: 0;
-  width: 44px;
-  height: 44px;
-  background: linear-gradient(135deg, transparent 50%, rgba(180, 140, 60, 0.16) 50%);
-  border-top-left-radius: 8px;
-  pointer-events: none;
+.manuscript-divider-line {
+  height: 1px;
+  flex: 1;
+  background: linear-gradient(to right, transparent, rgba(180, 107, 31, 0.35), transparent);
 }
 
-/* Navigation button */
-.book-nav-btn {
-  display: inline-flex;
-  align-items: center;
-  gap: 8px;
-  border-radius: 16px;
-  border: 1px solid #dccab3;
-  background: white;
-  padding: 10px 20px;
-  font-size: 14px;
-  font-weight: 800;
-  color: #44403c;
-  box-shadow: 0 2px 6px rgba(0,0,0,0.07);
-  cursor: pointer;
-  transition: transform 0.15s, border-color 0.15s, color 0.15s;
-}
-.book-nav-btn:hover {
-  transform: translateY(-1px);
-  border-color: #d8a342;
-  color: #9f661f;
+.manuscript-divider-glyph {
+  font-size: 1rem;
+  color: rgba(180, 107, 31, 0.55);
 }
 
-/* ── Flip animations ── */
-
-/* Flip next: book flips from right to left (right page peels away) */
-@keyframes bookSpreadFlipNext {
-  0%   { transform: perspective(2200px) rotateY(0deg);   opacity: 1; }
-  45%  { transform: perspective(2200px) rotateY(-8deg);  opacity: 0.9; }
-  100% { transform: perspective(2200px) rotateY(-16deg); opacity: 0; }
-}
-
-/* Flip prev: book opens back from left */
-@keyframes bookSpreadFlipPrev {
-  0%   { transform: perspective(2200px) rotateY(0deg);  opacity: 1; }
-  45%  { transform: perspective(2200px) rotateY(8deg);  opacity: 0.9; }
-  100% { transform: perspective(2200px) rotateY(16deg); opacity: 0; }
-}
-
-@keyframes bookSpreadFadeIn {
-  from { opacity: 0; transform: scale(0.985); }
-  to   { opacity: 1; transform: scale(1); }
-}
-
-.book-spread-flip-next {
-  animation: bookSpreadFlipNext 0.38s ease-in forwards;
-  transform-origin: left center;
-}
-
-.book-spread-flip-prev {
-  animation: bookSpreadFlipPrev 0.38s ease-in forwards;
-  transform-origin: right center;
-}
-
-/* New spread fades in after flip */
-.book-spread:not(.book-spread-flip-next):not(.book-spread-flip-prev) {
-  animation: bookSpreadFadeIn 0.22s ease-out both;
-}
-
-/* ── Mobile: single page layout ── */
-@media (max-width: 767px) {
-  .book-spread {
-    flex-direction: column;
-    border-radius: 16px;
+@media (max-width: 640px) {
+  .manuscript-page {
+    padding: 2rem 1.5rem;
+    border-radius: 20px;
   }
 
-  .book-page-left {
-    border-radius: 16px 16px 0 0;
-    border-right: 1px solid #d4b06a;
-    border-bottom: none;
+  .manuscript-drop-cap {
+    font-size: 3.4rem;
   }
-
-  .book-page-right {
-    border-radius: 0 0 16px 16px;
-    border-left: 1px solid #d4b06a;
-    border-top: none;
-  }
-
-  .book-spine {
-    width: 100%;
-    height: 12px;
-    background: linear-gradient(
-      180deg,
-      #7a5c10 0%,
-      #c8964a 40%,
-      #e8b866 55%,
-      #c8964a 70%,
-      #7a5c10 100%
-    );
-  }
-
-  .book-page {
-    min-height: 280px;
-  }
-
-  .book-corner-hint { display: none; }
 }
 
 /* ───────────────────────── Sound bars animation ───────────────────────── */
@@ -735,26 +590,3 @@ select {
 .sound-bars.playing .sound-bar:nth-child(3) { animation: soundBar 0.7s ease-in-out 0.2s infinite; }
 .sound-bars.playing .sound-bar:nth-child(4) { animation: soundBar 0.7s ease-in-out 0.3s infinite; }
 .sound-bars.playing .sound-bar:nth-child(5) { animation: soundBar 0.7s ease-in-out 0.15s infinite; }
-
-/* Parchment page surface — single-page fallback (used when text fits on 1 page) */
-.book-page-surface {
-  position: relative;
-  background:
-    repeating-linear-gradient(
-      0deg,
-      transparent,
-      transparent 35px,
-      rgba(180, 140, 60, 0.08) 35px,
-      rgba(180, 140, 60, 0.08) 36px
-    ),
-    linear-gradient(160deg, #fefcf4 0%, #fdf8e8 45%, #faf2d6 100%);
-  border: 1px solid #d4b06a;
-  border-left: 3px solid #c8964a;
-  border-radius: 6px 20px 20px 6px;
-  box-shadow:
-    0 20px 60px rgba(0, 0, 0, 0.12),
-    inset 0 0 40px rgba(200, 150, 50, 0.06);
-  padding: 2.5rem 2.5rem 2rem 3rem;
-  min-height: 340px;
-  overflow: hidden;
-}
