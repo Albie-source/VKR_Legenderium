@@ -8,7 +8,7 @@ import MascotHint from "@/components/MascotHint";
 export default async function ProfilePage() {
   const user = await requireUser();
 
-  const [favoritesCount, attempts, goalProgress, recentFavorites] =
+  const [favoritesCount, attempts, goalProgress, recentFavorites, restoredEntries] =
     await Promise.all([
       prisma.favorite.count({
         where: {
@@ -67,6 +67,25 @@ export default async function ProfilePage() {
           createdAt: "desc",
         },
         take: 12,
+      }),
+
+      prisma.materialProgress.findMany({
+        where: {
+          userId: user.id,
+          restoredAt: { not: null },
+        },
+        include: {
+          material: {
+            include: {
+              genre: true,
+              region: true,
+            },
+          },
+        },
+        orderBy: {
+          restoredAt: "desc",
+        },
+        take: 8,
       }),
     ]);
 
@@ -188,6 +207,78 @@ export default async function ProfilePage() {
                 Перейти к заданиям
               </Link>
             </div>
+          </section>
+
+          <section className="rounded-[2rem] border border-[#e4d4bf] bg-white p-6 shadow-md md:p-7">
+            <div className="mb-6 flex flex-wrap items-start justify-between gap-4">
+              <div>
+                <h2 className="text-3xl font-extrabold text-stone-950">
+                  Архив
+                </h2>
+
+                <p className="mt-2 max-w-2xl text-sm leading-6 text-stone-600">
+                  Восстановленные фрагменты легенд занимают своё место на
+                  полке архива.
+                </p>
+              </div>
+
+              <Link
+                href="/profile/archive"
+                className="rounded-2xl border border-[#d8a342]/45 bg-[#fff8e8] px-4 py-2 text-sm font-extrabold !text-[#8a5418] transition hover:bg-[#fff1cf]"
+              >
+                Открыть все
+              </Link>
+            </div>
+
+            {restoredEntries.length === 0 ? (
+              <EmptyMini
+                title="Полка архива пока пуста"
+                text="Находите фрагменты легенд и проходите проверку Архивариуса, чтобы восстанавливать их."
+                href="/library"
+                linkText="В библиотеку"
+              />
+            ) : (
+              <div className="legendarium-card-carousel flex gap-5 overflow-x-auto pb-3">
+                {restoredEntries.map((entry) => (
+                  <article
+                    key={entry.id}
+                    className="min-w-[260px] max-w-[260px] overflow-hidden rounded-[1.8rem] border border-[#9ee8c0]/60 bg-[#fbf7f1] shadow-sm"
+                  >
+                    <div className="relative h-40 overflow-hidden bg-[#eadfce]">
+                      {entry.material.imageUrl ? (
+                        <img
+                          src={entry.material.imageUrl}
+                          alt={entry.material.title}
+                          className="h-full w-full object-cover object-[center_42%]"
+                        />
+                      ) : (
+                        <div className="flex h-full items-center justify-center px-5 text-center text-sm text-stone-500">
+                          Изображение не добавлено
+                        </div>
+                      )}
+
+                      <div className="absolute right-3 top-3 rounded-full border border-[#6fcf97]/50 bg-[#173326]/85 px-3 py-1 text-xs font-black uppercase tracking-[0.08em] text-[#9ee8c0] shadow-sm backdrop-blur">
+                        ✓ Восстановлено
+                      </div>
+                    </div>
+
+                    <div className="p-5">
+                      <p className="mb-2 text-xs font-black uppercase tracking-[0.18em] text-[#b46b1f]">
+                        {entry.material.genre.name}
+                      </p>
+
+                      <h3 className="mb-2 text-xl font-extrabold leading-tight text-stone-950">
+                        {entry.material.title}
+                      </h3>
+
+                      <p className="line-clamp-2 text-sm leading-6 text-stone-600">
+                        {entry.material.region.name}
+                      </p>
+                    </div>
+                  </article>
+                ))}
+              </div>
+            )}
           </section>
 
           <section className="rounded-[2rem] border border-[#e4d4bf] bg-white p-6 shadow-md md:p-7">
