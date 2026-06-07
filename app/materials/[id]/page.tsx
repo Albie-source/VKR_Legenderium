@@ -63,8 +63,19 @@ export default async function MaterialPage({ params }: MaterialPageProps) {
 
   const isFavorite = Boolean(favorite);
 
+  const sourceLabel = material.source
+    ? [
+        material.source.author && `${material.source.author}.`,
+        material.source.title,
+        material.source.year && `${material.source.year}`,
+        material.source.type && `(${material.source.type})`,
+      ]
+        .filter(Boolean)
+        .join(" ")
+    : null;
+
   return (
-    <main className="overflow-hidden bg-[linear-gradient(180deg,#07181c_0%,#0b2428_28%,#f4ecdf_28%,#f4ecdf_100%)] pb-20">
+    <main className="bg-[#0b1f22] pb-20">
       <section className="mx-auto max-w-7xl px-6 pt-10">
         <nav className="mb-6 flex flex-wrap items-center gap-1.5 text-sm font-semibold">
           <Link
@@ -93,110 +104,65 @@ export default async function MaterialPage({ params }: MaterialPageProps) {
           </span>
         </nav>
 
-        <div className="relative overflow-hidden rounded-[2.5rem] border border-white/10 bg-[#0b1f22] shadow-2xl shadow-black/25">
-          <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_12%_18%,rgba(58,166,160,0.16),transparent_28%),radial-gradient(circle_at_82%_20%,rgba(216,163,66,0.14),transparent_24%),radial-gradient(circle_at_70%_88%,rgba(47,143,99,0.10),transparent_28%)]" />
-
-          <div className="relative grid gap-8 p-8 md:p-10 lg:grid-cols-[1.05fr_0.95fr] lg:items-center">
-            <div className="animate-fade-in-up">
-              <div className="mb-5 flex flex-wrap gap-2 text-xs">
-                <span className="rounded-full border border-[#d8a342]/35 bg-[#d8a342]/12 px-3 py-1 font-black uppercase tracking-[0.12em] text-[#f0bd5b]">
-                  {material.genre.name}
-                </span>
-
-                <span className="rounded-full border border-[#3aa6a0]/35 bg-[#3aa6a0]/12 px-3 py-1 font-bold text-[#9ee8e2]">
-                  {material.region.name}
-                </span>
-
-                <span className="rounded-full border border-white/10 bg-white/10 px-3 py-1 font-bold text-[#fff8e8]">
-                  {material.people.name}
-                </span>
-              </div>
-
-              <div className="mb-5 flex items-start gap-4">
-                <h1 className="max-w-4xl text-5xl font-extrabold leading-tight tracking-tight text-[#fff8e8] md:text-6xl">
-                  {material.title}
-                </h1>
-
-                <FavoriteIconButton
-                  materialId={material.id}
-                  isFavorite={isFavorite}
-                  isLoggedIn={Boolean(user)}
-                />
-              </div>
-
-              {material.shortDescription && (
-                <p className="max-w-3xl text-lg leading-8 text-[#d6c8b6]">
-                  {material.shortDescription}
-                </p>
-              )}
-
-              {material.topics.length > 0 && (
-                <div className="mt-7 flex flex-wrap gap-2">
-                  {material.topics.map(({ topic }) => (
-                    <span
-                      key={topic.id}
-                      className="rounded-full border border-white/10 bg-white/8 px-3 py-1 text-sm font-semibold text-[#fff8e8]"
-                    >
-                      {topic.name}
-                    </span>
-                  ))}
-                </div>
-              )}
-            </div>
-
-            <div className="overflow-hidden rounded-[2rem] border border-white/10 bg-[#06151a] shadow-2xl shadow-black/25">
-              {material.imageUrl ? (
-                <img
-                  src={material.imageUrl}
-                  alt={material.title}
-                  className="h-[380px] w-full object-cover"
-                />
-              ) : (
-                <div className="flex h-[380px] items-center justify-center bg-[radial-gradient(circle_at_35%_25%,rgba(216,163,66,0.18),transparent_28%),linear-gradient(135deg,#10272b,#06151a)] px-6 text-center text-sm font-semibold text-[#cbbba7]">
-                  Изображение не добавлено
-                </div>
-              )}
-            </div>
-          </div>
+        <div className="mb-4 flex flex-wrap items-center gap-2 text-xs">
+          <span className="rounded-full border border-[#d8a342]/35 bg-[#d8a342]/12 px-3 py-1 font-black uppercase tracking-[0.12em] text-[#f0bd5b]">
+            {material.genre.name}
+          </span>
+          <span className="rounded-full border border-white/10 bg-white/8 px-3 py-1 font-bold text-[#d6c8b6]">
+            {material.region.name} · {material.people.name}
+          </span>
         </div>
-      </section>
 
-      <section className="mx-auto max-w-7xl px-6 pt-10">
-        <div className="flex flex-col gap-8 lg:flex-row lg:items-start">
-          <div className="min-w-0 flex-1 space-y-6">
+        <h1 className="mb-3 max-w-4xl text-4xl font-extrabold leading-tight tracking-tight text-[#fff8e8] md:text-5xl">
+          {material.title}
+        </h1>
+
+        {material.shortDescription && (
+          <p className="mb-8 max-w-3xl text-lg leading-8 text-[#d6c8b6]">
+            {material.shortDescription}
+          </p>
+        )}
+
+        {process.env.YANDEX_TTS_API_KEY && material.fullText && (
+          <div className="mb-8">
+            <TtsPlayer text={material.fullText} />
+          </div>
+        )}
+
+        <div className="grid gap-8 lg:grid-cols-[1fr_320px] lg:items-start">
+          <div className="min-w-0 space-y-8">
             {material.fullText ? (
               <ManuscriptReader text={material.fullText} />
             ) : (
-              <p className="rounded-[2rem] border border-[#e4d4bf] bg-white p-7 text-stone-700 shadow-md md:p-8">
+              <p className="rounded-[1.75rem] border border-[#e4d4bf] bg-[#f8f0df] p-7 text-stone-700 shadow-md md:p-8">
                 Полный текст пока не добавлен.
               </p>
             )}
 
-            {material.source && (
-              <p className="manuscript-source mx-auto max-w-[760px] text-center text-sm">
-                <span className="font-semibold">Источник: </span>
-                {material.source.author && `${material.source.author}. `}
-                {material.source.title}
-                {material.source.year && `, ${material.source.year}`}
-                {material.source.type && ` (${material.source.type})`}
-                {material.source.url && (
-                  <>
-                    {" · "}
-                    <Link
-                      href={material.source.url}
-                      target="_blank"
-                      rel="noreferrer"
-                      className="underline underline-offset-2 transition hover:text-[#9f661f]"
-                    >
-                      Открыть
-                    </Link>
-                  </>
-                )}
-              </p>
+            {material.tasks.length > 0 && (
+              <section className="flex flex-col gap-5 rounded-[1.75rem] border border-[#d8a342]/35 bg-[#0e2227] p-6 shadow-md sm:flex-row sm:items-center sm:justify-between">
+                <div>
+                  <h2 className="mb-1 text-xl font-extrabold text-[#fff8e8]">
+                    Проверьте свои знания
+                  </h2>
+                  <p className="text-sm leading-6 text-[#d6c8b6]">
+                    Пройдите интерактивное задание по этому материалу и
+                    закрепите полученные знания.
+                  </p>
+                </div>
+
+                <Link
+                  href={`/quests/${material.tasks[0].id}`}
+                  className="inline-flex shrink-0 items-center justify-center gap-2 rounded-2xl bg-[#d8a342] px-5 py-3 font-extrabold text-[#06151a] shadow-md transition hover:-translate-y-0.5 hover:bg-[#f0bd5b]"
+                >
+                  Перейти к заданию
+                  <span aria-hidden>→</span>
+                </Link>
+              </section>
             )}
 
             {(material.audioUrl || material.videoUrl) && (
-              <section className="rounded-[2rem] border border-[#e4d4bf] bg-white p-7 shadow-md md:p-8">
+              <section className="rounded-[1.75rem] border border-[#e4d4bf] bg-white p-7 shadow-md md:p-8">
                 <p className="mb-2 text-sm font-black uppercase tracking-[0.25em] text-[#b46b1f]">
                   Медиа
                 </p>
@@ -227,45 +193,162 @@ export default async function MaterialPage({ params }: MaterialPageProps) {
             )}
           </div>
 
-          {(Boolean(process.env.YANDEX_TTS_API_KEY && material.fullText) ||
-            material.tasks.length > 0) && (
-            <div className="space-y-6 lg:sticky lg:top-28 lg:w-[230px] lg:shrink-0 lg:self-start">
-              {process.env.YANDEX_TTS_API_KEY && material.fullText && (
-                <TtsPlayer text={material.fullText} />
-              )}
-
-              {material.tasks.length > 0 && (
-                <section className="rounded-[2rem] border border-[#d8a342]/35 bg-[#fff4d8] p-6 shadow-md">
-                  <p className="mb-2 text-sm font-black uppercase tracking-[0.2em] text-[#b46b1f]">
-                    Задание
-                  </p>
-
-                  <h2 className="mb-3 text-2xl font-extrabold text-stone-950">
-                    Проверь понимание материала
-                  </h2>
-
-                  <p className="mb-5 leading-7 text-stone-700">
-                    К этому материалу добавлено интерактивное задание. Его
-                    можно пройти после чтения текста.
-                  </p>
-
-                  <Link
-                    href={`/quests/${material.tasks[0].id}`}
-                    className="inline-flex w-full justify-center rounded-2xl bg-[#d8a342] px-5 py-3 font-extrabold text-[#06151a] shadow-md transition hover:-translate-y-0.5 hover:bg-[#f0bd5b]"
-                  >
-                    Перейти к заданию
-                  </Link>
-                </section>
+          <aside className="space-y-6 lg:sticky lg:top-28 lg:self-start">
+            <div className="overflow-hidden rounded-[1.75rem] border border-white/10 bg-[#06151a] shadow-xl shadow-black/25">
+              {material.imageUrl ? (
+                <img
+                  src={material.imageUrl}
+                  alt={material.title}
+                  className="h-[230px] w-full object-cover"
+                />
+              ) : (
+                <div className="flex h-[230px] items-center justify-center bg-[radial-gradient(circle_at_35%_25%,rgba(216,163,66,0.18),transparent_28%),linear-gradient(135deg,#10272b,#06151a)] px-6 text-center text-sm font-semibold text-[#cbbba7]">
+                  Изображение не добавлено
+                </div>
               )}
             </div>
-          )}
+
+            <section className="rounded-[1.75rem] border border-white/10 bg-[#0e2227] p-6 shadow-md">
+              <h2 className="mb-4 text-xs font-black uppercase tracking-[0.2em] text-[#d8a342]">
+                О материале
+              </h2>
+
+              <dl className="space-y-3.5 text-sm">
+                <InfoRow icon={<PinIcon />} label="Регион" value={material.region.name} />
+                <InfoRow icon={<PeopleIcon />} label="Народ" value={material.people.name} />
+                <InfoRow icon={<BookIcon />} label="Жанр" value={material.genre.name} />
+                {sourceLabel && (
+                  <InfoRow
+                    icon={<DocIcon />}
+                    label="Источник"
+                    value={
+                      material.source?.url ? (
+                        <Link
+                          href={material.source.url}
+                          target="_blank"
+                          rel="noreferrer"
+                          className="underline underline-offset-2 transition hover:text-[#f0bd5b]"
+                        >
+                          {sourceLabel}
+                        </Link>
+                      ) : (
+                        sourceLabel
+                      )
+                    }
+                  />
+                )}
+              </dl>
+            </section>
+
+            {material.topics.length > 0 && (
+              <section className="rounded-[1.75rem] border border-white/10 bg-[#0e2227] p-6 shadow-md">
+                <h2 className="mb-4 text-xs font-black uppercase tracking-[0.2em] text-[#d8a342]">
+                  Темы и мотивы
+                </h2>
+
+                <div className="flex flex-wrap gap-2">
+                  {material.topics.map(({ topic }) => (
+                    <span
+                      key={topic.id}
+                      className="rounded-full border border-white/10 bg-white/8 px-3 py-1 text-sm font-semibold text-[#fff8e8]"
+                    >
+                      {topic.name}
+                    </span>
+                  ))}
+                </div>
+              </section>
+            )}
+
+            <FavoriteButton
+              materialId={material.id}
+              isFavorite={isFavorite}
+              isLoggedIn={Boolean(user)}
+            />
+          </aside>
         </div>
       </section>
     </main>
   );
 }
 
-function FavoriteIconButton({
+function InfoRow({
+  icon,
+  label,
+  value,
+}: {
+  icon: React.ReactNode;
+  label: string;
+  value: React.ReactNode;
+}) {
+  return (
+    <div className="flex items-start gap-3">
+      <span className="mt-0.5 flex h-8 w-8 shrink-0 items-center justify-center rounded-xl border border-white/10 bg-white/5 text-[#d8a342]">
+        {icon}
+      </span>
+      <span>
+        <span className="block text-xs font-semibold uppercase tracking-[0.1em] text-[#d6c8b6]/55">
+          {label}
+        </span>
+        <span className="block font-semibold text-[#fff8e8]">{value}</span>
+      </span>
+    </div>
+  );
+}
+
+function PinIcon() {
+  return (
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.5} className="h-4 w-4">
+      <path d="M12 21s-7-7.5-7-12a7 7 0 1 1 14 0c0 4.5-7 12-7 12Z" />
+      <circle cx="12" cy="9" r="2.4" />
+    </svg>
+  );
+}
+
+function PeopleIcon() {
+  return (
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.5} className="h-4 w-4">
+      <circle cx="9" cy="8" r="3" />
+      <path d="M3.5 20c0-3 2.5-5 5.5-5s5.5 2 5.5 5" />
+      <circle cx="17" cy="9" r="2.4" />
+      <path d="M15.5 12.2c2.4.4 4 2 4 4.8" />
+    </svg>
+  );
+}
+
+function BookIcon() {
+  return (
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.5} className="h-4 w-4">
+      <path d="M4 5.5c0-.8.7-1.5 1.5-1.5H12v16H5.5A1.5 1.5 0 0 1 4 18.5v-13Z" />
+      <path d="M20 5.5c0-.8-.7-1.5-1.5-1.5H12v16h6.5a1.5 1.5 0 0 0 1.5-1.5v-13Z" />
+    </svg>
+  );
+}
+
+function DocIcon() {
+  return (
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.5} className="h-4 w-4">
+      <path d="M7 3.5h7l4 4v13a1 1 0 0 1-1 1H7a1 1 0 0 1-1-1v-16a1 1 0 0 1 1-1Z" />
+      <path d="M14 3.5V8h4" />
+      <path d="M9 13h6M9 16.5h6" />
+    </svg>
+  );
+}
+
+function StarIcon({ filled }: { filled: boolean }) {
+  return (
+    <svg
+      viewBox="0 0 24 24"
+      fill={filled ? "currentColor" : "none"}
+      stroke="currentColor"
+      strokeWidth={1.5}
+      className="h-4 w-4"
+    >
+      <path d="m12 3.5 2.6 5.5 6 .8-4.3 4.3 1 6-5.3-2.9-5.3 2.9 1-6L3.4 9.8l6-.8 2.6-5.5Z" strokeLinejoin="round" />
+    </svg>
+  );
+}
+
+function FavoriteButton({
   materialId,
   isFavorite,
   isLoggedIn,
@@ -281,36 +364,25 @@ function FavoriteIconButton({
       : addToFavoritesAction;
 
   return (
-    <form action={action} className="shrink-0">
+    <form action={action}>
       <input type="hidden" name="materialId" value={materialId} />
 
       <button
         type="submit"
-        title={
-          !isLoggedIn
-            ? "Войти, чтобы добавить в избранное"
-            : isFavorite
-              ? "Удалить из избранного"
-              : "Добавить в избранное"
-        }
-        aria-label={
-          !isLoggedIn
-            ? "Войти, чтобы добавить в избранное"
-            : isFavorite
-              ? "Удалить из избранного"
-              : "Добавить в избранное"
-        }
         className={[
-          "flex h-14 w-14 items-center justify-center rounded-2xl border text-2xl shadow-lg transition hover:-translate-y-0.5",
+          "flex w-full items-center justify-center gap-2 rounded-2xl border px-5 py-3 text-sm font-extrabold shadow-md transition hover:-translate-y-0.5",
           isFavorite
-            ? "border-[#d8a342]/50 bg-[#d8a342] text-[#06151a] shadow-[#d8a342]/25"
-            : "border-white/15 bg-white/10 text-[#fff8e8] shadow-black/20 backdrop-blur hover:bg-white/16",
+            ? "border-[#d8a342]/50 bg-[#d8a342]/15 text-[#f0bd5b]"
+            : "border-white/10 bg-white/5 text-[#fff8e8] hover:bg-white/8",
         ].join(" ")}
       >
-        {isFavorite ? "♥" : "♡"}
+        <StarIcon filled={isFavorite} />
+        {!isLoggedIn
+          ? "Войти, чтобы добавить в избранное"
+          : isFavorite
+            ? "В избранном"
+            : "В избранное"}
       </button>
     </form>
   );
 }
-
-

@@ -473,43 +473,37 @@ select {
 
 /* ───────────────────────── Manuscript Reader ───────────────────────── */
 
-.manuscript-book {
+.manuscript-card {
   position: relative;
+  border-radius: 1.75rem;
+  border: 1px solid #e4d4bf;
+  background: #f8f0df;
+  box-shadow: 0 18px 50px rgba(0, 0, 0, 0.12);
+  padding: 2rem 2.25rem;
 }
 
-/* Centers the leaf alone — kept separate from .manuscript-book so the
-   nav row below isn't pulled into the same flex row as the leaf. */
-.manuscript-leaf-frame {
-  display: flex;
-  justify-content: center;
+.manuscript-card-label {
+  margin-bottom: 1rem;
+  font-size: 0.8rem;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  color: #9c8568;
 }
 
-/* Fixed-size leaf — identical footprint on every material page, regardless of text length */
-.manuscript-leaf {
+.manuscript-card-label span {
+  color: #b46b1f;
+}
+
+/* Fixed-height content area — identical footprint regardless of text length;
+   paragraphs that don't fit move to the next page instead of overflowing. */
+.manuscript-card-body {
   position: relative;
-  width: 100%;
-  max-width: 800px;
-  height: 560px;
-  border-radius: 6px 28px 28px 6px;
-  border: 1px solid #d4b06a;
-  border-left: 4px solid #c8964a;
-  background:
-    radial-gradient(circle at 18% 12%, rgba(200, 150, 50, 0.07), transparent 35%),
-    radial-gradient(circle at 85% 85%, rgba(180, 110, 40, 0.05), transparent 40%),
-    repeating-linear-gradient(
-      0deg, transparent, transparent 35px,
-      rgba(180, 140, 60, 0.05) 35px, rgba(180, 140, 60, 0.05) 36px
-    ),
-    linear-gradient(170deg, #fefdf6 0%, #fdf8e8 45%, #f8f0d4 100%);
-  box-shadow:
-    0 30px 80px rgba(0, 0, 0, 0.14),
-    inset 0 0 60px rgba(200, 150, 50, 0.06);
-  padding: 2.75rem 3rem 3.25rem;
+  height: 420px;
   overflow: hidden;
 }
 
-.manuscript-leaf-inner {
-  position: relative;
+.manuscript-card-body > .manuscript-paragraph + .manuscript-paragraph {
+  margin-top: 1.4rem;
 }
 
 /* Off-screen clone used only to measure rendered paragraph heights so
@@ -531,81 +525,61 @@ select {
   color: #7c6a52;
 }
 
-.manuscript-page-number {
-  position: absolute;
-  bottom: 14px;
-  right: 28px;
-  font-size: 11px;
-  font-weight: 900;
-  letter-spacing: 0.25em;
-  color: rgba(180, 107, 31, 0.5);
+@keyframes manuscriptFadeOut {
+  0%   { opacity: 1; }
+  100% { opacity: 0; }
 }
 
-/* ── Fragment restoration transition: the current piece dissolves into
-   golden light and the next one materializes out of it — fits the
-   "recovering scattered legends from the archive" narrative better
-   than a literal book-page flip. ── */
-
-@keyframes fragmentDissolve {
-  0%   { opacity: 1; filter: blur(0) brightness(1);   transform: scale(1); }
-  100% { opacity: 0; filter: blur(11px) brightness(1.5); transform: scale(0.96); }
+@keyframes manuscriptFadeIn {
+  0%   { opacity: 0; }
+  100% { opacity: 1; }
 }
 
-@keyframes fragmentMaterialize {
-  0%   { opacity: 0; filter: blur(11px) brightness(1.5); transform: scale(1.04); }
-  100% { opacity: 1; filter: blur(0) brightness(1);   transform: scale(1); }
-}
-
-.manuscript-fragment-out { animation: fragmentDissolve 0.4s ease-in forwards; }
-.manuscript-fragment-in  { animation: fragmentMaterialize 0.4s ease-out forwards; }
+.manuscript-fade-out { animation: manuscriptFadeOut 0.2s ease-in forwards; }
+.manuscript-fade-in  { animation: manuscriptFadeIn 0.25s ease-out forwards; }
 
 .manuscript-paragraph {
-  font-size: 1.08rem;
-  line-height: 2.05;
+  font-size: 1.05rem;
+  line-height: 1.9;
   color: #2b2620;
   white-space: pre-line;
   text-align: left;
   margin: 0;
 }
 
-.manuscript-drop-cap {
-  float: left;
-  font-family: var(--font-heading), serif;
-  font-size: 4.2rem;
-  line-height: 1;
-  font-weight: 800;
-  margin: -0.06em 0.18rem -0.1em 0;
-  color: #b46b1f;
-  text-shadow: 2px 2px 0 rgba(216, 163, 66, 0.18);
-}
-
-.manuscript-divider {
-  display: flex;
+.manuscript-nav-button {
+  display: inline-flex;
   align-items: center;
-  gap: 14px;
-  margin: 1.75rem 0;
+  gap: 0.5rem;
+  border-radius: 1rem;
+  border: 1px solid #dccab3;
+  background: #fffaf0;
+  padding: 0.625rem 1.25rem;
+  font-size: 0.875rem;
+  font-weight: 800;
+  color: #7c6a52;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.04);
+  transition: all 0.2s ease;
 }
 
-.manuscript-divider-line {
-  height: 1px;
-  flex: 1;
-  background: linear-gradient(to right, transparent, rgba(180, 107, 31, 0.35), transparent);
+.manuscript-nav-button:hover:not(:disabled) {
+  transform: translateY(-1px);
+  border-color: #d8a342;
+  color: #9f661f;
 }
 
-.manuscript-divider-glyph {
-  font-size: 1rem;
-  color: rgba(180, 107, 31, 0.55);
+.manuscript-nav-button:disabled {
+  pointer-events: none;
+  opacity: 0.35;
 }
 
 @media (max-width: 640px) {
-  .manuscript-leaf {
-    height: 480px;
-    padding: 2rem 1.5rem 2.5rem;
-    border-radius: 18px;
+  .manuscript-card {
+    padding: 1.5rem 1.5rem;
   }
 
-  .manuscript-drop-cap {
-    font-size: 3.2rem;
+  .manuscript-card-body {
+    height: 380px;
   }
 }
 

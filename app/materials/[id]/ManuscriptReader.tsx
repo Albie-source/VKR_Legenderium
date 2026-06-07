@@ -52,25 +52,25 @@ export default function ManuscriptReader({ text }: { text: string }) {
   const [phase, setPhase] = useState<Phase>("idle");
 
   const timerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
-  const leafRef = useRef<HTMLDivElement | null>(null);
+  const bodyRef = useRef<HTMLDivElement | null>(null);
   const blockRefs = useRef<(HTMLDivElement | null)[]>([]);
   const [contentWidth, setContentWidth] = useState<number>();
 
   useEffect(() => () => { if (timerRef.current) clearTimeout(timerRef.current); }, []);
 
   useIsomorphicLayoutEffect(() => {
-    const leaf = leafRef.current;
-    if (!leaf) return;
+    const body = bodyRef.current;
+    if (!body) return;
 
     function recompute() {
-      if (!leaf) return;
-      const style = window.getComputedStyle(leaf);
+      if (!body) return;
+      const style = window.getComputedStyle(body);
       const paddingY = parseFloat(style.paddingTop) + parseFloat(style.paddingBottom);
       const paddingX = parseFloat(style.paddingLeft) + parseFloat(style.paddingRight);
-      const available = leaf.clientHeight - paddingY;
+      const available = body.clientHeight - paddingY;
       if (available <= 0) return;
 
-      const width = leaf.clientWidth - paddingX;
+      const width = body.clientWidth - paddingX;
       if (width !== contentWidth) {
         // Measurer needs to re-render at the correct width before block
         // heights can be trusted — bail out, the effect re-runs once it does.
@@ -102,7 +102,7 @@ export default function ManuscriptReader({ text }: { text: string }) {
     recompute();
 
     const observer = new ResizeObserver(recompute);
-    observer.observe(leaf);
+    observer.observe(body);
     return () => observer.disconnect();
   }, [text, contentWidth]);
 
@@ -116,8 +116,8 @@ export default function ManuscriptReader({ text }: { text: string }) {
     timerRef.current = setTimeout(() => {
       setIndex(target);
       setPhase("in");
-      timerRef.current = setTimeout(() => setPhase("idle"), 400);
-    }, 400);
+      timerRef.current = setTimeout(() => setPhase("idle"), 250);
+    }, 200);
   }
 
   function navigate(direction: "next" | "prev") {
@@ -133,65 +133,37 @@ export default function ManuscriptReader({ text }: { text: string }) {
     return () => window.removeEventListener("keydown", onKey);
   });
 
-  const fragmentClass =
-    phase === "out" ? "manuscript-fragment-out"
-    : phase === "in" ? "manuscript-fragment-in"
+  const fadeClass =
+    phase === "out" ? "manuscript-fade-out"
+    : phase === "in" ? "manuscript-fade-in"
     : "";
 
   const currentIndices = pages[currentIndex] ?? [0];
-  const [firstIdx, ...restIdx] = currentIndices;
-  const isVeryFirstParagraph = firstIdx === 0;
 
   return (
-    <div className="manuscript-book">
-      <div className="manuscript-leaf-frame">
-        <div ref={leafRef} className={`manuscript-leaf ${fragmentClass}`}>
-          <div className="manuscript-leaf-inner">
-            {isVeryFirstParagraph ? (
-              <p className="manuscript-paragraph">
-                <span className="manuscript-drop-cap">{paragraphs[firstIdx].charAt(0)}</span>
-                {paragraphs[firstIdx].slice(1)}
-              </p>
-            ) : (
-              <p className="manuscript-paragraph">{paragraphs[firstIdx]}</p>
-            )}
+    <div className="manuscript-card">
+      {total > 1 && (
+        <p className="manuscript-card-label">
+          Страница <span>{currentIndex + 1}</span> из {total}
+        </p>
+      )}
 
-            {restIdx.map((pIdx) => (
-              <div key={pIdx}>
-                <div className="manuscript-divider" aria-hidden>
-                  <span className="manuscript-divider-line" />
-                  <span className="manuscript-divider-glyph">❦</span>
-                  <span className="manuscript-divider-line" />
-                </div>
-                <p className="manuscript-paragraph">{paragraphs[pIdx]}</p>
-              </div>
-            ))}
-          </div>
-
-          {total > 1 && <div className="manuscript-page-number">{currentIndex + 1} / {total}</div>}
-        </div>
+      <div ref={bodyRef} className={`manuscript-card-body ${fadeClass}`}>
+        {currentIndices.map((pIdx) => (
+          <p key={pIdx} className="manuscript-paragraph">{paragraphs[pIdx]}</p>
+        ))}
       </div>
 
       <div className="manuscript-measure" aria-hidden>
-        <div className="manuscript-leaf-inner" style={{ width: contentWidth }}>
+        <div style={{ width: contentWidth }}>
           {paragraphs.map((para, i) => (
-            <div key={i} ref={(el) => { blockRefs.current[i] = el; }}>
-              {i > 0 && (
-                <div className="manuscript-divider" aria-hidden>
-                  <span className="manuscript-divider-line" />
-                  <span className="manuscript-divider-glyph">❦</span>
-                  <span className="manuscript-divider-line" />
-                </div>
-              )}
-              {i === 0 ? (
-                <p className="manuscript-paragraph">
-                  <span className="manuscript-drop-cap">{para.charAt(0)}</span>
-                  {para.slice(1)}
-                </p>
-              ) : (
-                <p className="manuscript-paragraph">{para}</p>
-              )}
-            </div>
+            <p
+              key={i}
+              ref={(el) => { blockRefs.current[i] = el; }}
+              className="manuscript-paragraph"
+            >
+              {para}
+            </p>
           ))}
         </div>
       </div>
@@ -201,35 +173,19 @@ export default function ManuscriptReader({ text }: { text: string }) {
           <button
             onClick={() => navigate("prev")}
             disabled={currentIndex === 0 || phase !== "idle"}
-            className="flex items-center gap-2 rounded-2xl border border-[#dccab3] bg-white px-5 py-2.5 text-sm font-extrabold text-stone-700 shadow-sm transition hover:-translate-y-0.5 hover:border-[#d8a342] hover:text-[#9f661f] disabled:pointer-events-none disabled:opacity-35"
+            className="manuscript-nav-button"
           >
-            <span className="text-base leading-none">←</span>
-            Назад
+            <span aria-hidden>←</span>
+            Предыдущая
           </button>
-
-          <div className="flex items-center gap-1.5">
-            {pages.map((_, i) => (
-              <button
-                key={i}
-                onClick={() => goTo(i)}
-                aria-label={`Фрагмент ${i + 1}`}
-                className={[
-                  "rounded-full transition-all duration-200",
-                  i === currentIndex
-                    ? "h-2 w-5 bg-[#d8a342]"
-                    : "h-2 w-2 bg-stone-300 hover:bg-[#d8a342]/50",
-                ].join(" ")}
-              />
-            ))}
-          </div>
 
           <button
             onClick={() => navigate("next")}
             disabled={currentIndex >= total - 1 || phase !== "idle"}
-            className="flex items-center gap-2 rounded-2xl border border-[#dccab3] bg-white px-5 py-2.5 text-sm font-extrabold text-stone-700 shadow-sm transition hover:-translate-y-0.5 hover:border-[#d8a342] hover:text-[#9f661f] disabled:pointer-events-none disabled:opacity-35"
+            className="manuscript-nav-button"
           >
-            Вперёд
-            <span className="text-base leading-none">→</span>
+            Следующая
+            <span aria-hidden>→</span>
           </button>
         </div>
       )}
