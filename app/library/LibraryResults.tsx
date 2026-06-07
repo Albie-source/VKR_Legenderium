@@ -3,6 +3,7 @@
 import { useState } from "react";
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
+import type { MaterialStatus } from "@/lib/materialProgress";
 
 type Topic = { id: number; name: string };
 
@@ -11,6 +12,7 @@ type MaterialCard = {
   title: string;
   shortDescription: string | null;
   imageUrl: string | null;
+  status: MaterialStatus | null;
   region: { name: string };
   people: { name: string };
   genre: { name: string };
@@ -124,17 +126,28 @@ export default function LibraryResults({ materials, totalCount }: LibraryResults
 }
 
 function GridCard({ material, delay }: { material: MaterialCard; delay: number }) {
+  const isUndiscovered = material.status === "undiscovered";
+  const isRestored = material.status === "restored";
+
   return (
     <article
       style={{ animationDelay: `${delay}s` }}
-      className="animate-fade-in-up group flex min-h-[400px] flex-col overflow-hidden rounded-[2rem] border border-[#e4d4bf] bg-white shadow-md transition hover:-translate-y-1 hover:shadow-xl"
+      className={[
+        "animate-fade-in-up group flex min-h-[400px] flex-col overflow-hidden rounded-[2rem] border bg-white shadow-md transition hover:-translate-y-1 hover:shadow-xl",
+        isRestored
+          ? "border-[#6fcf97]/50 ring-1 ring-[#6fcf97]/25"
+          : "border-[#e4d4bf]",
+      ].join(" ")}
     >
       <div className="relative h-44 overflow-hidden bg-[#eadfce]">
         {material.imageUrl ? (
           <img
             src={material.imageUrl}
             alt={material.title}
-            className="h-full w-full object-cover object-[center_42%] transition duration-500 group-hover:scale-105"
+            className={[
+              "h-full w-full object-cover object-[center_42%] transition duration-500 group-hover:scale-105",
+              isUndiscovered ? "grayscale" : "",
+            ].join(" ")}
           />
         ) : (
           <div className="flex h-full items-center justify-center bg-[radial-gradient(circle_at_35%_25%,rgba(216,163,66,0.18),transparent_28%),linear-gradient(135deg,#efe4d3,#e5d4bd)] px-6 text-center text-sm font-semibold text-stone-600">
@@ -147,6 +160,18 @@ function GridCard({ material, delay }: { material: MaterialCard; delay: number }
         <div className="absolute left-4 top-4 rounded-full border border-[#d8a342]/30 bg-[#fff8e8]/90 px-3 py-1 text-xs font-extrabold text-[#9f661f] shadow-sm backdrop-blur">
           {material.genre.name}
         </div>
+
+        {isUndiscovered && (
+          <div className="absolute right-4 top-4 flex h-8 w-8 items-center justify-center rounded-full border border-white/40 bg-black/45 text-base font-black text-white/85 backdrop-blur">
+            ?
+          </div>
+        )}
+
+        {isRestored && (
+          <div className="absolute right-4 top-4 rounded-full border border-[#6fcf97]/50 bg-[#173326]/85 px-3 py-1 text-xs font-black uppercase tracking-[0.1em] text-[#9ee8c0] shadow-sm backdrop-blur">
+            ✓ Восстановлено
+          </div>
+        )}
       </div>
 
       <div className="flex flex-1 flex-col p-4">
@@ -160,15 +185,22 @@ function GridCard({ material, delay }: { material: MaterialCard; delay: number }
           </span>
         </div>
 
-        <h3 className="mb-2 text-lg font-extrabold leading-tight text-stone-950">
-          {material.title}
+        <h3
+          className={[
+            "mb-2 text-lg font-extrabold leading-tight",
+            isUndiscovered ? "text-stone-400" : "text-stone-950",
+          ].join(" ")}
+        >
+          {isUndiscovered ? "Фрагмент ещё не найден" : material.title}
         </h3>
 
         <p className="mb-3 line-clamp-3 flex-1 text-sm leading-6 text-stone-600">
-          {material.shortDescription}
+          {isUndiscovered
+            ? "Нажмите «Открыть материал», чтобы найти этот фрагмент и узнать, что скрывает Архивариус."
+            : material.shortDescription}
         </p>
 
-        {material.topics.length > 0 && (
+        {!isUndiscovered && material.topics.length > 0 && (
           <div className="mb-4 flex flex-wrap gap-1.5">
             {material.topics.slice(0, 3).map(({ topic }) => (
               <span
@@ -183,7 +215,12 @@ function GridCard({ material, delay }: { material: MaterialCard; delay: number }
 
         <Link
           href={`/materials/${material.id}`}
-          className="mt-auto rounded-2xl bg-[#d8a342] px-4 py-2.5 text-center text-sm font-extrabold text-[#06151a] shadow-md transition hover:-translate-y-0.5 hover:bg-[#f0bd5b]"
+          className={[
+            "mt-auto rounded-2xl px-4 py-2.5 text-center text-sm font-extrabold shadow-md transition hover:-translate-y-0.5",
+            isRestored
+              ? "bg-[#6fcf97] text-[#06151a] hover:bg-[#9ee8c0]"
+              : "bg-[#d8a342] text-[#06151a] hover:bg-[#f0bd5b]",
+          ].join(" ")}
         >
           Открыть материал
         </Link>
@@ -193,27 +230,44 @@ function GridCard({ material, delay }: { material: MaterialCard; delay: number }
 }
 
 function ListCard({ material, delay }: { material: MaterialCard; delay: number }) {
+  const isUndiscovered = material.status === "undiscovered";
+  const isRestored = material.status === "restored";
+
   return (
     <article
       style={{ animationDelay: `${delay}s` }}
-      className="animate-fade-in-up group flex flex-col gap-5 overflow-hidden rounded-[2rem] border border-[#e4d4bf] bg-white p-5 shadow-md transition hover:-translate-y-1 hover:shadow-xl sm:flex-row sm:items-center"
+      className={[
+        "animate-fade-in-up group flex flex-col gap-5 overflow-hidden rounded-[2rem] border bg-white p-5 shadow-md transition hover:-translate-y-1 hover:shadow-xl sm:flex-row sm:items-center",
+        isRestored
+          ? "border-[#6fcf97]/50 ring-1 ring-[#6fcf97]/25"
+          : "border-[#e4d4bf]",
+      ].join(" ")}
     >
       <div className="relative h-40 w-full shrink-0 overflow-hidden rounded-2xl bg-[#eadfce] sm:h-32 sm:w-48">
         {material.imageUrl ? (
           <img
             src={material.imageUrl}
             alt={material.title}
-            className="h-full w-full object-cover object-[center_42%] transition duration-500 group-hover:scale-105"
+            className={[
+              "h-full w-full object-cover object-[center_42%] transition duration-500 group-hover:scale-105",
+              isUndiscovered ? "grayscale" : "",
+            ].join(" ")}
           />
         ) : (
           <div className="flex h-full items-center justify-center bg-[radial-gradient(circle_at_35%_25%,rgba(216,163,66,0.18),transparent_28%),linear-gradient(135deg,#efe4d3,#e5d4bd)] px-4 text-center text-xs font-semibold text-stone-600">
             Нет изображения
           </div>
         )}
+
+        {isUndiscovered && (
+          <div className="absolute right-3 top-3 flex h-7 w-7 items-center justify-center rounded-full border border-white/40 bg-black/45 text-sm font-black text-white/85 backdrop-blur">
+            ?
+          </div>
+        )}
       </div>
 
       <div className="min-w-0 flex-1">
-        <div className="mb-2 flex flex-wrap gap-2 text-xs">
+        <div className="mb-2 flex flex-wrap items-center gap-2 text-xs">
           <span className="rounded-full border border-[#d8a342]/30 bg-[#fff8e8] px-3 py-1 font-extrabold text-[#9f661f]">
             {material.genre.name}
           </span>
@@ -223,20 +277,38 @@ function ListCard({ material, delay }: { material: MaterialCard; delay: number }
           <span className="rounded-full border border-stone-200 bg-stone-100 px-3 py-1 font-bold text-stone-700">
             {material.people.name}
           </span>
+
+          {isRestored && (
+            <span className="rounded-full border border-[#6fcf97]/40 bg-[#e8faf0] px-3 py-1 font-black uppercase tracking-[0.08em] text-[#2f8f63]">
+              ✓ Восстановлено
+            </span>
+          )}
         </div>
 
-        <h3 className="mb-2 text-xl font-extrabold leading-tight text-stone-950">
-          {material.title}
+        <h3
+          className={[
+            "mb-2 text-xl font-extrabold leading-tight",
+            isUndiscovered ? "text-stone-400" : "text-stone-950",
+          ].join(" ")}
+        >
+          {isUndiscovered ? "Фрагмент ещё не найден" : material.title}
         </h3>
 
         <p className="line-clamp-2 text-sm leading-6 text-stone-600">
-          {material.shortDescription}
+          {isUndiscovered
+            ? "Нажмите «Открыть», чтобы найти этот фрагмент и узнать, что скрывает Архивариус."
+            : material.shortDescription}
         </p>
       </div>
 
       <Link
         href={`/materials/${material.id}`}
-        className="shrink-0 rounded-2xl bg-[#d8a342] px-5 py-3 text-center text-sm font-extrabold text-[#06151a] shadow-md transition hover:-translate-y-0.5 hover:bg-[#f0bd5b] sm:self-center"
+        className={[
+          "shrink-0 rounded-2xl px-5 py-3 text-center text-sm font-extrabold shadow-md transition hover:-translate-y-0.5 sm:self-center",
+          isRestored
+            ? "bg-[#6fcf97] text-[#06151a] hover:bg-[#9ee8c0]"
+            : "bg-[#d8a342] text-[#06151a] hover:bg-[#f0bd5b]",
+        ].join(" ")}
       >
         Открыть
       </Link>

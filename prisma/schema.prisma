@@ -29,6 +29,7 @@ model User {
   favorites           Favorite[]
   taskAttempts        TaskAttempt[]
   goalProgress        GoalProgress[]
+  materialProgress    MaterialProgress[]
   passwordResetTokens PasswordResetToken[]
 
   @@map("users")
@@ -134,6 +135,7 @@ model Material {
   favorites       Favorite[]
   tasks           InteractiveTask[]
   goalMaterials   GoalMaterial[]
+  progress        MaterialProgress[]
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -168,6 +170,21 @@ model Favorite {
   @@unique([userId, materialId])
   @@index([userId])
   @@map("favorites")
+}
+
+model MaterialProgress {
+  id           Int       @id @default(autoincrement())
+  userId       Int
+  materialId   Int
+  discoveredAt DateTime?
+  restoredAt   DateTime?
+
+  user     User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  material Material @relation(fields: [materialId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, materialId])
+  @@index([userId])
+  @@map("material_progress")
 }
 
 model InteractiveTask {

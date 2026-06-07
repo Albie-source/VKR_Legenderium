@@ -2,6 +2,8 @@ import Link from "next/link";
 import { Suspense } from "react";
 import { Prisma } from "@prisma/client";
 import { prisma } from "@/lib/prisma";
+import { getCurrentUser } from "@/lib/auth";
+import { getMaterialStatusMap } from "@/lib/materialProgress";
 import LibraryFilters from "./LibraryFilters";
 import LibraryResults from "./LibraryResults";
 import LibraryPagination from "./LibraryPagination";
@@ -138,7 +140,7 @@ export default async function LibraryPage({ searchParams }: LibraryPageProps) {
         skip: (currentPage - 1) * PAGE_SIZE,
       });
 
-  const [materials, rawCount, regions, peoples, genres, topics] =
+  const [materials, rawCount, regions, peoples, genres, topics, user] =
     await Promise.all([
       materialQuery,
       trgmIds !== null
@@ -148,6 +150,7 @@ export default async function LibraryPage({ searchParams }: LibraryPageProps) {
       prisma.people.findMany({ orderBy: { name: "asc" } }),
       prisma.genre.findMany({ orderBy: { name: "asc" } }),
       prisma.topic.findMany({ orderBy: { name: "asc" } }),
+      getCurrentUser(),
     ]);
 
   // Restore relevance order (Prisma doesn't guarantee IN-clause order)
@@ -157,6 +160,16 @@ export default async function LibraryPage({ searchParams }: LibraryPageProps) {
     const order = new Map(pageIds.map((id, i) => [id, i]));
     materials.sort((a, b) => (order.get(a.id) ?? 999) - (order.get(b.id) ?? 999));
   }
+
+  const statusMap = await getMaterialStatusMap(
+    user?.id ?? null,
+    materials.map((material) => material.id)
+  );
+
+  const materialsWithStatus = materials.map((material) => ({
+    ...material,
+    status: user ? statusMap.get(material.id) ?? "undiscovered" : null,
+  }));
 
   const totalCount = rawCount;
   const totalPages = Math.ceil(totalCount / PAGE_SIZE);
@@ -214,7 +227,7 @@ export default async function LibraryPage({ searchParams }: LibraryPageProps) {
 
           <div className="min-w-0">
             <Suspense fallback={null}>
-              <LibraryResults materials={materials} totalCount={totalCount} />
+              <LibraryResults materials={materialsWithStatus} totalCount={totalCount} />
             </Suspense>
 
             <Suspense fallback={null}>

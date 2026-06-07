@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { Fragment, useCallback, useEffect, useMemo, useState } from "react";
 import {
   CircleMarker,
   GeoJSON,
@@ -15,6 +15,7 @@ import {
 import type { Feature, GeoJsonObject, Geometry } from "geojson";
 import type { Layer, Map as LeafletMap } from "leaflet";
 import type { GoalStop, MaterialItem, RegionItem } from "./MapClient";
+import type { MaterialStatus } from "@/lib/materialProgress";
 
 type LayerWithInternals = Layer & {
   getBounds?: () => import("leaflet").LatLngBounds;
@@ -48,6 +49,42 @@ const SELECTED_REGION_STYLE = {
   fillColor: "#d8a342",
   fillOpacity: 0.38,
 };
+
+function getMarkerStyle(status: MaterialStatus | null, isHovered: boolean) {
+  if (status === "restored") {
+    return {
+      radius: isHovered ? 13 : 10,
+      pathOptions: {
+        color: isHovered ? "#fff8e8" : "#eafff2",
+        weight: isHovered ? 3 : 2.5,
+        fillColor: "#6fcf97",
+        fillOpacity: 1,
+      },
+    };
+  }
+
+  if (status === "undiscovered") {
+    return {
+      radius: isHovered ? 10 : 6,
+      pathOptions: {
+        color: isHovered ? "#cbbba7" : "#384749",
+        weight: isHovered ? 2.5 : 1.5,
+        fillColor: isHovered ? "#7c8c8e" : "#56676a",
+        fillOpacity: isHovered ? 0.85 : 0.5,
+      },
+    };
+  }
+
+  return {
+    radius: isHovered ? 12 : 8,
+    pathOptions: {
+      color: isHovered ? "#fff8e8" : "#06151a",
+      weight: isHovered ? 3 : 2,
+      fillColor: isHovered ? "#f0bd5b" : "#d8a342",
+      fillOpacity: 0.95,
+    },
+  };
+}
 
 const REGION_NAME_MAP: Record<string, string> = {
   "Adygea": "Республика Адыгея",
@@ -368,33 +405,51 @@ export default function MapView({ regions, goalStops }: MapViewProps) {
             }
 
             const isHovered = hoveredMaterialId === material.id;
+            const center: [number, number] = [material.latitude, material.longitude];
+            const { radius, pathOptions } = getMarkerStyle(material.status, isHovered);
 
             return (
-              <CircleMarker
-                key={material.id}
-                center={[material.latitude, material.longitude]}
-                radius={isHovered ? 12 : 8}
-                pathOptions={{
-                  color: isHovered ? "#fff8e8" : "#06151a",
-                  weight: isHovered ? 3 : 2,
-                  fillColor: isHovered ? "#f0bd5b" : "#d8a342",
-                  fillOpacity: 0.95,
-                }}
-                eventHandlers={{
-                  mouseover: () => setHoveredMaterialId(material.id),
-                  mouseout: () => setHoveredMaterialId(null),
-                  click: () => router.push(`/materials/${material.id}`),
-                }}
-              >
-                <Tooltip
-                  direction="top"
-                  offset={[0, -8]}
-                  opacity={1}
-                  className="legendarium-material-tooltip"
+              <Fragment key={material.id}>
+                {material.status === "restored" && (
+                  <CircleMarker
+                    center={center}
+                    radius={isHovered ? 20 : 16}
+                    pathOptions={{ stroke: false, fillColor: "#6fcf97", fillOpacity: 0.18 }}
+                    interactive={false}
+                  />
+                )}
+
+                <CircleMarker
+                  center={center}
+                  radius={radius}
+                  pathOptions={pathOptions}
+                  eventHandlers={{
+                    mouseover: () => setHoveredMaterialId(material.id),
+                    mouseout: () => setHoveredMaterialId(null),
+                    click: () => router.push(`/materials/${material.id}`),
+                  }}
                 >
-                  <MaterialTooltip material={material} />
-                </Tooltip>
-              </CircleMarker>
+                  {material.status === "undiscovered" ? (
+                    <Tooltip
+                      direction="center"
+                      permanent
+                      opacity={1}
+                      className="legendarium-mystery-marker"
+                    >
+                      <span>?</span>
+                    </Tooltip>
+                  ) : (
+                    <Tooltip
+                      direction="top"
+                      offset={[0, -8]}
+                      opacity={1}
+                      className="legendarium-material-tooltip"
+                    >
+                      <MaterialTooltip material={material} />
+                    </Tooltip>
+                  )}
+                </CircleMarker>
+              </Fragment>
             );
           })}
         </MapContainer>
@@ -482,19 +537,31 @@ export default function MapView({ regions, goalStops }: MapViewProps) {
                       onMouseEnter={() => setHoveredMaterialId(material.id)}
                       onMouseLeave={() => setHoveredMaterialId(null)}
                     >
-                      <div className="mb-2 flex flex-wrap gap-2 text-xs">
+                      <div className="mb-2 flex flex-wrap items-center gap-2 text-xs">
                         <span className="badge-genre">{material.genre.name}</span>
 
                         <span className="rounded-full border border-white/10 bg-white/10 px-3 py-1 font-extrabold text-[#fff8e8]">
                           {material.people.name}
                         </span>
+
+                        {material.status === "restored" && (
+                          <span className="rounded-full border border-[#6fcf97]/40 bg-[#6fcf97]/12 px-2.5 py-1 font-black uppercase tracking-[0.08em] text-[#9ee8c0]">
+                            ✓ Восстановлен
+                          </span>
+                        )}
+
+                        {material.status === "undiscovered" && (
+                          <span className="flex h-5 w-5 items-center justify-center rounded-full border border-white/15 bg-white/8 font-black text-[#cbbba7]">
+                            ?
+                          </span>
+                        )}
                       </div>
 
                       <h4 className="mb-2 text-lg font-extrabold text-[#fff8e8]">
-                        {material.title}
+                        {material.status === "undiscovered" ? "Фрагмент ещё не найден" : material.title}
                       </h4>
 
-                      {material.shortDescription && (
+                      {material.status !== "undiscovered" && material.shortDescription && (
                         <p className="line-clamp-3 text-sm leading-6 text-[#cbbba7]">
                           {material.shortDescription}
                         </p>
@@ -567,12 +634,34 @@ function MaterialTooltip({ material }: { material: MaterialItem }) {
       </div>
 
       {material.shortDescription && (
-        <p className="line-clamp-3 break-words text-sm leading-5 text-[#cbbba7]">
+        <p className="mb-2 line-clamp-3 break-words text-sm leading-5 text-[#cbbba7]">
           {material.shortDescription}
         </p>
       )}
+
+      <MaterialStatusBadge status={material.status} />
     </div>
   );
+}
+
+function MaterialStatusBadge({ status }: { status: MaterialStatus | null }) {
+  if (status === "restored") {
+    return (
+      <span className="inline-flex items-center gap-1.5 rounded-full border border-[#6fcf97]/40 bg-[#6fcf97]/12 px-2.5 py-1 text-[0.65rem] font-black uppercase tracking-[0.1em] text-[#9ee8c0]">
+        ✓ Фрагмент восстановлен
+      </span>
+    );
+  }
+
+  if (status === "discovered") {
+    return (
+      <span className="inline-flex items-center gap-1.5 rounded-full border border-white/10 bg-white/8 px-2.5 py-1 text-[0.65rem] font-black uppercase tracking-[0.1em] text-[#d6c8b6]">
+        Найден · ожидает восстановления
+      </span>
+    );
+  }
+
+  return null;
 }
 
 function getFeatureRegionName(

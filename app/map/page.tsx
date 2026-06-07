@@ -1,4 +1,6 @@
 import { prisma } from "@/lib/prisma";
+import { getCurrentUser } from "@/lib/auth";
+import { getMaterialStatusMap } from "@/lib/materialProgress";
 import MapClient from "./MapClient";
 import type { GoalStop } from "./MapClient";
 import MascotHint from "@/components/MascotHint";
@@ -83,6 +85,12 @@ export default async function MapPage({ searchParams }: MapPageProps) {
     },
   });
 
+  const user = await getCurrentUser();
+  const allMaterialIds = regions.flatMap((region) =>
+    region.materials.map((material) => material.id)
+  );
+  const statusMap = await getMaterialStatusMap(user?.id ?? null, allMaterialIds);
+
   const preparedRegions = regions.map((region) => {
     const peoplesMap = new Map<number, string>();
 
@@ -105,6 +113,7 @@ export default async function MapPage({ searchParams }: MapPageProps) {
         latitude: material.latitude,
         longitude: material.longitude,
         imageUrl: material.imageUrl,
+        status: user ? statusMap.get(material.id) ?? "undiscovered" : null,
         people: {
           id: material.people.id,
           name: material.people.name,

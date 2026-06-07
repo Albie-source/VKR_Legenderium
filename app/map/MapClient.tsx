@@ -1,6 +1,7 @@
 "use client";
 
 import dynamic from "next/dynamic";
+import type { MaterialStatus } from "@/lib/materialProgress";
 
 export type RegionItem = {
   id: number;
@@ -20,6 +21,7 @@ export type MaterialItem = {
   latitude: number | null;
   longitude: number | null;
   imageUrl: string | null;
+  status: MaterialStatus | null;
   people: {
     id: number;
     name: string;

@@ -193,6 +193,29 @@ select {
   display: none !important;
 }
 
+.legendarium-mystery-marker {
+  border: none !important;
+  background: transparent !important;
+  box-shadow: none !important;
+  padding: 0 !important;
+}
+
+.legendarium-mystery-marker::before {
+  display: none !important;
+}
+
+.legendarium-mystery-marker .leaflet-tooltip-content {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 16px;
+  height: 16px;
+  margin: 0 !important;
+  font-weight: 900;
+  font-size: 0.7rem;
+  color: rgba(255, 248, 232, 0.7);
+}
+
 .leaflet-popup-content-wrapper,
 .leaflet-popup-tip {
   background: rgba(6, 21, 26, 0.96) !important;
