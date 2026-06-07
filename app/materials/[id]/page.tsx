@@ -161,17 +161,10 @@ export default async function MaterialPage({ params }: MaterialPageProps) {
         </div>
       </section>
 
-      <section
-        className={[
-          "mx-auto max-w-7xl px-6 pt-10",
-          material.tasks.length > 0
-            ? "grid gap-8 lg:grid-cols-[1fr_340px]"
-            : "",
-        ].join(" ")}
-      >
-        <div className="space-y-8">
-          <div className="flex flex-col gap-8 lg:flex-row lg:items-start">
-            <section className="min-w-0 flex-1 rounded-[2rem] border border-[#e4d4bf] bg-white p-7 shadow-md md:p-8">
+      <section className="mx-auto max-w-7xl px-6 pt-10">
+        <div className="flex flex-col gap-8 lg:flex-row lg:items-start">
+          <div className="min-w-0 flex-1 space-y-8">
+            <section className="rounded-[2rem] border border-[#e4d4bf] bg-white p-7 shadow-md md:p-8">
               {material.fullText ? (
                 <ManuscriptReader text={material.fullText} />
               ) : (
@@ -204,71 +197,71 @@ export default async function MaterialPage({ params }: MaterialPageProps) {
               )}
             </section>
 
-            {process.env.YANDEX_TTS_API_KEY && material.fullText && (
-              <div className="lg:w-[230px] lg:shrink-0">
-                <TtsPlayer text={material.fullText} />
-              </div>
+            {(material.audioUrl || material.videoUrl) && (
+              <section className="rounded-[2rem] border border-[#e4d4bf] bg-white p-7 shadow-md md:p-8">
+                <p className="mb-2 text-sm font-black uppercase tracking-[0.25em] text-[#b46b1f]">
+                  Медиа
+                </p>
+
+                <h2 className="mb-6 text-3xl font-extrabold text-stone-950">
+                  Мультимедийные материалы
+                </h2>
+
+                <div className="space-y-6">
+                  {material.audioUrl && (
+                    <AudioPlayer src={material.audioUrl} />
+                  )}
+
+                  {material.videoUrl && (
+                    <div className="rounded-2xl border border-[#eadbc7] bg-[#fbf7f1] p-5">
+                      <p className="mb-3 text-sm font-bold text-stone-800">
+                        Видеоматериал
+                      </p>
+
+                      <video controls className="w-full rounded-xl">
+                        <source src={material.videoUrl} />
+                        Ваш браузер не поддерживает видео.
+                      </video>
+                    </div>
+                  )}
+                </div>
+              </section>
             )}
           </div>
 
-          {(material.audioUrl || material.videoUrl) && (
-            <section className="rounded-[2rem] border border-[#e4d4bf] bg-white p-7 shadow-md md:p-8">
-              <p className="mb-2 text-sm font-black uppercase tracking-[0.25em] text-[#b46b1f]">
-                Медиа
-              </p>
+          {(Boolean(process.env.YANDEX_TTS_API_KEY && material.fullText) ||
+            material.tasks.length > 0) && (
+            <div className="space-y-6 lg:sticky lg:top-28 lg:w-[230px] lg:shrink-0 lg:self-start">
+              {process.env.YANDEX_TTS_API_KEY && material.fullText && (
+                <TtsPlayer text={material.fullText} />
+              )}
 
-              <h2 className="mb-6 text-3xl font-extrabold text-stone-950">
-                Мультимедийные материалы
-              </h2>
+              {material.tasks.length > 0 && (
+                <section className="rounded-[2rem] border border-[#d8a342]/35 bg-[#fff4d8] p-6 shadow-md">
+                  <p className="mb-2 text-sm font-black uppercase tracking-[0.2em] text-[#b46b1f]">
+                    Задание
+                  </p>
 
-              <div className="space-y-6">
-                {material.audioUrl && (
-                  <AudioPlayer src={material.audioUrl} />
-                )}
+                  <h2 className="mb-3 text-2xl font-extrabold text-stone-950">
+                    Проверь понимание материала
+                  </h2>
 
-                {material.videoUrl && (
-                  <div className="rounded-2xl border border-[#eadbc7] bg-[#fbf7f1] p-5">
-                    <p className="mb-3 text-sm font-bold text-stone-800">
-                      Видеоматериал
-                    </p>
+                  <p className="mb-5 leading-7 text-stone-700">
+                    К этому материалу добавлено интерактивное задание. Его
+                    можно пройти после чтения текста.
+                  </p>
 
-                    <video controls className="w-full rounded-xl">
-                      <source src={material.videoUrl} />
-                      Ваш браузер не поддерживает видео.
-                    </video>
-                  </div>
-                )}
-              </div>
-            </section>
+                  <Link
+                    href={`/quests/${material.tasks[0].id}`}
+                    className="inline-flex w-full justify-center rounded-2xl bg-[#d8a342] px-5 py-3 font-extrabold text-[#06151a] shadow-md transition hover:-translate-y-0.5 hover:bg-[#f0bd5b]"
+                  >
+                    Перейти к заданию
+                  </Link>
+                </section>
+              )}
+            </div>
           )}
-
         </div>
-
-        {material.tasks.length > 0 && (
-          <aside className="lg:sticky lg:top-28 lg:self-start">
-            <section className="rounded-[2rem] border border-[#d8a342]/35 bg-[#fff4d8] p-6 shadow-md">
-              <p className="mb-2 text-sm font-black uppercase tracking-[0.2em] text-[#b46b1f]">
-                Задание
-              </p>
-
-              <h2 className="mb-3 text-2xl font-extrabold text-stone-950">
-                Проверь понимание материала
-              </h2>
-
-              <p className="mb-5 leading-7 text-stone-700">
-                К этому материалу добавлено интерактивное задание. Его можно
-                пройти после чтения текста.
-              </p>
-
-              <Link
-                href={`/quests/${material.tasks[0].id}`}
-                className="inline-flex w-full justify-center rounded-2xl bg-[#d8a342] px-5 py-3 font-extrabold text-[#06151a] shadow-md transition hover:-translate-y-0.5 hover:bg-[#f0bd5b]"
-              >
-                Перейти к заданию
-              </Link>
-            </section>
-          </aside>
-        )}
       </section>
     </main>
   );
