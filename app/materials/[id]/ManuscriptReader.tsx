@@ -101,9 +101,23 @@ export default function ManuscriptReader({ text }: { text: string }) {
 
     recompute();
 
+    // Шрифты Manrope/Playfair грузятся асинхронно: при первом расчёте страниц
+    // высота параграфов могла быть измерена с системным шрифтом-заменителем.
+    // Как только браузер подгрузит и применит настоящий шрифт, пересчитываем
+    // разбивку заново — иначе часть текста останется обрезанной контейнером.
+    let cancelled = false;
+    if (typeof document !== "undefined" && "fonts" in document) {
+      document.fonts.ready.then(() => {
+        if (!cancelled) recompute();
+      });
+    }
+
     const observer = new ResizeObserver(recompute);
     observer.observe(body);
-    return () => observer.disconnect();
+    return () => {
+      cancelled = true;
+      observer.disconnect();
+    };
   }, [text, contentWidth]);
 
   const total = pages.length;
