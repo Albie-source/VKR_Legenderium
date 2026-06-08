@@ -621,6 +621,33 @@ async function createDemoTasks(
     await prisma.interactiveTask.create({
       data: {
         materialId: baseMaterial.id,
+        title: `Мемо: найди одинаковые карточки`,
+        description: "Сложный уровень: переверните карточки и найдите все 10 пар одинаковых картинок.",
+        type: "memo",
+        difficulty: "hard",
+        config: {
+          question: "Найдите все пары одинаковых карточек",
+          cardBack: "/images/cards.png",
+          pairs: [
+            { id: "img1", cardA: "Мирон радуется", cardB: "Мирон радуется", image: "/images/miron-happy.png" },
+            { id: "img2", cardA: "Мирон грустит", cardB: "Мирон грустит", image: "/images/miron-sad.png" },
+            { id: "img3", cardA: "Мирон-наставник", cardB: "Мирон-наставник", image: "/images/miron-full.png" },
+            { id: "img4", cardA: "Любопытный студент", cardB: "Любопытный студент", image: "/images/student-curious.png" },
+            { id: "img5", cardA: "Студент даёт клятву", cardB: "Студент даёт клятву", image: "/images/student-pledge.png" },
+            { id: "img6", cardA: "Студент готов учиться", cardB: "Студент готов учиться", image: "/images/student-ready.png" },
+            { id: "img7", cardA: "Удивлённый студент", cardB: "Удивлённый студент", image: "/images/student-shocked.png" },
+            { id: "img8", cardA: "Сцена на рассвете", cardB: "Сцена на рассвете", image: "/images/scene-dawn.png" },
+            { id: "img9", cardA: "Сцена грозы", cardB: "Сцена грозы", image: "/images/scene-storm.png" },
+            { id: "img10", cardA: "Сцена в библиотеке", cardB: "Сцена в библиотеке", image: "/images/scene-library.png" },
+          ],
+          explanation: "Тренировка зрительной памяти: чем больше карточек, тем сложнее удержать в голове расположение пар.",
+        },
+      },
+    });
+
+    await prisma.interactiveTask.create({
+      data: {
+        materialId: baseMaterial.id,
         title: `Собери образ: традиционный костюм`,
         description: "Выберите правильные элементы традиционного костюма народа.",
         type: "assemble_outfit",

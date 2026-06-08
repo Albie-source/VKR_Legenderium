@@ -59,11 +59,13 @@ type MemoPair = {
   id: string;
   cardA: string;
   cardB: string;
+  image?: string | null;
 };
 
 type MemoConfig = {
   question: string;
   pairs: MemoPair[];
+  cardBack?: string | null;
   explanation?: string | null;
 };
 
@@ -728,7 +730,7 @@ function WhoAmITask({
 
 // ─── 6. Memo ──────────────────────────────────────────────────────────────────
 
-type MemoCard = { id: string; pairId: string; side: "A" | "B"; label: string };
+type MemoCard = { id: string; pairId: string; side: "A" | "B"; label: string; image?: string | null };
 
 function MemoTask({
   taskId,
@@ -742,8 +744,8 @@ function MemoTask({
   const cards: MemoCard[] = useMemo(() => {
     const all: MemoCard[] = [];
     for (const pair of config.pairs) {
-      all.push({ id: `${pair.id}-A`, pairId: pair.id, side: "A", label: pair.cardA });
-      all.push({ id: `${pair.id}-B`, pairId: pair.id, side: "B", label: pair.cardB });
+      all.push({ id: `${pair.id}-A`, pairId: pair.id, side: "A", label: pair.cardA, image: pair.image });
+      all.push({ id: `${pair.id}-B`, pairId: pair.id, side: "B", label: pair.cardB, image: pair.image });
     }
     return shuffleSeeded(all);
   }, [config.pairs]);
@@ -821,7 +823,7 @@ function MemoTask({
 
       <div
         className="mb-7 grid gap-3"
-        style={{ gridTemplateColumns: `repeat(${Math.min(cards.length, 4)}, 1fr)` }}
+        style={{ gridTemplateColumns: `repeat(${cards.length > 12 ? 5 : Math.min(cards.length, 4)}, 1fr)` }}
       >
         {cards.map((card) => {
           const isFlipped = flipped.has(card.id) || matched.has(card.id);
@@ -833,7 +835,7 @@ function MemoTask({
               type="button"
               onClick={() => handleCardClick(card.id)}
               disabled={isMatched || locked || isFlipped}
-              className={["relative aspect-square rounded-2xl border-2 text-center text-sm font-extrabold shadow-sm transition-all duration-300 select-none",
+              className={["relative aspect-square overflow-hidden rounded-2xl border-2 text-center text-sm font-extrabold shadow-sm transition-all duration-300 select-none",
                 isMatched
                   ? "border-emerald-300 bg-emerald-50 text-emerald-800 cursor-default"
                   : isFlipped
@@ -841,11 +843,21 @@ function MemoTask({
                     : "border-[#eadbc7] bg-[#fbf7f1] text-stone-400 hover:border-[#d8a342]/55 hover:bg-[#fff4d8] cursor-pointer"
               ].join(" ")}
             >
-              <span className="flex h-full w-full items-center justify-center p-2 leading-snug">
-                {isFlipped ? card.label : "?"}
-              </span>
+              {card.image ? (
+                isFlipped ? (
+                  <Image src={card.image} alt={card.label} fill sizes="160px" className="object-cover" />
+                ) : config.cardBack ? (
+                  <Image src={config.cardBack} alt="" fill sizes="160px" className="object-cover" />
+                ) : (
+                  <span className="flex h-full w-full items-center justify-center p-2 leading-snug">?</span>
+                )
+              ) : (
+                <span className="flex h-full w-full items-center justify-center p-2 leading-snug">
+                  {isFlipped ? card.label : "?"}
+                </span>
+              )}
               {isMatched && (
-                <span className="absolute right-1 top-1 text-emerald-500 text-xs">✓</span>
+                <span className="absolute right-1 top-1 z-10 flex h-5 w-5 items-center justify-center rounded-full bg-emerald-500 text-xs text-white">✓</span>
               )}
             </button>
           );
