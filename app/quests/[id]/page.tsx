@@ -72,6 +72,8 @@ export default async function QuestPage({ params }: QuestPageProps) {
     notFound();
   }
 
+  const cover = getTaskCover(task);
+
   return (
     <main className="overflow-hidden bg-[#0b1f22] pb-20">
       <section className="border-b border-white/10 bg-[radial-gradient(circle_at_18%_12%,rgba(58,166,160,0.16),transparent_28%),radial-gradient(circle_at_82%_8%,rgba(216,163,66,0.12),transparent_24%),linear-gradient(180deg,#07181c_0%,#0b2428_100%)]">
@@ -129,10 +131,10 @@ export default async function QuestPage({ params }: QuestPageProps) {
               </div>
 
               <div className="relative h-[300px] overflow-hidden rounded-[1.75rem] border border-white/10 bg-[#06151a] shadow-xl shadow-black/25">
-                {task.material?.imageUrl ? (
+                {cover ? (
                   <Image
-                    src={task.material.imageUrl}
-                    alt={task.material.title}
+                    src={cover.src}
+                    alt={cover.alt}
                     fill
                     sizes="(max-width: 1024px) 100vw, 800px"
                     className="object-cover object-[center_42%]"
@@ -233,6 +235,21 @@ function formatTaskType(type: string) {
   };
 
   return labels[type] ?? type;
+}
+
+const TYPE_COVER_IMAGES: Record<string, string> = {
+  memo: "/images/memo.png",
+};
+
+function getTaskCover(task: {
+  type: string;
+  title: string;
+  material: { imageUrl: string | null; title: string } | null;
+}): { src: string; alt: string } | null {
+  const typeCover = TYPE_COVER_IMAGES[task.type];
+  if (typeCover) return { src: typeCover, alt: task.title };
+  if (task.material?.imageUrl) return { src: task.material.imageUrl, alt: task.material.title };
+  return null;
 }
 
 function formatDifficulty(difficulty: string) {

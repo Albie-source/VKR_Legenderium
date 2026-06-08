@@ -41,6 +41,17 @@ const DIFFICULTY_LABELS: Record<string, string> = {
   hard: "Сложное",
 };
 
+const TYPE_COVER_IMAGES: Record<string, string> = {
+  memo: "/images/memo.png",
+};
+
+function getTaskCover(task: TaskItem): { src: string; alt: string } | null {
+  const typeCover = TYPE_COVER_IMAGES[task.type];
+  if (typeCover) return { src: typeCover, alt: task.title };
+  if (task.material?.imageUrl) return { src: task.material.imageUrl, alt: task.material.title };
+  return null;
+}
+
 export default function QuestsFilter({ tasks }: { tasks: TaskItem[] }) {
   const [activeType, setActiveType] = useState<string | null>(null);
   const [activeDifficulty, setActiveDifficulty] = useState<string | null>(null);
@@ -179,13 +190,15 @@ export default function QuestsFilter({ tasks }: { tasks: TaskItem[] }) {
 }
 
 function TaskCard({ task }: { task: TaskItem }) {
+  const cover = getTaskCover(task);
+
   return (
     <article className="animate-fade-in-up group flex flex-col overflow-hidden rounded-[1.5rem] border border-[#e4d4bf] bg-white shadow-md transition hover:-translate-y-1 hover:shadow-xl">
       <div className="relative h-32 overflow-hidden bg-[#eadfce]">
-        {task.material?.imageUrl ? (
+        {cover ? (
           <Image
-            src={task.material.imageUrl}
-            alt={task.material.title}
+            src={cover.src}
+            alt={cover.alt}
             fill
             sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 25vw"
             className="object-cover object-[center_42%] transition duration-500 group-hover:scale-105"

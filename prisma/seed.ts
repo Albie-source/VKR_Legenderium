@@ -627,7 +627,7 @@ async function createDemoTasks(
         difficulty: "hard",
         config: {
           question: "Найдите все пары одинаковых карточек",
-          cardBack: "/images/memo.png",
+          cardBack: "/images/cards.png",
           pairs: [
             { id: "img1", cardA: "Карточка 1", cardB: "Карточка 1", image: "/images/memo/1.png" },
             { id: "img2", cardA: "Карточка 2", cardB: "Карточка 2", image: "/images/memo/2.png" },
