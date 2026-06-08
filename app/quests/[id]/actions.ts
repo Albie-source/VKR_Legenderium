@@ -20,6 +20,32 @@ type MatchingConfig = {
   explanation?: string | null;
 };
 
+type VisualNovelScene = {
+  id: string;
+  isEnd?: boolean;
+  isCorrect?: boolean;
+};
+
+type VisualNovelConfig = {
+  scenes: VisualNovelScene[];
+};
+
+type HiddenObjectsConfig = {
+  objects: { id: string }[];
+};
+
+type WhoAmIConfig = {
+  answer: string;
+};
+
+type MemoConfig = {
+  pairs: { id: string }[];
+};
+
+type AssembleOutfitConfig = {
+  slots: { id: string; correctItem: string }[];
+};
+
 type SaveTaskResult = {
   isAuthenticated: boolean;
   isCorrect: boolean;
@@ -68,6 +94,60 @@ function isMatchingConfig(config: unknown): config is MatchingConfig {
   );
 }
 
+function isVisualNovelConfig(config: unknown): config is VisualNovelConfig {
+  if (!config || typeof config !== "object") return false;
+  const value = config as Partial<VisualNovelConfig>;
+  return (
+    Array.isArray(value.scenes) &&
+    value.scenes.every(
+      (scene) => scene && typeof scene === "object" && typeof (scene as { id?: unknown }).id === "string"
+    )
+  );
+}
+
+function isHiddenObjectsConfig(config: unknown): config is HiddenObjectsConfig {
+  if (!config || typeof config !== "object") return false;
+  const value = config as Partial<HiddenObjectsConfig>;
+  return (
+    Array.isArray(value.objects) &&
+    value.objects.every(
+      (obj) => obj && typeof obj === "object" && typeof (obj as { id?: unknown }).id === "string"
+    )
+  );
+}
+
+function isWhoAmIConfig(config: unknown): config is WhoAmIConfig {
+  if (!config || typeof config !== "object") return false;
+  const value = config as Partial<WhoAmIConfig>;
+  return typeof value.answer === "string";
+}
+
+function isMemoConfig(config: unknown): config is MemoConfig {
+  if (!config || typeof config !== "object") return false;
+  const value = config as Partial<MemoConfig>;
+  return (
+    Array.isArray(value.pairs) &&
+    value.pairs.every(
+      (pair) => pair && typeof pair === "object" && typeof (pair as { id?: unknown }).id === "string"
+    )
+  );
+}
+
+function isAssembleOutfitConfig(config: unknown): config is AssembleOutfitConfig {
+  if (!config || typeof config !== "object") return false;
+  const value = config as Partial<AssembleOutfitConfig>;
+  return (
+    Array.isArray(value.slots) &&
+    value.slots.every(
+      (slot) =>
+        slot &&
+        typeof slot === "object" &&
+        typeof (slot as { id?: unknown }).id === "string" &&
+        typeof (slot as { correctItem?: unknown }).correctItem === "string"
+    )
+  );
+}
+
 export async function saveTaskResultAction(
   taskId: number,
   selectedAnswer: string
@@ -101,6 +181,16 @@ export async function saveTaskResultAction(
       isCorrect = selectedAnswer === task.config.correctAnswer;
     } else if (task.type === "matching" && isMatchingConfig(task.config)) {
       isCorrect = checkMatchingAnswer(task.config, selectedAnswer);
+    } else if (task.type === "visual_novel" && isVisualNovelConfig(task.config)) {
+      isCorrect = checkVisualNovelAnswer(task.config, selectedAnswer);
+    } else if (task.type === "hidden_objects" && isHiddenObjectsConfig(task.config)) {
+      isCorrect = checkHiddenObjectsAnswer(task.config, selectedAnswer);
+    } else if (task.type === "who_am_i" && isWhoAmIConfig(task.config)) {
+      isCorrect = selectedAnswer === task.config.answer;
+    } else if (task.type === "memo" && isMemoConfig(task.config)) {
+      isCorrect = checkMemoAnswer(task.config, selectedAnswer);
+    } else if (task.type === "assemble_outfit" && isAssembleOutfitConfig(task.config)) {
+      isCorrect = checkAssembleOutfitAnswer(task.config, selectedAnswer);
     } else {
       return {
         isAuthenticated: Boolean(user),
@@ -261,6 +351,49 @@ function checkMatchingAnswer(config: MatchingConfig, selectedAnswer: string) {
     const parsed = JSON.parse(selectedAnswer) as Record<string, string>;
 
     return config.pairs.every((pair) => parsed[pair.left] === pair.right);
+  } catch {
+    return false;
+  }
+}
+
+function checkVisualNovelAnswer(config: VisualNovelConfig, selectedAnswer: string) {
+  try {
+    const parsed = JSON.parse(selectedAnswer) as { endScene?: string };
+    const scene = config.scenes.find((s) => s.id === parsed.endScene);
+
+    return Boolean(scene?.isEnd && scene.isCorrect);
+  } catch {
+    return false;
+  }
+}
+
+function checkHiddenObjectsAnswer(config: HiddenObjectsConfig, selectedAnswer: string) {
+  try {
+    const parsed = JSON.parse(selectedAnswer) as { found?: string[] };
+    const found = new Set(parsed.found ?? []);
+
+    return config.objects.every((obj) => found.has(obj.id));
+  } catch {
+    return false;
+  }
+}
+
+function checkMemoAnswer(config: MemoConfig, selectedAnswer: string) {
+  try {
+    const parsed = JSON.parse(selectedAnswer) as { matched?: string[] };
+    const matched = new Set(parsed.matched ?? []);
+
+    return matched.size === config.pairs.length * 2;
+  } catch {
+    return false;
+  }
+}
+
+function checkAssembleOutfitAnswer(config: AssembleOutfitConfig, selectedAnswer: string) {
+  try {
+    const parsed = JSON.parse(selectedAnswer) as Record<string, string>;
+
+    return config.slots.every((slot) => parsed[slot.id] === slot.correctItem);
   } catch {
     return false;
   }

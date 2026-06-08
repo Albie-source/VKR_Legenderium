@@ -1076,7 +1076,7 @@ function ResultBlock({
         <div className="rounded-2xl border border-[#d8a342]/40 bg-[#fff4d8] p-5 text-stone-800 shadow-sm">
           <h4 className="mb-2 text-xl font-extrabold text-stone-950">Результат не сохранён</h4>
           <p className="mb-4 leading-7 text-stone-700">Вы прошли задание, но прогресс целей сохраняется только для авторизованных пользователей.</p>
-          <Link href="/login" className="inline-flex rounded-2xl bg-[#d8a342] px-5 py-3 font-extrabold text-[#06151a] shadow-md transition hover:bg-[#f0bd5b]">Войти в аккаунт</Link>
+          <Link href="/login" className="inline-flex rounded-2xl bg-[#d8a342] px-5 py-3 font-extrabold !text-[#06151a] shadow-md transition hover:bg-[#f0bd5b]">Войти в аккаунт</Link>
         </div>
       )}
 
@@ -1112,7 +1112,7 @@ function ResultBlock({
         <button type="button" onClick={onReset} className="rounded-2xl border border-[#d8c3a5] bg-white px-5 py-3 font-extrabold text-stone-700 transition hover:bg-[#fff8e8]">
           Ответить заново
         </button>
-        <Link href="/quests" className="rounded-2xl border border-[#d8c3a5] bg-white px-5 py-3 font-extrabold text-stone-700 transition hover:bg-[#fff8e8]">
+        <Link href="/quests" className="rounded-2xl border border-[#d8c3a5] bg-white px-5 py-3 font-extrabold !text-stone-700 transition hover:bg-[#fff8e8]">
           К списку заданий
         </Link>
       </div>
