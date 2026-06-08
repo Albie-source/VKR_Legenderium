@@ -73,22 +73,27 @@ export default async function QuestPage({ params }: QuestPageProps) {
   }
 
   return (
-    <main className="overflow-hidden bg-[#f4ecdf] pb-20">
+    <main className="overflow-hidden bg-[#0b1f22] pb-20">
       <section className="border-b border-white/10 bg-[radial-gradient(circle_at_18%_12%,rgba(58,166,160,0.16),transparent_28%),radial-gradient(circle_at_82%_8%,rgba(216,163,66,0.12),transparent_24%),linear-gradient(180deg,#07181c_0%,#0b2428_100%)]">
-        <div className="mx-auto max-w-7xl px-6 py-12">
-          <Link
-            href="/quests"
-            className="mb-6 inline-flex rounded-2xl border border-white/10 bg-white/8 px-4 py-2 text-sm font-bold text-[#fff8e8] shadow-sm backdrop-blur transition hover:bg-white/14"
-          >
-            ← Все задания
-          </Link>
+        <div className="mx-auto max-w-7xl px-6 py-8">
+          <nav className="mb-4 flex flex-wrap items-center gap-1.5 text-sm font-semibold">
+            <Link href="/" className="text-[#d6c8b6]/60 transition hover:text-[#fff8e8]">
+              Главная
+            </Link>
+            <span className="text-[#d6c8b6]/30">›</span>
+            <Link href="/quests" className="text-[#d6c8b6]/60 transition hover:text-[#fff8e8]">
+              Задания
+            </Link>
+            <span className="text-[#d6c8b6]/30">›</span>
+            <span className="max-w-[220px] truncate text-[#fff8e8]">{task.title}</span>
+          </nav>
 
-          <div className="relative overflow-hidden rounded-[2.5rem] border border-white/10 bg-[#0b1f22] shadow-2xl shadow-black/25">
+          <div className="relative overflow-hidden rounded-[2rem] border border-white/10 bg-[#0b1f22] shadow-xl shadow-black/20">
             <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_12%_18%,rgba(58,166,160,0.16),transparent_28%),radial-gradient(circle_at_82%_20%,rgba(216,163,66,0.14),transparent_24%),radial-gradient(circle_at_70%_88%,rgba(47,143,99,0.10),transparent_28%)]" />
 
-            <div className="relative grid gap-8 p-8 md:p-10 lg:grid-cols-[1.05fr_0.95fr] lg:items-center">
+            <div className="relative grid gap-8 p-7 md:p-9 lg:grid-cols-[1.05fr_0.95fr] lg:items-center">
               <div>
-                <div className="mb-5 flex flex-wrap gap-2 text-xs">
+                <div className="mb-4 flex flex-wrap gap-2 text-xs">
                   <span className="rounded-full border border-[#d8a342]/35 bg-[#d8a342]/12 px-3 py-1 font-black uppercase tracking-[0.12em] text-[#f0bd5b]">
                     {formatTaskType(task.type)}
                   </span>
@@ -112,18 +117,18 @@ export default async function QuestPage({ params }: QuestPageProps) {
                   )}
                 </div>
 
-                <h1 className="mb-5 max-w-4xl text-5xl font-extrabold leading-tight tracking-tight text-[#fff8e8] md:text-6xl">
+                <h1 className="mb-3 max-w-4xl text-3xl font-extrabold leading-tight tracking-tight text-[#fff8e8] md:text-4xl">
                   {task.title}
                 </h1>
 
                 {task.description && (
-                  <p className="max-w-3xl text-lg leading-8 text-[#d6c8b6]">
+                  <p className="max-w-3xl text-base leading-7 text-[#d6c8b6]">
                     {task.description}
                   </p>
                 )}
               </div>
 
-              <div className="relative h-[360px] overflow-hidden rounded-[2rem] border border-white/10 bg-[#06151a] shadow-2xl shadow-black/25">
+              <div className="relative h-[300px] overflow-hidden rounded-[1.75rem] border border-white/10 bg-[#06151a] shadow-xl shadow-black/25">
                 {task.material?.imageUrl ? (
                   <Image
                     src={task.material.imageUrl}
@@ -155,30 +160,30 @@ export default async function QuestPage({ params }: QuestPageProps) {
 
         <aside className="space-y-6 lg:sticky lg:top-28 lg:self-start">
           {task.material && (
-            <section className="rounded-[2rem] border border-[#e4d4bf] bg-white p-6 shadow-md">
-              <p className="mb-2 text-sm font-black uppercase tracking-[0.2em] text-[#b46b1f]">
+            <section className="rounded-[1.75rem] border border-white/10 bg-[#0e2227] p-6 shadow-md">
+              <p className="mb-2 text-xs font-black uppercase tracking-[0.2em] text-[#d8a342]">
                 Материал
               </p>
 
-              <h2 className="mb-3 text-2xl font-extrabold text-stone-950">
+              <h2 className="mb-3 text-2xl font-extrabold text-[#fff8e8]">
                 {task.material.title}
               </h2>
 
               {task.material.shortDescription && (
-                <p className="mb-5 line-clamp-5 leading-7 text-stone-700">
+                <p className="mb-5 line-clamp-5 leading-7 text-[#d6c8b6]">
                   {task.material.shortDescription}
                 </p>
               )}
 
               <div className="mb-5 flex flex-wrap gap-2">
-                <span className="rounded-full border border-[#3aa6a0]/20 bg-[#e7f7f5] px-3 py-1 text-xs font-bold text-[#247670]">
+                <span className="rounded-full border border-[#3aa6a0]/35 bg-[#3aa6a0]/12 px-3 py-1 text-xs font-bold text-[#9ee8e2]">
                   {task.material.people.name}
                 </span>
 
                 {task.material.topics.map(({ topic }) => (
                   <span
                     key={topic.id}
-                    className="rounded-full border border-[#eadbc7] bg-[#faf4eb] px-3 py-1 text-xs font-semibold text-stone-600"
+                    className="rounded-full border border-white/10 bg-white/8 px-3 py-1 text-xs font-semibold text-[#d6c8b6]"
                   >
                     {topic.name}
                   </span>
@@ -194,16 +199,16 @@ export default async function QuestPage({ params }: QuestPageProps) {
             </section>
           )}
 
-          <section className="rounded-[2rem] border border-[#d8a342]/35 bg-[#fff4d8] p-6 shadow-md">
-            <p className="mb-2 text-sm font-black uppercase tracking-[0.2em] text-[#b46b1f]">
+          <section className="rounded-[1.75rem] border border-white/10 bg-[#0e2227] p-6 shadow-md">
+            <p className="mb-2 text-xs font-black uppercase tracking-[0.2em] text-[#d8a342]">
               Подсказка
             </p>
 
-            <h2 className="mb-3 text-2xl font-extrabold text-stone-950">
+            <h2 className="mb-3 text-2xl font-extrabold text-[#fff8e8]">
               Как проходить
             </h2>
 
-            <p className="leading-7 text-stone-700">
+            <p className="leading-7 text-[#d6c8b6]">
               Прочитайте вопрос, выберите один вариант ответа и нажмите кнопку
               проверки. После ответа появится результат и пояснение.
             </p>

@@ -65,12 +65,19 @@ export default function QuestsFilter({ tasks }: { tasks: TaskItem[] }) {
 
   const hasFilters = activeType !== null || activeDifficulty !== null;
 
+  function resetFilters() {
+    setActiveType(null);
+    setActiveDifficulty(null);
+  }
+
   return (
-    <>
-      {/* Filter bar */}
-      <div className="mb-8 space-y-4">
+    <div className="grid gap-8 lg:grid-cols-[300px_1fr] lg:items-start">
+      {/* Filters sidebar */}
+      <aside className="rounded-[1.75rem] border border-[#e4d4bf] bg-[#f8f0df] p-6 shadow-md">
+        <p className="mb-5 text-sm font-bold text-stone-800">Фильтры</p>
+
         {availableTypes.length > 1 && (
-          <div>
+          <div className="mb-6">
             <p className="mb-2.5 text-xs font-black uppercase tracking-[0.22em] text-stone-500">
               Тип задания
             </p>
@@ -84,7 +91,7 @@ export default function QuestsFilter({ tasks }: { tasks: TaskItem[] }) {
                     "rounded-full border px-4 py-2 text-sm font-bold transition",
                     activeType === type
                       ? "border-[#d8a342] bg-[#d8a342] text-[#06151a]"
-                      : "border-[#e4d4bf] bg-white text-stone-700 hover:border-[#d8a342] hover:text-[#9f661f]",
+                      : "border-[#dccab3] bg-white text-stone-700 hover:border-[#d8a342] hover:text-[#9f661f]",
                   ].join(" ")}
                 >
                   {TYPE_LABELS[type] ?? type}
@@ -95,7 +102,7 @@ export default function QuestsFilter({ tasks }: { tasks: TaskItem[] }) {
         )}
 
         {availableDifficulties.length > 0 && (
-          <div>
+          <div className="mb-6">
             <p className="mb-2.5 text-xs font-black uppercase tracking-[0.22em] text-stone-500">
               Сложность
             </p>
@@ -111,7 +118,7 @@ export default function QuestsFilter({ tasks }: { tasks: TaskItem[] }) {
                     "rounded-full border px-4 py-2 text-sm font-bold transition",
                     activeDifficulty === diff
                       ? "border-[#3aa6a0] bg-[#3aa6a0] text-white"
-                      : "border-[#e4d4bf] bg-white text-stone-700 hover:border-[#3aa6a0] hover:text-[#247670]",
+                      : "border-[#dccab3] bg-white text-stone-700 hover:border-[#3aa6a0] hover:text-[#247670]",
                   ].join(" ")}
                 >
                   {DIFFICULTY_LABELS[diff] ?? diff}
@@ -124,55 +131,56 @@ export default function QuestsFilter({ tasks }: { tasks: TaskItem[] }) {
         {hasFilters && (
           <button
             type="button"
-            onClick={() => {
-              setActiveType(null);
-              setActiveDifficulty(null);
-            }}
-            className="text-sm font-semibold text-stone-400 transition hover:text-stone-600"
+            onClick={resetFilters}
+            className="w-full rounded-xl border border-[#dccab3] bg-white px-4 py-2.5 text-sm font-semibold text-stone-600 transition hover:border-[#d8a342] hover:text-[#9f661f]"
           >
             × Сбросить фильтры
           </button>
         )}
-      </div>
+      </aside>
 
-      {/* Count */}
-      <div className="mb-6 flex flex-wrap items-center justify-between gap-4">
-        <h2 className="text-3xl font-extrabold text-stone-950">
-          {hasFilters ? "Результаты фильтрации" : "Список заданий"}
-        </h2>
-
-        <span className="rounded-full border border-[#d8c3a5] bg-white px-4 py-2 text-sm font-bold text-stone-700 shadow-sm">
-          Показано: {filtered.length}
-        </span>
-      </div>
-
-      {/* Cards */}
-      {filtered.length === 0 ? (
-        <div className="rounded-[2rem] border border-[#e4d4bf] bg-white p-10 text-center shadow-md">
-          <div className="mx-auto mb-5 flex h-16 w-16 items-center justify-center rounded-3xl border border-[#d8a342]/30 bg-[#fff5dc] text-2xl text-[#c78a24]">
-            ?
-          </div>
-          <h3 className="mb-3 text-2xl font-extrabold text-stone-950">
-            Ничего не найдено
-          </h3>
-          <p className="mx-auto max-w-xl leading-7 text-stone-600">
-            Нет заданий, подходящих под выбранные фильтры. Попробуйте изменить условия.
+      {/* Results */}
+      <div className="min-w-0 rounded-[1.75rem] border border-[#e4d4bf] bg-[#f8f0df] p-6 shadow-md md:p-8">
+        <div className="mb-6 flex flex-wrap items-center justify-between gap-4">
+          <p className="text-sm font-bold text-stone-700">
+            Найдено <span className="text-[#9f661f]">{filtered.length}</span>{" "}
+            {hasFilters ? "по фильтрам" : "заданий"}
           </p>
+
+          {hasFilters && (
+            <span className="rounded-full border border-[#d8a342]/35 bg-[#fff8e8] px-4 py-1.5 text-xs font-bold text-[#9f661f]">
+              Применены фильтры
+            </span>
+          )}
         </div>
-      ) : (
-        <div className="grid gap-6 md:grid-cols-2 xl:grid-cols-3">
-          {filtered.map((task) => (
-            <TaskCard key={task.id} task={task} />
-          ))}
-        </div>
-      )}
-    </>
+
+        {filtered.length === 0 ? (
+          <div className="rounded-[1.5rem] border border-[#e4d4bf] bg-white p-10 text-center shadow-sm">
+            <div className="mx-auto mb-5 flex h-16 w-16 items-center justify-center rounded-3xl border border-[#d8a342]/30 bg-[#fff5dc] text-2xl text-[#c78a24]">
+              ?
+            </div>
+            <h3 className="mb-3 text-2xl font-extrabold text-stone-950">
+              Ничего не найдено
+            </h3>
+            <p className="mx-auto max-w-xl leading-7 text-stone-600">
+              Нет заданий, подходящих под выбранные фильтры. Попробуйте изменить условия.
+            </p>
+          </div>
+        ) : (
+          <div className="grid gap-6 md:grid-cols-2 xl:grid-cols-3">
+            {filtered.map((task) => (
+              <TaskCard key={task.id} task={task} />
+            ))}
+          </div>
+        )}
+      </div>
+    </div>
   );
 }
 
 function TaskCard({ task }: { task: TaskItem }) {
   return (
-    <article className="group flex min-h-[440px] flex-col overflow-hidden rounded-[2rem] border border-[#e4d4bf] bg-white shadow-md transition hover:-translate-y-1 hover:shadow-xl">
+    <article className="animate-fade-in-up group flex min-h-[440px] flex-col overflow-hidden rounded-[2rem] border border-[#e4d4bf] bg-white shadow-md transition hover:-translate-y-1 hover:shadow-xl">
       <div className="relative h-48 overflow-hidden bg-[#eadfce]">
         {task.material?.imageUrl ? (
           <Image
