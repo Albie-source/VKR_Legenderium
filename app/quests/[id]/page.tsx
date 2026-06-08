@@ -1,3 +1,4 @@
+import Image from "next/image";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { prisma } from "@/lib/prisma";
@@ -97,15 +98,17 @@ export default async function QuestPage({ params }: QuestPageProps) {
                 )}
               </div>
 
-              <div className="overflow-hidden rounded-[2rem] border border-white/10 bg-[#06151a] shadow-2xl shadow-black/25">
+              <div className="relative h-[360px] overflow-hidden rounded-[2rem] border border-white/10 bg-[#06151a] shadow-2xl shadow-black/25">
                 {task.material?.imageUrl ? (
-                  <img
+                  <Image
                     src={task.material.imageUrl}
                     alt={task.material.title}
-                    className="h-[360px] w-full object-cover object-[center_42%]"
+                    fill
+                    sizes="(max-width: 1024px) 100vw, 800px"
+                    className="object-cover object-[center_42%]"
                   />
                 ) : (
-                  <div className="flex h-[360px] items-center justify-center bg-[radial-gradient(circle_at_35%_25%,rgba(216,163,66,0.18),transparent_28%),linear-gradient(135deg,#10272b,#06151a)] px-6 text-center text-sm font-semibold text-[#cbbba7]">
+                  <div className="flex h-full items-center justify-center bg-[radial-gradient(circle_at_35%_25%,rgba(216,163,66,0.18),transparent_28%),linear-gradient(135deg,#10272b,#06151a)] px-6 text-center text-sm font-semibold text-[#cbbba7]">
                     Изображение не добавлено
                   </div>
                 )}

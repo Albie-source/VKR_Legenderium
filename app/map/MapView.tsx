@@ -1,5 +1,6 @@
 "use client";
 
+import Image from "next/image";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { Fragment, useCallback, useEffect, useMemo, useState } from "react";
@@ -252,18 +253,13 @@ export default function MapView({ regions, goalStops }: MapViewProps) {
     fetch("/maps/russia-regions-light.geojson")
       .then((response) => {
         if (!response.ok) {
-          throw new Error("Light GeoJSON not found");
+          throw new Error("GeoJSON not found");
         }
 
         return response.json();
       })
       .then((data) => setGeoJson(data))
-      .catch(() => {
-        fetch("/maps/russia-regions.geojson")
-          .then((response) => response.json())
-          .then((data) => setGeoJson(data))
-          .catch(() => setGeoJson(null));
-      });
+      .catch(() => setGeoJson(null));
   }, []);
 
   const selectedRegion = useMemo(() => {
@@ -459,7 +455,7 @@ export default function MapView({ regions, goalStops }: MapViewProps) {
             Файл карты регионов не найден. Проверь путь:
             <span className="font-extrabold text-[#d8a342]">
               {" "}
-              public/maps/russia-regions.geojson
+              public/maps/russia-regions-light.geojson
             </span>
           </div>
         )}
@@ -608,12 +604,14 @@ function MaterialTooltip({ material }: { material: MaterialItem }) {
   return (
     <div className="w-[300px] max-w-[300px] overflow-hidden rounded-2xl border border-white/10 bg-[#06151a]/96 p-4 text-[#fff8e8] shadow-2xl shadow-black/30 backdrop-blur-xl">
       <div className="mb-3 flex min-w-0 gap-3">
-        <div className="h-20 w-20 shrink-0 overflow-hidden rounded-xl border border-white/10 bg-white/10">
+        <div className="relative h-20 w-20 shrink-0 overflow-hidden rounded-xl border border-white/10 bg-white/10">
           {material.imageUrl ? (
-            <img
+            <Image
               src={material.imageUrl}
               alt={material.title}
-              className="h-full w-full object-cover"
+              fill
+              sizes="80px"
+              className="object-cover"
             />
           ) : (
             <div className="flex h-full items-center justify-center px-2 text-center text-xs text-[#cbbba7]">

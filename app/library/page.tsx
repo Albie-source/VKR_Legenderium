@@ -4,6 +4,7 @@ import { Prisma } from "@prisma/client";
 import { prisma } from "@/lib/prisma";
 import { getCurrentUser } from "@/lib/auth";
 import { getMaterialStatusMap } from "@/lib/materialProgress";
+import { getRegions, getPeoples, getGenres, getTopics } from "@/lib/dictionaries";
 import LibraryFilters from "./LibraryFilters";
 import LibraryResults from "./LibraryResults";
 import LibraryPagination from "./LibraryPagination";
@@ -146,10 +147,10 @@ export default async function LibraryPage({ searchParams }: LibraryPageProps) {
       trgmIds !== null
         ? Promise.resolve(trgmIds.length)
         : prisma.material.count({ where }),
-      prisma.region.findMany({ orderBy: { name: "asc" } }),
-      prisma.people.findMany({ orderBy: { name: "asc" } }),
-      prisma.genre.findMany({ orderBy: { name: "asc" } }),
-      prisma.topic.findMany({ orderBy: { name: "asc" } }),
+      getRegions(),
+      getPeoples(),
+      getGenres(),
+      getTopics(),
       getCurrentUser(),
     ]);
 

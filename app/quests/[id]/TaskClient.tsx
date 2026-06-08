@@ -1,5 +1,6 @@
 "use client";
 
+import Image from "next/image";
 import Link from "next/link";
 import { useCallback, useEffect, useMemo, useRef, useState, useTransition } from "react";
 
@@ -419,7 +420,13 @@ function VisualNovelTask({
       {/* Scene image */}
       {currentScene.imageUrl && (
         <div className="relative h-64 overflow-hidden bg-[#eadfce] md:h-80">
-          <img src={currentScene.imageUrl} alt="" className="h-full w-full object-cover object-center transition-all duration-700" />
+          <Image
+            src={currentScene.imageUrl}
+            alt=""
+            fill
+            sizes="(max-width: 768px) 100vw, 800px"
+            className="object-cover object-center transition-all duration-700"
+          />
           <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/10 to-transparent" />
         </div>
       )}
@@ -1009,10 +1016,12 @@ function MironCelebration({
         visible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-4 pointer-events-none",
       ].join(" ")}
     >
-      <img
+      <Image
         src="/images/miron-happy.png"
         alt="Мирон"
-        className="h-28 w-auto shrink-0 object-contain drop-shadow-xl"
+        width={112}
+        height={112}
+        className="h-28 w-28 shrink-0 object-contain drop-shadow-xl"
       />
       <div className="rounded-2xl border border-[#d8a342]/30 bg-[#0b1f22]/95 p-4 shadow-2xl backdrop-blur-md">
         <p className="mb-1 text-[10px] font-black uppercase tracking-[0.24em] text-[#d8a342]">

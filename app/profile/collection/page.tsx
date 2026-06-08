@@ -1,3 +1,4 @@
+import Image from "next/image";
 import Link from "next/link";
 import { requireUser } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
@@ -78,12 +79,14 @@ export default async function CollectionPage() {
                   </p>
 
                   <div className="rounded-[1.5rem] border border-amber-200 bg-white p-4 shadow-sm">
-                    <div className="mb-4 flex h-52 items-center justify-center overflow-hidden rounded-2xl bg-gradient-to-br from-amber-100 via-stone-100 to-stone-200">
+                    <div className="relative mb-4 flex h-52 items-center justify-center overflow-hidden rounded-2xl bg-gradient-to-br from-amber-100 via-stone-100 to-stone-200">
                       {progress.goal.cardImageUrl ? (
-                        <img
+                        <Image
                           src={progress.goal.cardImageUrl}
                           alt={progress.goal.cardTitle}
-                          className="h-full w-full object-cover"
+                          fill
+                          sizes="(max-width: 768px) 100vw, 400px"
+                          className="object-cover"
                         />
                       ) : (
                         <div className="px-4 text-center text-sm text-stone-500">

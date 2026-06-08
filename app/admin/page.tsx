@@ -1,3 +1,4 @@
+import Image from "next/image";
 import Link from "next/link";
 import { requireAdmin } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
@@ -206,12 +207,14 @@ export default async function AdminPage() {
                     >
                       <td className="px-5 py-4">
                         <div className="grid gap-3 sm:grid-cols-[72px_1fr]">
-                          <div className="h-16 w-20 overflow-hidden rounded-xl bg-[#eadfce]">
+                          <div className="relative h-16 w-20 overflow-hidden rounded-xl bg-[#eadfce]">
                             {material.imageUrl ? (
-                              <img
+                              <Image
                                 src={material.imageUrl}
                                 alt={material.title}
-                                className="h-full w-full object-cover object-[center_42%]"
+                                fill
+                                sizes="80px"
+                                className="object-cover object-[center_42%]"
                               />
                             ) : (
                               <div className="flex h-full items-center justify-center text-xs text-stone-500">

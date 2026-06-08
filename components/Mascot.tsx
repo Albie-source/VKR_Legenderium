@@ -1,5 +1,6 @@
 "use client";
 
+import Image from "next/image";
 import { useEffect, useRef, useState } from "react";
 
 export type MascotMood = "happy" | "thinking" | "excited" | "sad" | "neutral";
@@ -45,11 +46,13 @@ export default function Mascot({
     >
       {/* Avatar */}
       <div className="relative shrink-0">
-        <div className="flex h-16 w-16 items-center justify-center overflow-hidden rounded-full border-2 border-[#d8a342]/60 bg-[#0b1f22] shadow-lg shadow-black/30">
-          <img
+        <div className="relative flex h-16 w-16 items-center justify-center overflow-hidden rounded-full border-2 border-[#d8a342]/60 bg-[#0b1f22] shadow-lg shadow-black/30">
+          <Image
             src={moodImage[mood]}
             alt="Архивариус Мирон"
-            className="h-full w-full object-cover object-top"
+            fill
+            sizes="64px"
+            className="object-cover object-top"
           />
         </div>
         {/* Online dot */}

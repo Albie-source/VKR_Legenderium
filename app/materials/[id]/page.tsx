@@ -1,3 +1,4 @@
+import Image from "next/image";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { prisma } from "@/lib/prisma";
@@ -223,15 +224,18 @@ export default async function MaterialPage({ params }: MaterialPageProps) {
           </div>
 
           <aside className="space-y-6 lg:sticky lg:top-28 lg:self-start">
-            <div className="overflow-hidden rounded-[1.75rem] border border-white/10 bg-[#06151a] shadow-xl shadow-black/25">
+            <div className="relative h-[420px] overflow-hidden rounded-[1.75rem] border border-white/10 bg-[#06151a] shadow-xl shadow-black/25 lg:h-[520px]">
               {material.imageUrl ? (
-                <img
+                <Image
                   src={material.imageUrl}
                   alt={material.title}
-                  className="h-[420px] w-full object-cover lg:h-[520px]"
+                  fill
+                  priority
+                  sizes="(max-width: 1024px) 100vw, 480px"
+                  className="object-cover"
                 />
               ) : (
-                <div className="flex h-[420px] items-center justify-center bg-[radial-gradient(circle_at_35%_25%,rgba(216,163,66,0.18),transparent_28%),linear-gradient(135deg,#10272b,#06151a)] px-6 text-center text-sm font-semibold text-[#cbbba7] lg:h-[520px]">
+                <div className="flex h-full items-center justify-center bg-[radial-gradient(circle_at_35%_25%,rgba(216,163,66,0.18),transparent_28%),linear-gradient(135deg,#10272b,#06151a)] px-6 text-center text-sm font-semibold text-[#cbbba7]">
                   Изображение не добавлено
                 </div>
               )}

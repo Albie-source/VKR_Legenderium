@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useMemo } from "react";
+import Image from "next/image";
 import Link from "next/link";
 
 type Topic = { id: number; name: string };
@@ -174,10 +175,12 @@ function TaskCard({ task }: { task: TaskItem }) {
     <article className="group flex min-h-[440px] flex-col overflow-hidden rounded-[2rem] border border-[#e4d4bf] bg-white shadow-md transition hover:-translate-y-1 hover:shadow-xl">
       <div className="relative h-48 overflow-hidden bg-[#eadfce]">
         {task.material?.imageUrl ? (
-          <img
+          <Image
             src={task.material.imageUrl}
             alt={task.material.title}
-            className="h-full w-full object-cover object-[center_42%] transition duration-500 group-hover:scale-105"
+            fill
+            sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
+            className="object-cover object-[center_42%] transition duration-500 group-hover:scale-105"
           />
         ) : (
           <div className="flex h-full items-center justify-center bg-[radial-gradient(circle_at_35%_25%,rgba(216,163,66,0.18),transparent_28%),linear-gradient(135deg,#efe4d3,#e5d4bd)] px-6 text-center text-sm font-semibold text-stone-600">

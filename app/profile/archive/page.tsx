@@ -1,3 +1,4 @@
+import Image from "next/image";
 import Link from "next/link";
 import { requireUser } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
@@ -123,10 +124,12 @@ export default async function ArchivePage() {
               >
                 <div className="relative h-44 overflow-hidden bg-stone-100">
                   {entry.material.imageUrl ? (
-                    <img
+                    <Image
                       src={entry.material.imageUrl}
                       alt={entry.material.title}
-                      className="h-full w-full object-cover object-[center_42%]"
+                      fill
+                      sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
+                      className="object-cover object-[center_42%]"
                     />
                   ) : (
                     <div className="flex h-full items-center justify-center px-5 text-center text-sm text-stone-500">

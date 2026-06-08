@@ -1,3 +1,4 @@
+import Image from "next/image";
 import Link from "next/link";
 import { requireUser } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
@@ -99,10 +100,12 @@ export default async function FavoritesPage() {
                 >
                   <div className="relative h-48 bg-stone-200">
                     {material.imageUrl ? (
-                      <img
+                      <Image
                         src={material.imageUrl}
                         alt={material.title}
-                        className="h-full w-full object-cover transition duration-300 group-hover:scale-105"
+                        fill
+                        sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
+                        className="object-cover transition duration-300 group-hover:scale-105"
                       />
                     ) : (
                       <div className="flex h-full items-center justify-center bg-gradient-to-br from-amber-100 to-stone-200 text-sm text-stone-500">

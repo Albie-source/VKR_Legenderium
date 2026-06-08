@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import Image from "next/image";
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
 import type { MaterialStatus } from "@/lib/materialProgress";
@@ -141,11 +142,13 @@ function GridCard({ material, delay }: { material: MaterialCard; delay: number }
     >
       <div className="relative h-44 overflow-hidden bg-[#eadfce]">
         {material.imageUrl ? (
-          <img
+          <Image
             src={material.imageUrl}
             alt={material.title}
+            fill
+            sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
             className={[
-              "h-full w-full object-cover object-[center_42%] transition duration-500 group-hover:scale-105",
+              "object-cover object-[center_42%] transition duration-500 group-hover:scale-105",
               isUndiscovered ? "grayscale" : "",
             ].join(" ")}
           />
@@ -245,11 +248,13 @@ function ListCard({ material, delay }: { material: MaterialCard; delay: number }
     >
       <div className="relative h-40 w-full shrink-0 overflow-hidden rounded-2xl bg-[#eadfce] sm:h-32 sm:w-48">
         {material.imageUrl ? (
-          <img
+          <Image
             src={material.imageUrl}
             alt={material.title}
+            fill
+            sizes="(max-width: 640px) 100vw, 192px"
             className={[
-              "h-full w-full object-cover object-[center_42%] transition duration-500 group-hover:scale-105",
+              "object-cover object-[center_42%] transition duration-500 group-hover:scale-105",
               isUndiscovered ? "grayscale" : "",
             ].join(" ")}
           />

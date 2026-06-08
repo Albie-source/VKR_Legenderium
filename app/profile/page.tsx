@@ -1,3 +1,4 @@
+import Image from "next/image";
 import Link from "next/link";
 import { revalidatePath } from "next/cache";
 import { requireUser } from "@/lib/auth";
@@ -118,11 +119,13 @@ export default async function ProfilePage() {
             <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_12%_18%,rgba(58,166,160,0.16),transparent_28%),radial-gradient(circle_at_82%_20%,rgba(216,163,66,0.14),transparent_24%),radial-gradient(circle_at_70%_88%,rgba(47,143,99,0.10),transparent_28%)]" />
 
             <div className="relative flex flex-col gap-6 sm:flex-row sm:items-center">
-              <div className="h-28 w-28 shrink-0 overflow-hidden rounded-[2rem] border border-[#d8a342]/35 bg-white/10 shadow-xl shadow-black/25">
-                <img
+              <div className="relative h-28 w-28 shrink-0 overflow-hidden rounded-[2rem] border border-[#d8a342]/35 bg-white/10 shadow-xl shadow-black/25">
+                <Image
                   src="/images/avatar.png"
                   alt="Аватар пользователя"
-                  className="h-full w-full object-cover"
+                  fill
+                  sizes="112px"
+                  className="object-cover"
                 />
               </div>
 
@@ -246,10 +249,12 @@ export default async function ProfilePage() {
                   >
                     <div className="relative h-40 overflow-hidden bg-[#eadfce]">
                       {entry.material.imageUrl ? (
-                        <img
+                        <Image
                           src={entry.material.imageUrl}
                           alt={entry.material.title}
-                          className="h-full w-full object-cover object-[center_42%]"
+                          fill
+                          sizes="260px"
+                          className="object-cover object-[center_42%]"
                         />
                       ) : (
                         <div className="flex h-full items-center justify-center px-5 text-center text-sm text-stone-500">
@@ -315,12 +320,14 @@ export default async function ProfilePage() {
                     key={progress.id}
                     className="min-w-[260px] max-w-[260px] overflow-hidden rounded-[1.8rem] border border-[#eadbc7] bg-[#fbf7f1] shadow-sm"
                   >
-                    <div className="h-40 overflow-hidden bg-[#eadfce]">
+                    <div className="relative h-40 overflow-hidden bg-[#eadfce]">
                       {progress.goal.cardImageUrl ? (
-                        <img
+                        <Image
                           src={progress.goal.cardImageUrl}
                           alt={progress.goal.cardTitle}
-                          className="h-full w-full object-cover object-[center_42%]"
+                          fill
+                          sizes="260px"
+                          className="object-cover object-[center_42%]"
                         />
                       ) : (
                         <div className="flex h-full items-center justify-center px-5 text-center text-sm text-stone-500">
@@ -402,12 +409,14 @@ export default async function ProfilePage() {
                     </form>
 
                     <Link href={`/materials/${favorite.material.id}`}>
-                      <div className="mb-3 h-28 overflow-hidden rounded-xl bg-[#eadfce]">
+                      <div className="relative mb-3 h-28 overflow-hidden rounded-xl bg-[#eadfce]">
                         {favorite.material.imageUrl ? (
-                          <img
+                          <Image
                             src={favorite.material.imageUrl}
                             alt={favorite.material.title}
-                            className="h-full w-full object-cover object-[center_42%] transition duration-300 group-hover:scale-105"
+                            fill
+                            sizes="(max-width: 640px) 50vw, 260px"
+                            className="object-cover object-[center_42%] transition duration-300 group-hover:scale-105"
                           />
                         ) : (
                           <div className="flex h-full items-center justify-center text-xs text-stone-500">

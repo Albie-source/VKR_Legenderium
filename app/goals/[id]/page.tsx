@@ -1,3 +1,4 @@
+import Image from "next/image";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { prisma } from "@/lib/prisma";
@@ -185,9 +186,11 @@ export default async function GoalPage({ params }: GoalPageProps) {
                 Награда
               </p>
               {goal.cardImageUrl && (
-                <img
+                <Image
                   src={goal.cardImageUrl}
                   alt={goal.cardTitle}
+                  width={96}
+                  height={96}
                   className="mx-auto mb-3 h-24 w-24 rounded-2xl object-cover"
                 />
               )}
