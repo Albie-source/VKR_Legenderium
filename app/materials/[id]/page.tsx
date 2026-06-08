@@ -1,6 +1,7 @@
 import Image from "next/image";
 import Link from "next/link";
 import { notFound } from "next/navigation";
+import type { Metadata } from "next";
 import { prisma } from "@/lib/prisma";
 import { getCurrentUser } from "@/lib/auth";
 import { markMaterialDiscovered, statusFromProgress } from "@/lib/materialProgress";
@@ -18,6 +19,31 @@ type MaterialPageProps = {
     id: string;
   }>;
 };
+
+export async function generateMetadata({ params }: MaterialPageProps): Promise<Metadata> {
+  const { id } = await params;
+  const materialId = Number(id);
+  if (Number.isNaN(materialId)) return {};
+
+  const material = await prisma.material.findFirst({
+    where: { id: materialId, status: "PUBLISHED" },
+    select: { title: true, shortDescription: true, imageUrl: true },
+  });
+
+  if (!material) return {};
+
+  const description = material.shortDescription ?? undefined;
+
+  return {
+    title: `${material.title} — Легендариум`,
+    description,
+    openGraph: {
+      title: material.title,
+      description,
+      images: material.imageUrl ? [{ url: material.imageUrl }] : undefined,
+    },
+  };
+}
 
 export default async function MaterialPage({ params }: MaterialPageProps) {
   const { id } = await params;

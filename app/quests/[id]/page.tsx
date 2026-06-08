@@ -1,6 +1,7 @@
 import Image from "next/image";
 import Link from "next/link";
 import { notFound } from "next/navigation";
+import type { Metadata } from "next";
 import { prisma } from "@/lib/prisma";
 import TaskClient from "./TaskClient";
 import { saveTaskResultAction } from "./actions";
@@ -10,6 +11,30 @@ type QuestPageProps = {
     id: string;
   }>;
 };
+
+export async function generateMetadata({ params }: QuestPageProps): Promise<Metadata> {
+  const { id } = await params;
+  const taskId = Number(id);
+  if (Number.isNaN(taskId)) return {};
+
+  const task = await prisma.interactiveTask.findFirst({
+    where: {
+      id: taskId,
+      OR: [
+        { material: { is: null } },
+        { material: { status: "PUBLISHED" } },
+      ],
+    },
+    select: { title: true, description: true },
+  });
+
+  if (!task) return {};
+
+  return {
+    title: `${task.title} — Легендариум`,
+    description: task.description ?? undefined,
+  };
+}
 
 export default async function QuestPage({ params }: QuestPageProps) {
   const { id } = await params;

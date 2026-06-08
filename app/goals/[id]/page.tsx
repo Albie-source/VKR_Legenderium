@@ -1,6 +1,7 @@
 import Image from "next/image";
 import Link from "next/link";
 import { notFound } from "next/navigation";
+import type { Metadata } from "next";
 import { prisma } from "@/lib/prisma";
 import { getCurrentUser } from "@/lib/auth";
 import type { RouteStop } from "./GoalMapClient";
@@ -9,6 +10,31 @@ import GoalMapWrapper from "./GoalMapWrapper";
 type GoalPageProps = {
   params: Promise<{ id: string }>;
 };
+
+export async function generateMetadata({ params }: GoalPageProps): Promise<Metadata> {
+  const { id } = await params;
+  const goalId = Number(id);
+  if (Number.isNaN(goalId)) return {};
+
+  const goal = await prisma.goal.findUnique({
+    where: { id: goalId },
+    select: { title: true, description: true, cardImageUrl: true, isActive: true },
+  });
+
+  if (!goal || !goal.isActive) return {};
+
+  const description = goal.description ?? undefined;
+
+  return {
+    title: `${goal.title} — Легендариум`,
+    description,
+    openGraph: {
+      title: goal.title,
+      description,
+      images: goal.cardImageUrl ? [{ url: goal.cardImageUrl }] : undefined,
+    },
+  };
+}
 
 export default async function GoalPage({ params }: GoalPageProps) {
   const { id } = await params;
