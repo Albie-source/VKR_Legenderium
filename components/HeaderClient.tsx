@@ -29,6 +29,10 @@ type HeaderClientProps = {
   goals: HeaderGoal[];
 };
 
+function isNavActive(pathname: string, href: string) {
+  return pathname === href || pathname.startsWith(`${href}/`);
+}
+
 export default function HeaderClient({ user, goals }: HeaderClientProps) {
   const [isGoalsOpen, setIsGoalsOpen] = useState(false);
   const pathname = usePathname();
@@ -54,9 +58,9 @@ export default function HeaderClient({ user, goals }: HeaderClientProps) {
           </Link>
 
           <nav className="hidden items-center gap-8 md:flex lg:gap-10">
-            <HeaderNavItem href="/map" id="nav-map">Карта</HeaderNavItem>
-            <HeaderNavItem href="/library" id="nav-library">Библиотека</HeaderNavItem>
-            <HeaderNavItem href="/quests" id="nav-quests">Задания</HeaderNavItem>
+            <HeaderNavItem href="/map" id="nav-map" active={isNavActive(pathname, "/map")}>Карта</HeaderNavItem>
+            <HeaderNavItem href="/library" id="nav-library" active={isNavActive(pathname, "/library")}>Библиотека</HeaderNavItem>
+            <HeaderNavItem href="/quests" id="nav-quests" active={isNavActive(pathname, "/quests")}>Задания</HeaderNavItem>
 
             {user && (
               <HeaderNavButton onClick={() => setIsGoalsOpen(true)}>
@@ -114,9 +118,9 @@ export default function HeaderClient({ user, goals }: HeaderClientProps) {
         })()}
 
         <nav className="flex gap-3 overflow-x-auto border-t border-white/10 px-6 py-3 md:hidden">
-          <MobileNavLink href="/map">Карта</MobileNavLink>
-          <MobileNavLink href="/library">Библиотека</MobileNavLink>
-          <MobileNavLink href="/quests">Задания</MobileNavLink>
+          <MobileNavLink href="/map" active={isNavActive(pathname, "/map")}>Карта</MobileNavLink>
+          <MobileNavLink href="/library" active={isNavActive(pathname, "/library")}>Библиотека</MobileNavLink>
+          <MobileNavLink href="/quests" active={isNavActive(pathname, "/quests")}>Задания</MobileNavLink>
 
           {user && (
             <button
@@ -144,17 +148,24 @@ export default function HeaderClient({ user, goals }: HeaderClientProps) {
 function HeaderNavItem({
   href,
   id,
+  active,
   children,
 }: {
   href: string;
   id?: string;
+  active?: boolean;
   children: ReactNode;
 }) {
   return (
     <Link
       id={id}
       href={href}
-      className="rounded-xl px-2 py-1 text-[16px] font-extrabold text-[#fff8e8] transition hover:text-[#d8a342]"
+      className={[
+        "rounded-xl border-b-2 px-2 py-1 text-[16px] font-extrabold transition",
+        active
+          ? "border-[#d8a342] text-[#d8a342]"
+          : "border-transparent text-[#fff8e8] hover:text-[#d8a342]",
+      ].join(" ")}
     >
       {children}
     </Link>
@@ -181,15 +192,22 @@ function HeaderNavButton({
 
 function MobileNavLink({
   href,
+  active,
   children,
 }: {
   href: string;
+  active?: boolean;
   children: ReactNode;
 }) {
   return (
     <Link
       href={href}
-      className="shrink-0 rounded-2xl border border-white/10 bg-white/10 px-4 py-2 text-sm font-extrabold !text-[#fff8e8]"
+      className={[
+        "shrink-0 rounded-2xl border px-4 py-2 text-sm font-extrabold",
+        active
+          ? "border-[#d8a342]/50 bg-[#d8a342]/15 !text-[#d8a342]"
+          : "border-white/10 bg-white/10 !text-[#fff8e8]",
+      ].join(" ")}
     >
       {children}
     </Link>
