@@ -43,7 +43,7 @@ export default async function NewTaskPage() {
         </div>
 
         {/* Task type selector */}
-        <div className="mb-8 grid gap-3 sm:grid-cols-2">
+        <div className="mb-8 grid gap-3 sm:grid-cols-3">
           <div className="rounded-2xl border-2 border-amber-700 bg-amber-50 p-4">
             <p className="mb-1 text-xs font-bold uppercase tracking-[0.2em] text-amber-700">Активный тип</p>
             <p className="text-lg font-bold text-stone-900">Выбор ответа</p>
@@ -56,6 +56,14 @@ export default async function NewTaskPage() {
             <p className="mb-1 text-xs font-bold uppercase tracking-[0.2em] text-stone-500">Другой тип →</p>
             <p className="text-lg font-bold text-stone-900">Скрытые объекты</p>
             <p className="mt-1 text-sm text-stone-600">Кликни на картинку, найди все предметы</p>
+          </Link>
+          <Link
+            href="/admin/tasks/new/memo"
+            className="rounded-2xl border border-stone-300 bg-white p-4 transition hover:border-amber-700 hover:bg-amber-50"
+          >
+            <p className="mb-1 text-xs font-bold uppercase tracking-[0.2em] text-stone-500">Другой тип →</p>
+            <p className="text-lg font-bold text-stone-900">Мемо (карточки)</p>
+            <p className="mt-1 text-sm text-stone-600">Загрузи картинки, найди все одинаковые пары</p>
           </Link>
         </div>
 

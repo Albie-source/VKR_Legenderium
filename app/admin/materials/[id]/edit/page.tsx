@@ -24,7 +24,7 @@ export default async function EditMaterialPage({
     notFound();
   }
 
-  const [material, regions, peoples, genres, topics, sources] =
+  const [material, regions, peoples, genres, topics, sources, existingMaterials] =
     await Promise.all([
       prisma.material.findUnique({
         where: {
@@ -60,6 +60,23 @@ export default async function EditMaterialPage({
       }),
 
       prisma.source.findMany({
+        orderBy: {
+          title: "asc",
+        },
+      }),
+
+      prisma.material.findMany({
+        where: {
+          id: { not: materialId },
+          latitude: { not: null },
+          longitude: { not: null },
+        },
+        select: {
+          id: true,
+          title: true,
+          latitude: true,
+          longitude: true,
+        },
         orderBy: {
           title: "asc",
         },
@@ -196,6 +213,12 @@ export default async function EditMaterialPage({
           <CoordPicker
             defaultLatitude={material.latitude}
             defaultLongitude={material.longitude}
+            existingMaterials={existingMaterials.map((m) => ({
+              id: m.id,
+              title: m.title,
+              latitude: m.latitude as number,
+              longitude: m.longitude as number,
+            }))}
           />
 
           <div className="grid gap-4 md:grid-cols-3">

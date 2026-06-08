@@ -8,7 +8,7 @@ import CoordPicker from "@/app/admin/materials/CoordPicker";
 export default async function NewMaterialPage() {
   await requireAdmin();
 
-  const [regions, peoples, genres, topics, sources] = await Promise.all([
+  const [regions, peoples, genres, topics, sources, existingMaterials] = await Promise.all([
     prisma.region.findMany({
       orderBy: {
         name: "asc",
@@ -30,6 +30,22 @@ export default async function NewMaterialPage() {
       },
     }),
     prisma.source.findMany({
+      orderBy: {
+        title: "asc",
+      },
+    }),
+
+    prisma.material.findMany({
+      where: {
+        latitude: { not: null },
+        longitude: { not: null },
+      },
+      select: {
+        id: true,
+        title: true,
+        latitude: true,
+        longitude: true,
+      },
       orderBy: {
         title: "asc",
       },
@@ -124,7 +140,14 @@ export default async function NewMaterialPage() {
             </div>
           </div>
 
-          <CoordPicker />
+          <CoordPicker
+            existingMaterials={existingMaterials.map((m) => ({
+              id: m.id,
+              title: m.title,
+              latitude: m.latitude as number,
+              longitude: m.longitude as number,
+            }))}
+          />
 
           <div className="grid gap-4 md:grid-cols-3">
             <MediaUploadField

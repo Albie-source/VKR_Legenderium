@@ -2,12 +2,20 @@
 
 import React, { useEffect, useRef, useState } from "react";
 
+type ExistingMaterial = {
+  id: number;
+  title: string;
+  latitude: number;
+  longitude: number;
+};
+
 type Props = {
   defaultLatitude?: number | null;
   defaultLongitude?: number | null;
+  existingMaterials?: ExistingMaterial[];
 };
 
-export default function CoordPicker({ defaultLatitude, defaultLongitude }: Props) {
+export default function CoordPicker({ defaultLatitude, defaultLongitude, existingMaterials = [] }: Props) {
   const mapRef = useRef<HTMLDivElement>(null);
   const mapInstanceRef = useRef<import("leaflet").Map | null>(null);
   const markerRef = useRef<import("leaflet").Marker | null>(null);
@@ -34,6 +42,19 @@ export default function CoordPicker({ defaultLatitude, defaultLongitude }: Props
         attribution: "© OpenStreetMap © CARTO",
         maxZoom: 19,
       }).addTo(map);
+
+      // Точки уже добавленных легенд — чтобы не поставить новую слишком близко к существующей
+      for (const material of existingMaterials) {
+        L.circleMarker([material.latitude, material.longitude], {
+          radius: 7,
+          color: "#7c8a9a",
+          weight: 2,
+          fillColor: "#cfd6df",
+          fillOpacity: 0.85,
+        })
+          .addTo(map)
+          .bindTooltip(material.title, { direction: "top", offset: [0, -6] });
+      }
 
       const icon = L.divIcon({
         className: "",
@@ -76,6 +97,13 @@ export default function CoordPicker({ defaultLatitude, defaultLongitude }: Props
         Координаты на карте
         <span className="ml-2 text-xs text-stone-400">— кликните на карту, чтобы выбрать точку</span>
       </p>
+
+      {existingMaterials.length > 0 && (
+        <p className="mb-2 flex items-center gap-2 text-xs text-stone-500">
+          <span className="inline-block h-3 w-3 rounded-full border-2 border-[#7c8a9a] bg-[#cfd6df]" />
+          серые точки — уже добавленные легенды ({existingMaterials.length}); наведите на точку, чтобы увидеть название
+        </p>
+      )}
 
       <div
         ref={mapRef}
