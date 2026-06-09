@@ -1,18 +1,20 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useSyncExternalStore } from "react";
 
 const CINEMA_KEY = "legendarium_cinema_done";
 
+const emptySubscribe = () => () => {};
+
 export default function HomeStoryButton() {
-  const [seen, setSeen] = useState<boolean | null>(null);
+  // Render only on the client (avoids hydration mismatch)
+  const mounted = useSyncExternalStore(
+    emptySubscribe,
+    () => true,
+    () => false,
+  );
 
-  useEffect(() => {
-    setSeen(Boolean(localStorage.getItem(CINEMA_KEY)));
-  }, []);
-
-  // Don't render until localStorage is read (avoids hydration mismatch)
-  if (seen === null) return null;
+  if (!mounted) return null;
 
   function handleClick() {
     localStorage.removeItem(CINEMA_KEY);

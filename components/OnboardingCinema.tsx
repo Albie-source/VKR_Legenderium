@@ -92,11 +92,17 @@ export default function OnboardingCinema({ autoStart = true, onFinish }: Onboard
     };
   }, []);
 
+  // Reset typewriter text as soon as the beat changes (state adjustment during render)
+  const [typedBeat, setTypedBeat] = useState<number | null>(beatIndex);
+  if (typedBeat !== beatIndex) {
+    setTypedBeat(beatIndex);
+    setDisplayedText("");
+  }
+
   // Typewriter effect — runs on every beat change
   useEffect(() => {
     if (beatIndex === null) return;
     const fullText = BEATS[beatIndex].text;
-    setDisplayedText("");
     if (typewriterRef.current) clearInterval(typewriterRef.current);
     let i = 0;
     typewriterRef.current = setInterval(() => {
@@ -148,19 +154,21 @@ export default function OnboardingCinema({ autoStart = true, onFinish }: Onboard
     }
   }, [autoStart]);
 
-  // Crossfade background when scene changes
-  useEffect(() => {
-    if (beatIndex === null) return;
-    const scene = BEATS[beatIndex].scene;
-    if (scene === baseBg) return;
+  // Crossfade background when scene changes: start the fade during render,
+  // commit the new base layer after the transition
+  const targetBg = beatIndex !== null ? BEATS[beatIndex].scene : null;
+  if (targetBg !== null && targetBg !== baseBg && incomingBg !== targetBg) {
+    setIncomingBg(targetBg);
+  }
 
-    setIncomingBg(scene);
+  useEffect(() => {
+    if (incomingBg === null) return;
     const t = setTimeout(() => {
-      setBaseBg(scene);
+      setBaseBg(incomingBg);
       setIncomingBg(null);
     }, 420);
     return () => clearTimeout(t);
-  }, [beatIndex, baseBg]);
+  }, [incomingBg]);
 
   const finish = useCallback(() => {
     ambientRef.current?.pause();
@@ -196,7 +204,7 @@ export default function OnboardingCinema({ autoStart = true, onFinish }: Onboard
       setBeatIndex(beatIndex + 1);
       setTextVisible(true);
     }, 160);
-  }, [beatIndex, displayedText, finish]); // eslint-disable-line react-hooks/exhaustive-deps
+  }, [beatIndex, displayedText, finish]);  
 
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => {

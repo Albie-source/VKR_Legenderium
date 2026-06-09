@@ -6,8 +6,13 @@ const YANDEX_TTS_URL =
   "https://tts.api.cloud.yandex.net/speech/v1/tts:synthesize";
 
 export async function POST(req: NextRequest) {
-  const { text } = await req.json();
-  if (!text || typeof text !== "string") {
+  let text: unknown;
+  try {
+    ({ text } = await req.json());
+  } catch {
+    return NextResponse.json({ error: "invalid JSON body" }, { status: 400 });
+  }
+  if (typeof text !== "string" || !text.trim()) {
     return NextResponse.json({ error: "text required" }, { status: 400 });
   }
 

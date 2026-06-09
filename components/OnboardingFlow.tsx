@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, useSyncExternalStore } from "react";
 import OnboardingCinema from "./OnboardingCinema";
 import OnboardingTour from "./OnboardingTour";
 
@@ -9,31 +9,37 @@ const TOUR_KEY = "legendarium_onboarding_done";
 
 type Phase = "cinema" | "tour" | "done";
 
+const emptySubscribe = () => () => {};
+
+function readStoredPhase(): Phase {
+  if (localStorage.getItem(TOUR_KEY)) return "done";
+  if (localStorage.getItem(CINEMA_KEY)) return "tour";
+  return "cinema";
+}
+
 export default function OnboardingFlow() {
-  const [phase, setPhase] = useState<Phase | null>(null);
+  // null on the server / during hydration, then derived from localStorage
+  const storedPhase = useSyncExternalStore<Phase | null>(
+    emptySubscribe,
+    readStoredPhase,
+    () => null,
+  );
+  const [override, setOverride] = useState<Phase | null>(null);
+  const phase = override ?? storedPhase;
 
   useEffect(() => {
-    if (typeof window === "undefined") return;
-    if (localStorage.getItem(TOUR_KEY)) {
-      setPhase("done");
-    } else if (localStorage.getItem(CINEMA_KEY)) {
-      setPhase("tour");
-    } else {
-      setPhase("cinema");
-    }
-
-    const handleRewatch = () => setPhase("cinema");
+    const handleRewatch = () => setOverride("cinema");
     window.addEventListener("legendarium:rewatch", handleRewatch);
     return () => window.removeEventListener("legendarium:rewatch", handleRewatch);
   }, []);
 
   function onCinemaDone() {
     localStorage.setItem(CINEMA_KEY, "1");
-    setTimeout(() => setPhase("tour"), 300);
+    setTimeout(() => setOverride("tour"), 300);
   }
 
   function onTourDone() {
-    setPhase("done");
+    setOverride("done");
   }
 
   if (phase === "cinema") {

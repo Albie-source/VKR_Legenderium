@@ -1,6 +1,13 @@
 import { Resend } from "resend";
 
-const resend = new Resend(process.env.RESEND_API_KEY);
+// Lazy init: the Resend constructor throws without an API key,
+// which would break `next build` when the env variable is absent
+let resendClient: Resend | null = null;
+
+function getResend(): Resend {
+  resendClient ??= new Resend(process.env.RESEND_API_KEY);
+  return resendClient;
+}
 
 const FROM_EMAIL =
   process.env.RESEND_FROM_EMAIL ?? "noreply@legendarium.ru";
@@ -14,7 +21,7 @@ export async function sendPasswordResetEmail(
 ): Promise<void> {
   const resetUrl = `${APP_URL}/reset-password?token=${token}`;
 
-  await resend.emails.send({
+  await getResend().emails.send({
     from: FROM_EMAIL,
     to,
     subject: "Сброс пароля — Легендариум",
