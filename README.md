@@ -1,36 +1,105 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Легендариум
 
-## Getting Started
+Образовательная платформа о фольклоре народов России: легенды, мифы, сказки и
+предания, собранные по регионам и жанрам, с интерактивными заданиями,
+картой регионов и игровым сюжетом про Архивариуса Мирона и его утраченный
+архив.
 
-First, run the development server:
+Проект на [Next.js](https://nextjs.org) (App Router) с PostgreSQL и Prisma.
+
+## Возможности
+
+- **Библиотека материалов** — легенды, сказки и мифы с фильтрами по региону,
+  жанру и теме, плеером озвучки (Yandex SpeechKit) и аудиоплеером.
+- **Карта регионов** — интерактивная карта России с привязкой материалов к
+  регионам.
+- **Интерактивные задания** — 7 типов заданий (выбор ответа, сопоставление,
+  визуальная новелла, поиск скрытых объектов, «Кто я?», мемо, «Собери образ»)
+  с проверкой и сохранением прогресса.
+- **Цели и архив** — игровая механика восстановления архива: выполняя
+  задания, пользователь восстанавливает фрагменты и получает карточки.
+- **Личный кабинет** — прогресс, избранное, коллекция, история попыток.
+- **Админ-панель** — управление материалами, заданиями, целями и
+  справочниками (регионы, народы, жанры, темы, источники).
+- **Авторизация** — регистрация, вход, восстановление пароля по email.
+
+## Стек
+
+Next.js 16 · React 19 · TypeScript · Prisma 7 · PostgreSQL · Tailwind CSS 4 ·
+Leaflet (карта) · Playwright (e2e)
+
+## Запуск локально
+
+### 1. Зависимости
+
+```bash
+npm ci
+```
+
+### 2. База данных и переменные окружения
+
+Скопируйте `.env.example` в `.env` и заполните значения:
+
+```bash
+cp .env.example .env
+```
+
+```ini
+DATABASE_URL="postgresql://user:password@localhost:5432/legendariumdb"
+SESSION_SECRET="<сгенерируйте: node -e \"console.log(require('crypto').randomBytes(32).toString('hex'))\">"
+YANDEX_TTS_API_KEY=""   # опционально, для озвучки материалов
+```
+
+### 3. Миграции и тестовые данные
+
+```bash
+npx prisma migrate deploy
+npx prisma db seed
+```
+
+После заполнения доступны тестовые аккаунты:
+
+| Роль          | Email                 | Пароль   |
+|---------------|-----------------------|----------|
+| Администратор | admin@legendarium.ru  | admin123 |
+| Пользователь  | user@legendarium.ru   | user123  |
+
+### 4. Запуск
 
 ```bash
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Откройте [http://localhost:3000](http://localhost:3000).
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## Тесты
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+```bash
+npm run build && npm run start   # в одном терминале — приложение должно быть запущено
+npm run test:e2e                 # в другом терминале
+```
 
-## Learn More
+Для e2e-тестов база данных должна быть заполнена сидом (см. выше) — тесты
+используют тестового пользователя `user@legendarium.ru`.
 
-To learn more about Next.js, take a look at the following resources:
+## Структура проекта
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+```
+app/
+  page.tsx              — главная страница с прологом
+  library/              — библиотека материалов с фильтрами
+  materials/[id]/       — страница материала (текст, аудио, озвучка)
+  map/                  — интерактивная карта регионов
+  quests/               — список заданий и их прохождение
+  goals/                — цели и прогресс восстановления архива
+  profile/              — личный кабинет (архив, коллекция, избранное, попытки)
+  admin/                — админ-панель
+prisma/
+  schema.prisma         — схема базы данных
+  seed.ts, seedMaterials.ts — тестовые данные
+e2e/                     — Playwright-тесты
+```
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+## Деплой
 
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+Инструкция по развёртыванию на VPS — см. [DEPLOY.md](./DEPLOY.md).

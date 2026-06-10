@@ -691,6 +691,18 @@ async function createDemoGoals() {
     },
   });
 
+  const myth = await prisma.genre.findFirst({
+    where: {
+      name: "Миф",
+    },
+  });
+
+  const legendType = await prisma.genre.findFirst({
+    where: {
+      name: "Предание",
+    },
+  });
+
   const spirits = await prisma.topic.findFirst({
     where: {
       name: "Духи природы",
@@ -712,6 +724,18 @@ async function createDemoGoals() {
   const ritualGenre = await prisma.genre.findFirst({
     where: {
       name: "Обрядовый текст",
+    },
+  });
+
+  const worldOrigin = await prisma.topic.findFirst({
+    where: {
+      name: "Происхождение мира",
+    },
+  });
+
+  const journey = await prisma.topic.findFirst({
+    where: {
+      name: "Путешествие",
     },
   });
 
@@ -756,6 +780,36 @@ async function createDemoGoals() {
         cardImageUrl: "/materials/3.png",
         genres: { create: { genreId: ritualGenre.id } },
         topics: { create: { topicId: rituals.id } },
+      },
+    });
+  }
+
+  if (myth && worldOrigin) {
+    await prisma.goal.create({
+      data: {
+        title: "Хранитель мифов о творении",
+        description:
+          "Изучи мифы о происхождении мира, людей и природных сил у разных народов.",
+        requiredMaterialsCount: 3,
+        cardTitle: "Свидетель сотворения",
+        cardImageUrl: "/materials/4.png",
+        genres: { create: { genreId: myth.id } },
+        topics: { create: { topicId: worldOrigin.id } },
+      },
+    });
+  }
+
+  if (legendType && journey) {
+    await prisma.goal.create({
+      data: {
+        title: "Странник по преданиям",
+        description:
+          "Найди предания о путешествиях, дорогах и дальних странствиях.",
+        requiredMaterialsCount: 2,
+        cardTitle: "Вечный странник",
+        cardImageUrl: "/materials/5.png",
+        genres: { create: { genreId: legendType.id } },
+        topics: { create: { topicId: journey.id } },
       },
     });
   }

@@ -313,7 +313,7 @@ export default function MapView({ regions, goalStops }: MapViewProps) {
   );
 
   return (
-    <div className="grid min-h-[calc(100vh-135px)] gap-5 xl:grid-cols-[1fr_420px]">
+    <div className="grid gap-5 xl:min-h-[calc(100vh-135px)] xl:grid-cols-[1fr_420px]">
       <section className="relative overflow-hidden rounded-[2.4rem] border border-[#d8a342]/18 bg-[#09181c] shadow-2xl shadow-black/30">
         <div className="pointer-events-none absolute inset-0 z-[1] bg-[radial-gradient(circle_at_18%_18%,rgba(58,166,160,0.16),transparent_24%),radial-gradient(circle_at_82%_72%,rgba(216,163,66,0.12),transparent_28%)]" />
 
@@ -324,7 +324,7 @@ export default function MapView({ regions, goalStops }: MapViewProps) {
           maxZoom={8}
           scrollWheelZoom
           preferCanvas
-          className="relative z-[2] h-[calc(100vh-135px)] min-h-[690px] w-full"
+          className="relative z-[2] h-[60vh] min-h-[420px] w-full xl:h-[calc(100vh-135px)] xl:min-h-[690px]"
         >
           <TileLayer
             attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> &copy; <a href="https://carto.com/">CARTO</a>'
@@ -461,7 +461,7 @@ export default function MapView({ regions, goalStops }: MapViewProps) {
         )}
       </section>
 
-      <aside className="flex h-[calc(100vh-135px)] min-h-[690px] flex-col overflow-hidden rounded-[2.4rem] border border-[#d8a342]/16 bg-[#10272b]/88 p-6 shadow-2xl shadow-black/20 backdrop-blur-xl">
+      <aside className="flex h-[70vh] min-h-[420px] flex-col overflow-hidden rounded-[2.4rem] border border-[#d8a342]/16 bg-[#10272b]/88 p-6 shadow-2xl shadow-black/20 backdrop-blur-xl xl:h-[calc(100vh-135px)] xl:min-h-[690px]">
         {selectedRegion ? (
           <>
             <div className="mb-6 border-b border-white/10 pb-5">

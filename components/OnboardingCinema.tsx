@@ -79,12 +79,18 @@ export default function OnboardingCinema({ autoStart = true, onFinish }: Onboard
     if (typeof window === "undefined") return;
     ambientRef.current = new Audio("/sounds/onboarding-ambient.mp3");
     ambientRef.current.loop = true;
+    ambientRef.current.preload = "auto";
+    ambientRef.current.load();
 
     stormRef.current = new Audio("/sounds/onboarding-storm.mp3");
     stormRef.current.loop = true;
     stormRef.current.volume = 0;
+    stormRef.current.preload = "auto";
+    stormRef.current.load();
 
     pageRef.current = new Audio("/sounds/onboarding-page.mp3");
+    pageRef.current.preload = "auto";
+    pageRef.current.load();
 
     return () => {
       ambientRef.current?.pause();
