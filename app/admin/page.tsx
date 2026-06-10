@@ -2,11 +2,23 @@ import Image from "next/image";
 import Link from "next/link";
 import { requireAdmin } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
+import Pagination from "@/components/Pagination";
 import { archiveMaterialAction } from "./actions";
 import { logoutAction } from "../login/actions";
 
-export default async function AdminPage() {
+const MATERIALS_PAGE_SIZE = 20;
+
+type AdminPageProps = {
+  searchParams: Promise<{ page?: string }>;
+};
+
+export default async function AdminPage({ searchParams }: AdminPageProps) {
   const admin = await requireAdmin();
+
+  const params = await searchParams;
+  const requestedPage = Number(params.page);
+  const currentPage =
+    Number.isInteger(requestedPage) && requestedPage > 0 ? requestedPage : 1;
 
   const [
     materials,
@@ -30,6 +42,8 @@ export default async function AdminPage() {
       orderBy: {
         createdAt: "desc",
       },
+      skip: (currentPage - 1) * MATERIALS_PAGE_SIZE,
+      take: MATERIALS_PAGE_SIZE,
     }),
 
     prisma.material.count({
@@ -60,6 +74,10 @@ export default async function AdminPage() {
 
   const totalMaterials =
     publishedMaterialsCount + draftMaterialsCount + archivedMaterialsCount;
+  const totalPages = Math.max(
+    1,
+    Math.ceil(totalMaterials / MATERIALS_PAGE_SIZE),
+  );
 
   return (
     <main className="overflow-hidden bg-[#f4ecdf] pb-20">
@@ -293,6 +311,12 @@ export default async function AdminPage() {
               </table>
             </div>
           )}
+
+          <Pagination
+            currentPage={currentPage}
+            totalPages={totalPages}
+            basePath="/admin"
+          />
         </section>
       </section>
     </main>

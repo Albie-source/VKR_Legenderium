@@ -1,34 +1,54 @@
 import Link from "next/link";
 import { requireUser } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
+import Pagination from "@/components/Pagination";
 
-export default async function AttemptsPage() {
+const ATTEMPTS_PAGE_SIZE = 20;
+
+type AttemptsPageProps = {
+  searchParams: Promise<{ page?: string }>;
+};
+
+export default async function AttemptsPage({ searchParams }: AttemptsPageProps) {
   const user = await requireUser();
 
-  const attempts = await prisma.taskAttempt.findMany({
-    where: {
-      userId: user.id,
-    },
-    include: {
-      task: {
-        include: {
-          material: {
-            include: {
-              region: true,
-              people: true,
-              genre: true,
+  const params = await searchParams;
+  const requestedPage = Number(params.page);
+  const currentPage =
+    Number.isInteger(requestedPage) && requestedPage > 0 ? requestedPage : 1;
+
+  const [attempts, totalCount, successfulCount] = await Promise.all([
+    prisma.taskAttempt.findMany({
+      where: {
+        userId: user.id,
+      },
+      include: {
+        task: {
+          include: {
+            material: {
+              include: {
+                region: true,
+                people: true,
+                genre: true,
+              },
             },
           },
         },
       },
-    },
-    orderBy: {
-      completedAt: "desc",
-    },
-  });
+      orderBy: {
+        completedAt: "desc",
+      },
+      skip: (currentPage - 1) * ATTEMPTS_PAGE_SIZE,
+      take: ATTEMPTS_PAGE_SIZE,
+    }),
+    prisma.taskAttempt.count({ where: { userId: user.id } }),
+    prisma.taskAttempt.count({
+      where: { userId: user.id, isCompleted: true },
+    }),
+  ]);
 
-  const successfulAttempts = attempts.filter((attempt) => attempt.isCompleted);
-  const failedAttempts = attempts.filter((attempt) => !attempt.isCompleted);
+  const failedCount = totalCount - successfulCount;
+  const totalPages = Math.max(1, Math.ceil(totalCount / ATTEMPTS_PAGE_SIZE));
 
   return (
     <main className="min-h-screen bg-stone-50 text-stone-900">
@@ -61,16 +81,16 @@ export default async function AttemptsPage() {
             </div>
 
             <div className="grid grid-cols-3 gap-3">
-              <HeroStat title="Всего" value={attempts.length} />
-              <HeroStat title="Успешно" value={successfulAttempts.length} />
-              <HeroStat title="Ошибок" value={failedAttempts.length} />
+              <HeroStat title="Всего" value={totalCount} />
+              <HeroStat title="Успешно" value={successfulCount} />
+              <HeroStat title="Ошибок" value={failedCount} />
             </div>
           </div>
         </div>
       </section>
 
       <section className="mx-auto max-w-7xl px-6 py-10">
-        {attempts.length === 0 ? (
+        {totalCount === 0 ? (
           <EmptyState />
         ) : (
           <div className="overflow-hidden rounded-[2rem] border border-stone-200 bg-white shadow-sm">
@@ -164,6 +184,13 @@ export default async function AttemptsPage() {
             </div>
           </div>
         )}
+
+        <Pagination
+          currentPage={currentPage}
+          totalPages={totalPages}
+          basePath="/profile/attempts"
+          light
+        />
       </section>
     </main>
   );

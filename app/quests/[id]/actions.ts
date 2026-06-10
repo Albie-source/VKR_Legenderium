@@ -3,22 +3,7 @@
 import { getCurrentUser } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { markMaterialRestored } from "@/lib/materialProgress";
-
-type SingleChoiceConfig = {
-  question: string;
-  options: string[];
-  correctAnswer: string;
-  explanation?: string | null;
-};
-
-type MatchingConfig = {
-  question: string;
-  pairs: {
-    left: string;
-    right: string;
-  }[];
-  explanation?: string | null;
-};
+import { checkTaskAnswer } from "@/lib/taskAnswers";
 
 type SaveTaskResult = {
   isAuthenticated: boolean;
@@ -33,40 +18,6 @@ type SaveTaskResult = {
   fragmentTitle: string | null;
   error?: string;
 };
-
-function isSingleChoiceConfig(config: unknown): config is SingleChoiceConfig {
-  if (!config || typeof config !== "object") {
-    return false;
-  }
-
-  const value = config as Partial<SingleChoiceConfig>;
-
-  return (
-    typeof value.question === "string" &&
-    Array.isArray(value.options) &&
-    typeof value.correctAnswer === "string"
-  );
-}
-
-function isMatchingConfig(config: unknown): config is MatchingConfig {
-  if (!config || typeof config !== "object") {
-    return false;
-  }
-
-  const value = config as Partial<MatchingConfig>;
-
-  return (
-    typeof value.question === "string" &&
-    Array.isArray(value.pairs) &&
-    value.pairs.every(
-      (pair) =>
-        pair &&
-        typeof pair === "object" &&
-        typeof (pair as { left?: unknown }).left === "string" &&
-        typeof (pair as { right?: unknown }).right === "string"
-    )
-  );
-}
 
 export async function saveTaskResultAction(
   taskId: number,
@@ -95,13 +46,9 @@ export async function saveTaskResultAction(
       };
     }
 
-    let isCorrect = false;
+    const checkResult = checkTaskAnswer(task.type, task.config, selectedAnswer);
 
-    if (task.type === "single_choice" && isSingleChoiceConfig(task.config)) {
-      isCorrect = selectedAnswer === task.config.correctAnswer;
-    } else if (task.type === "matching" && isMatchingConfig(task.config)) {
-      isCorrect = checkMatchingAnswer(task.config, selectedAnswer);
-    } else {
+    if (checkResult === null) {
       return {
         isAuthenticated: Boolean(user),
         isCorrect: false,
@@ -111,6 +58,8 @@ export async function saveTaskResultAction(
         fragmentTitle: null,
       };
     }
+
+    const isCorrect = checkResult;
 
     if (!user) {
       return {
@@ -253,15 +202,5 @@ export async function saveTaskResultAction(
       fragmentTitle: null,
       error: "Произошла ошибка при сохранении результата. Попробуйте снова.",
     };
-  }
-}
-
-function checkMatchingAnswer(config: MatchingConfig, selectedAnswer: string) {
-  try {
-    const parsed = JSON.parse(selectedAnswer) as Record<string, string>;
-
-    return config.pairs.every((pair) => parsed[pair.left] === pair.right);
-  } catch {
-    return false;
   }
 }
