@@ -20,6 +20,76 @@ type MatchingConfig = {
   explanation?: string | null;
 };
 
+type VisualNovelScene = {
+  id: string;
+  text: string;
+  imageUrl?: string | null;
+  isEnd?: boolean;
+  isCorrect?: boolean;
+  choices?: { text: string; nextScene: string }[];
+};
+
+type VisualNovelConfig = {
+  scenes: VisualNovelScene[];
+  explanation?: string | null;
+};
+
+type HiddenObject = {
+  id: string;
+  label: string;
+  x: number;
+  y: number;
+  radius: number;
+};
+
+type HiddenObjectsConfig = {
+  question: string;
+  imageUrl: string;
+  objects: HiddenObject[];
+  explanation?: string | null;
+};
+
+type WhoAmIConfig = {
+  clues: string[];
+  answer: string;
+  options: string[];
+  explanation?: string | null;
+};
+
+type MemoPair = {
+  id: string;
+  cardA: string;
+  cardB: string;
+  image?: string | null;
+};
+
+type MemoConfig = {
+  question: string;
+  pairs: MemoPair[];
+  cardBack?: string | null;
+  explanation?: string | null;
+};
+
+type OutfitSlot = {
+  id: string;
+  label: string;
+  correctItem: string;
+};
+
+type OutfitItem = {
+  id: string;
+  label: string;
+  slotId: string;
+};
+
+type AssembleOutfitConfig = {
+  question: string;
+  character?: string | null;
+  slots: OutfitSlot[];
+  items: OutfitItem[];
+  explanation?: string | null;
+};
+
 type SaveTaskResult = {
   isAuthenticated: boolean;
   isCorrect: boolean;
@@ -68,6 +138,86 @@ function isMatchingConfig(config: unknown): config is MatchingConfig {
   );
 }
 
+function isVisualNovelConfig(config: unknown): config is VisualNovelConfig {
+  if (!config || typeof config !== "object") {
+    return false;
+  }
+
+  const value = config as Partial<VisualNovelConfig>;
+
+  return (
+    Array.isArray(value.scenes) &&
+    value.scenes.length > 0 &&
+    value.scenes.every(
+      (scene) =>
+        scene &&
+        typeof scene === "object" &&
+        typeof (scene as { id?: unknown }).id === "string"
+    )
+  );
+}
+
+function isHiddenObjectsConfig(config: unknown): config is HiddenObjectsConfig {
+  if (!config || typeof config !== "object") {
+    return false;
+  }
+
+  const value = config as Partial<HiddenObjectsConfig>;
+
+  return (
+    typeof value.question === "string" &&
+    typeof value.imageUrl === "string" &&
+    Array.isArray(value.objects) &&
+    value.objects.every(
+      (obj) => obj && typeof obj === "object" && typeof (obj as { id?: unknown }).id === "string"
+    )
+  );
+}
+
+function isWhoAmIConfig(config: unknown): config is WhoAmIConfig {
+  if (!config || typeof config !== "object") {
+    return false;
+  }
+
+  const value = config as Partial<WhoAmIConfig>;
+
+  return (
+    Array.isArray(value.clues) &&
+    typeof value.answer === "string" &&
+    Array.isArray(value.options)
+  );
+}
+
+function isMemoConfig(config: unknown): config is MemoConfig {
+  if (!config || typeof config !== "object") {
+    return false;
+  }
+
+  const value = config as Partial<MemoConfig>;
+
+  return (
+    typeof value.question === "string" &&
+    Array.isArray(value.pairs) &&
+    value.pairs.every(
+      (pair) => pair && typeof pair === "object" && typeof (pair as { id?: unknown }).id === "string"
+    )
+  );
+}
+
+function isAssembleOutfitConfig(config: unknown): config is AssembleOutfitConfig {
+  if (!config || typeof config !== "object") {
+    return false;
+  }
+
+  const value = config as Partial<AssembleOutfitConfig>;
+
+  return (
+    typeof value.question === "string" &&
+    Array.isArray(value.slots) &&
+    Array.isArray(value.items)
+  );
+}
+
 export async function saveTaskResultAction(
   taskId: number,
   selectedAnswer: string
@@ -101,6 +251,16 @@ export async function saveTaskResultAction(
       isCorrect = selectedAnswer === task.config.correctAnswer;
     } else if (task.type === "matching" && isMatchingConfig(task.config)) {
       isCorrect = checkMatchingAnswer(task.config, selectedAnswer);
+    } else if (task.type === "who_am_i" && isWhoAmIConfig(task.config)) {
+      isCorrect = selectedAnswer === task.config.answer;
+    } else if (task.type === "hidden_objects" && isHiddenObjectsConfig(task.config)) {
+      isCorrect = checkHiddenObjectsAnswer(task.config, selectedAnswer);
+    } else if (task.type === "memo" && isMemoConfig(task.config)) {
+      isCorrect = checkMemoAnswer(task.config, selectedAnswer);
+    } else if (task.type === "assemble_outfit" && isAssembleOutfitConfig(task.config)) {
+      isCorrect = checkAssembleOutfitAnswer(task.config, selectedAnswer);
+    } else if (task.type === "visual_novel" && isVisualNovelConfig(task.config)) {
+      isCorrect = checkVisualNovelAnswer(task.config, selectedAnswer);
     } else {
       return {
         isAuthenticated: Boolean(user),
@@ -261,6 +421,51 @@ function checkMatchingAnswer(config: MatchingConfig, selectedAnswer: string) {
     const parsed = JSON.parse(selectedAnswer) as Record<string, string>;
 
     return config.pairs.every((pair) => parsed[pair.left] === pair.right);
+  } catch {
+    return false;
+  }
+}
+
+function checkHiddenObjectsAnswer(config: HiddenObjectsConfig, selectedAnswer: string) {
+  try {
+    const parsed = JSON.parse(selectedAnswer) as { found?: string[] };
+    const found = new Set(parsed.found ?? []);
+
+    return config.objects.every((obj) => found.has(obj.id));
+  } catch {
+    return false;
+  }
+}
+
+function checkMemoAnswer(config: MemoConfig, selectedAnswer: string) {
+  try {
+    const parsed = JSON.parse(selectedAnswer) as { matched?: string[] };
+    const matched = new Set(parsed.matched ?? []);
+
+    return config.pairs.every(
+      (pair) => matched.has(`${pair.id}-A`) && matched.has(`${pair.id}-B`)
+    );
+  } catch {
+    return false;
+  }
+}
+
+function checkAssembleOutfitAnswer(config: AssembleOutfitConfig, selectedAnswer: string) {
+  try {
+    const parsed = JSON.parse(selectedAnswer) as Record<string, string>;
+
+    return config.slots.every((slot) => parsed[slot.id] === slot.correctItem);
+  } catch {
+    return false;
+  }
+}
+
+function checkVisualNovelAnswer(config: VisualNovelConfig, selectedAnswer: string) {
+  try {
+    const parsed = JSON.parse(selectedAnswer) as { endScene?: string };
+    const scene = config.scenes.find((s) => s.id === parsed.endScene);
+
+    return Boolean(scene?.isEnd && scene.isCorrect);
   } catch {
     return false;
   }
