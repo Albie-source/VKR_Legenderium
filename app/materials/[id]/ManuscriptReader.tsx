@@ -78,19 +78,29 @@ export default function ManuscriptReader({ text }: { text: string }) {
         return;
       }
 
+      // The visible page adds a margin-top between consecutive paragraphs
+      // (.manuscript-card-body > .manuscript-paragraph + .manuscript-paragraph),
+      // but the off-screen measurer renders paragraphs inside an extra wrapper,
+      // so that selector never matches there and offsetHeight excludes this gap.
+      // Without accounting for it, pages are packed too full, the extra height
+      // gets clipped by overflow: hidden, and that text never appears anywhere.
+      const rootFontSize = parseFloat(window.getComputedStyle(document.documentElement).fontSize) || 16;
+      const paragraphGap = rootFontSize * 1.4;
+
       const next: number[][] = [];
       let current: number[] = [];
       let used = 0;
 
       for (let i = 0; i < paragraphs.length; i++) {
         const height = blockRefs.current[i]?.offsetHeight ?? 0;
-        if (current.length && used + height > available) {
+        const addition = current.length > 0 ? paragraphGap + height : height;
+        if (current.length && used + addition > available) {
           next.push(current);
           current = [i];
           used = height;
         } else {
           current.push(i);
-          used += height;
+          used += addition;
         }
       }
       if (current.length) next.push(current);
