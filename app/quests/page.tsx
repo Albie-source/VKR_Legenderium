@@ -2,22 +2,37 @@ import { prisma } from "@/lib/prisma";
 import Link from "next/link";
 import MascotHint from "@/components/MascotHint";
 import QuestsFilter from "./QuestsFilter";
+import { getCurrentUser } from "@/lib/auth";
 
 export default async function QuestsPage() {
-  const tasks = await prisma.interactiveTask.findMany({
-    include: {
-      material: {
-        include: {
-          region: true,
-          genre: true,
-          topics: {
-            include: { topic: true },
+  const [tasks, user] = await Promise.all([
+    prisma.interactiveTask.findMany({
+      include: {
+        material: {
+          include: {
+            region: true,
+            genre: true,
+            topics: {
+              include: { topic: true },
+            },
           },
         },
       },
-    },
-    orderBy: { createdAt: "desc" },
-  });
+      orderBy: { createdAt: "desc" },
+    }),
+    getCurrentUser(),
+  ]);
+
+  let completedTaskIds: number[] = [];
+
+  if (user) {
+    const completedAttempts = await prisma.taskAttempt.findMany({
+      where: { userId: user.id, isCompleted: true },
+      select: { taskId: true },
+      distinct: ["taskId"],
+    });
+    completedTaskIds = completedAttempts.map((attempt) => attempt.taskId);
+  }
 
   return (
     <main className="overflow-hidden bg-[#0b1f22] pb-20">
@@ -63,7 +78,7 @@ export default async function QuestsPage() {
         {tasks.length === 0 ? (
           <EmptyState />
         ) : (
-          <QuestsFilter tasks={tasks} />
+          <QuestsFilter tasks={tasks} completedTaskIds={completedTaskIds} />
         )}
       </section>
     </main>

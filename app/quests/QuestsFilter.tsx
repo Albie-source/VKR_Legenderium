@@ -52,9 +52,18 @@ function getTaskCover(task: TaskItem): { src: string; alt: string } | null {
   return null;
 }
 
-export default function QuestsFilter({ tasks }: { tasks: TaskItem[] }) {
+export default function QuestsFilter({
+  tasks,
+  completedTaskIds,
+}: {
+  tasks: TaskItem[];
+  completedTaskIds: number[];
+}) {
   const [activeType, setActiveType] = useState<string | null>(null);
   const [activeDifficulty, setActiveDifficulty] = useState<string | null>(null);
+  const [hideCompleted, setHideCompleted] = useState(false);
+
+  const completedSet = useMemo(() => new Set(completedTaskIds), [completedTaskIds]);
 
   const availableTypes = useMemo(
     () => [...new Set(tasks.map((t) => t.type))],
@@ -70,15 +79,17 @@ export default function QuestsFilter({ tasks }: { tasks: TaskItem[] }) {
     return tasks.filter((t) => {
       if (activeType && t.type !== activeType) return false;
       if (activeDifficulty && t.difficulty !== activeDifficulty) return false;
+      if (hideCompleted && completedSet.has(t.id)) return false;
       return true;
     });
-  }, [tasks, activeType, activeDifficulty]);
+  }, [tasks, activeType, activeDifficulty, hideCompleted, completedSet]);
 
-  const hasFilters = activeType !== null || activeDifficulty !== null;
+  const hasFilters = activeType !== null || activeDifficulty !== null || hideCompleted;
 
   function resetFilters() {
     setActiveType(null);
     setActiveDifficulty(null);
+    setHideCompleted(false);
   }
 
   return (
@@ -139,6 +150,26 @@ export default function QuestsFilter({ tasks }: { tasks: TaskItem[] }) {
           </div>
         )}
 
+        {completedSet.size > 0 && (
+          <div className="mb-6">
+            <p className="mb-2.5 text-xs font-black uppercase tracking-[0.22em] text-stone-500">
+              Прогресс
+            </p>
+            <button
+              type="button"
+              onClick={() => setHideCompleted((v) => !v)}
+              className={[
+                "rounded-full border px-4 py-2 text-sm font-bold transition",
+                hideCompleted
+                  ? "border-emerald-400 bg-emerald-500 text-white"
+                  : "border-[#dccab3] bg-white text-stone-700 hover:border-emerald-400 hover:text-emerald-700",
+              ].join(" ")}
+            >
+              Скрыть выполненные
+            </button>
+          </div>
+        )}
+
         {hasFilters && (
           <button
             type="button"
@@ -180,7 +211,7 @@ export default function QuestsFilter({ tasks }: { tasks: TaskItem[] }) {
         ) : (
           <div className="grid gap-5 md:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4">
             {filtered.map((task) => (
-              <TaskCard key={task.id} task={task} />
+              <TaskCard key={task.id} task={task} isCompleted={completedSet.has(task.id)} />
             ))}
           </div>
         )}
@@ -189,11 +220,16 @@ export default function QuestsFilter({ tasks }: { tasks: TaskItem[] }) {
   );
 }
 
-function TaskCard({ task }: { task: TaskItem }) {
+function TaskCard({ task, isCompleted }: { task: TaskItem; isCompleted: boolean }) {
   const cover = getTaskCover(task);
 
   return (
-    <article className="animate-fade-in-up group flex flex-col overflow-hidden rounded-[1.5rem] border border-[#e4d4bf] bg-white shadow-md transition hover:-translate-y-1 hover:shadow-xl">
+    <article
+      className={[
+        "animate-fade-in-up group flex flex-col overflow-hidden rounded-[1.5rem] border bg-white shadow-md transition hover:-translate-y-1 hover:shadow-xl",
+        isCompleted ? "border-emerald-300" : "border-[#e4d4bf]",
+      ].join(" ")}
+    >
       <div className="relative h-32 overflow-hidden bg-[#eadfce]">
         {cover ? (
           <Image
@@ -221,6 +257,15 @@ function TaskCard({ task }: { task: TaskItem }) {
             </span>
           )}
         </div>
+
+        {isCompleted && (
+          <div className="absolute right-3 top-3 flex items-center gap-1 rounded-full border border-emerald-300 bg-emerald-500/90 px-2.5 py-0.5 text-[11px] font-extrabold text-white shadow-sm backdrop-blur">
+            <svg className="h-3 w-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={3}>
+              <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
+            </svg>
+            Выполнено
+          </div>
+        )}
       </div>
 
       <div className="flex flex-1 flex-col p-4">
