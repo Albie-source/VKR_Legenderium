@@ -822,8 +822,11 @@ function MemoTask({
       </div>
 
       <div
-        className="mb-7 grid gap-3"
-        style={{ gridTemplateColumns: `repeat(${cards.length > 12 ? 5 : Math.min(cards.length, 4)}, 1fr)` }}
+        className="memo-grid mb-7 grid gap-2 sm:gap-3"
+        style={{
+          "--memo-cols-mobile": Math.min(cards.length > 12 ? 5 : Math.min(cards.length, 4), 3),
+          "--memo-cols-desktop": cards.length > 12 ? 5 : Math.min(cards.length, 4),
+        } as React.CSSProperties}
       >
         {cards.map((card) => {
           const isFlipped = flipped.has(card.id) || matched.has(card.id);
@@ -845,9 +848,9 @@ function MemoTask({
             >
               {card.image ? (
                 isFlipped ? (
-                  <Image src={card.image} alt={card.label} fill sizes="160px" className="object-cover" />
+                  <Image src={card.image} alt={card.label} fill sizes="(max-width: 640px) 33vw, 160px" className="object-cover" />
                 ) : config.cardBack ? (
-                  <Image src={config.cardBack} alt="" fill sizes="160px" className="object-cover" />
+                  <Image src={config.cardBack} alt="" fill sizes="(max-width: 640px) 33vw, 160px" className="object-cover" />
                 ) : (
                   <span className="flex h-full w-full items-center justify-center p-2 leading-snug">?</span>
                 )

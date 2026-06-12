@@ -607,6 +607,18 @@ select {
   }
 }
 
+/* ───────────────────────── Memo task grid ───────────────────────── */
+
+.memo-grid {
+  grid-template-columns: repeat(var(--memo-cols-mobile), 1fr);
+}
+
+@media (min-width: 640px) {
+  .memo-grid {
+    grid-template-columns: repeat(var(--memo-cols-desktop), 1fr);
+  }
+}
+
 /* ───────────────────────── Sound bars animation ───────────────────────── */
 
 @keyframes soundBar {
