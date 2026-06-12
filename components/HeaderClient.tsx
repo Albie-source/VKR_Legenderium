@@ -80,6 +80,7 @@ export default function HeaderClient({ user, goals }: HeaderClientProps) {
           ) : user ? (
             <Link
               id="nav-profile"
+              data-onboarding-id="nav-profile"
               href="/profile"
               className="rounded-2xl bg-[#d8a342] px-5 py-3 text-sm font-extrabold !text-[#06151a] shadow-md transition hover:bg-[#f0bd5b]"
             >
@@ -118,9 +119,9 @@ export default function HeaderClient({ user, goals }: HeaderClientProps) {
         })()}
 
         <nav className="flex gap-3 overflow-x-auto border-t border-white/10 px-6 py-3 md:hidden">
-          <MobileNavLink href="/map" active={isNavActive(pathname, "/map")}>Карта</MobileNavLink>
-          <MobileNavLink href="/library" active={isNavActive(pathname, "/library")}>Библиотека</MobileNavLink>
-          <MobileNavLink href="/quests" active={isNavActive(pathname, "/quests")}>Задания</MobileNavLink>
+          <MobileNavLink href="/map" highlightId="nav-map" active={isNavActive(pathname, "/map")}>Карта</MobileNavLink>
+          <MobileNavLink href="/library" highlightId="nav-library" active={isNavActive(pathname, "/library")}>Библиотека</MobileNavLink>
+          <MobileNavLink href="/quests" highlightId="nav-quests" active={isNavActive(pathname, "/quests")}>Задания</MobileNavLink>
 
           {user && (
             <button
@@ -159,6 +160,7 @@ function HeaderNavItem({
   return (
     <Link
       id={id}
+      data-onboarding-id={id}
       href={href}
       className={[
         "rounded-xl border-b-2 px-2 py-1 text-[16px] font-extrabold transition",
@@ -192,16 +194,19 @@ function HeaderNavButton({
 
 function MobileNavLink({
   href,
+  highlightId,
   active,
   children,
 }: {
   href: string;
+  highlightId?: string;
   active?: boolean;
   children: ReactNode;
 }) {
   return (
     <Link
       href={href}
+      data-onboarding-id={highlightId}
       className={[
         "shrink-0 rounded-2xl border px-4 py-2 text-sm font-extrabold",
         active

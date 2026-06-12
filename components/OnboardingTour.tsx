@@ -75,17 +75,17 @@ export default function OnboardingTour({ autoStart = true, onFinish }: Onboardin
     }
   }, [autoStart]);
 
-  // Highlight nav item
+  // Highlight nav item (desktop and mobile nav both carry the same data attribute)
   useEffect(() => {
     if (step === null) return;
     const currentStep = STEPS[step];
     if (!currentStep?.highlightId) return;
 
-    const el = document.getElementById(currentStep.highlightId);
-    if (el) {
-      el.classList.add("onboarding-highlight");
-      return () => el.classList.remove("onboarding-highlight");
-    }
+    const elements = document.querySelectorAll(
+      `[data-onboarding-id="${currentStep.highlightId}"]`
+    );
+    elements.forEach((el) => el.classList.add("onboarding-highlight"));
+    return () => elements.forEach((el) => el.classList.remove("onboarding-highlight"));
   }, [step]);
 
   function handleNext() {
@@ -122,11 +122,11 @@ export default function OnboardingTour({ autoStart = true, onFinish }: Onboardin
         onClick={finish}
       />
 
-      {/* Full-body illustration on first step */}
+      {/* Full-body illustration on first step (desktop only — too wide for mobile viewports) */}
       {step === 0 && (
         <div
           className={[
-            "fixed bottom-0 left-48 z-50 pointer-events-none transition-all duration-500",
+            "fixed bottom-0 left-48 z-50 hidden pointer-events-none transition-all duration-500 lg:block",
             closing ? "opacity-0 translate-y-8" : "opacity-100 translate-y-0",
           ].join(" ")}
         >

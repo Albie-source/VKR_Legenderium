@@ -154,6 +154,21 @@ export default function OnboardingCinema({ autoStart = true, onFinish }: Onboard
     }
   }, [autoStart]);
 
+  // Preload scene backgrounds and character sprites so transitions don't flash/glitch
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+    const sources = [
+      ...Object.values(SCENE_BG),
+      ...Object.values(STUDENT_SPRITE),
+      "/images/miron-happy.png",
+      "/images/miron-sad.png",
+    ];
+    sources.forEach((src) => {
+      const img = new window.Image();
+      img.src = src;
+    });
+  }, []);
+
   // Crossfade background when scene changes
   useEffect(() => {
     if (beatIndex === null) return;
@@ -218,7 +233,7 @@ export default function OnboardingCinema({ autoStart = true, onFinish }: Onboard
 
   if (beatIndex === null && showSplash) {
     return (
-      <div className="fixed inset-0 z-50 select-none">
+      <div className="fixed inset-0 z-50 select-none bg-[#06151a]">
         {/* Background */}
         <div
           className="absolute inset-0 bg-cover bg-center"
@@ -282,7 +297,7 @@ export default function OnboardingCinema({ autoStart = true, onFinish }: Onboard
   return (
     <div
       className={[
-        "fixed inset-0 z-50 cursor-pointer select-none transition-opacity duration-500",
+        "fixed inset-0 z-50 cursor-pointer select-none bg-[#06151a] transition-opacity duration-500",
         closing ? "opacity-0" : "opacity-100",
       ].join(" ")}
       onClick={handleAdvance}
