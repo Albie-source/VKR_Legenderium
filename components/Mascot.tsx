@@ -40,7 +40,7 @@ export default function Mascot({
   return (
     <div
       className={[
-        "pointer-events-auto flex max-w-sm items-end gap-3 transition-all duration-500",
+        "pointer-events-auto flex max-w-[calc(100vw-3rem)] items-end gap-3 transition-all duration-500 sm:max-w-sm",
         visible ? "translate-y-0 opacity-100" : "translate-y-6 opacity-0",
       ].join(" ")}
     >
