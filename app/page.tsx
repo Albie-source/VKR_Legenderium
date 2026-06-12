@@ -33,7 +33,7 @@ export default async function HomePage() {
                 Фольклор народов России
               </p>
 
-              <h1 className="animate-fade-in-up delay-100 mb-6 text-6xl font-extrabold leading-[0.95] tracking-tight text-[#fff8e8] drop-shadow-lg md:text-7xl">
+              <h1 className="animate-fade-in-up delay-100 mb-6 text-4xl font-extrabold leading-[0.95] tracking-tight text-[#fff8e8] drop-shadow-lg sm:text-6xl md:text-7xl">
                 Легендариум
               </h1>
 
